@@ -179,10 +179,12 @@ public abstract class ActionService extends Service {
      * A <code>WakeLock</code> is acquired while this action is executing.
      * </p>
      * @param intent to process
+     * @throws InterruptedException if the action is cancelled
+     * @throws ActionExecutionFailedException if the action failed to execute
      * @see #isActionCancelled(Intent)
      */
     protected abstract void handleAction(Intent intent)
-            throws InterruptedException;
+            throws ActionExecutionFailedException, InterruptedException;
     
     /**
      * Internal thread for executing actions.
