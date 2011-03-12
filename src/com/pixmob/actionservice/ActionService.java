@@ -160,6 +160,16 @@ public abstract class ActionService extends Service {
     }
     
     /**
+     * This method is invoked when an action failed to execute.
+     * @param intent action which failed
+     * @param error action error
+     */
+    protected void onActionError(Intent intent, Exception error) {
+        Log.w(TAG, serviceName + " got an error when executing action: "
+                + intent, error);
+    }
+    
+    /**
      * Check if this intent should interrupt the current action. The internal
      * thread executing the action will be interrupted: the methode
      * {@link #handleAction(Intent)} will have to handle the
@@ -235,8 +245,7 @@ public abstract class ActionService extends Service {
                                     + serviceName);
                         }
                     } catch (Exception e) {
-                        Log.w(TAG, serviceName
-                                + " got an error when executing action", e);
+                        onActionError(nextIntent, e);
                     }
                 }
                 
