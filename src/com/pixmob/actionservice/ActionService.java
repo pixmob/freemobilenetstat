@@ -166,7 +166,7 @@ public abstract class ActionService extends Service {
     /**
      * Check if this intent should interrupt the current action. The internal
      * thread executing the action will be interrupted: the methode
-     * {@link #handleAction(Intent)} will have to handle the
+     * {@link #onHandleAction(Intent)} will have to handle the
      * {@link InterruptedException} error.
      * @param intent to check
      * @return <code>true</code> if the current action should be interrupted
@@ -187,7 +187,7 @@ public abstract class ActionService extends Service {
      * @throws ActionExecutionFailedException if the action failed to execute
      * @see #isActionCancelled(Intent)
      */
-    protected abstract void handleAction(Intent intent) throws ActionExecutionFailedException,
+    protected abstract void onHandleAction(Intent intent) throws ActionExecutionFailedException,
             InterruptedException;
     
     /**
@@ -224,7 +224,7 @@ public abstract class ActionService extends Service {
                             cancelAction.set(false);
                             
                             // delegate to handleAction
-                            handleAction(nextIntent);
+                            onHandleAction(nextIntent);
                         }
                     } catch (InterruptedException e) {
                         if (Thread.interrupted() && !cancelAction.get()) {
