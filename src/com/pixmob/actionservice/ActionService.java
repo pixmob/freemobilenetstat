@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Alexandre Roman
+ * Copyright (C) 2011 Pixmob (http://github.com/pixmob)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,13 +69,11 @@ public abstract class ActionService extends Service {
             throw new IllegalArgumentException("Service name is required");
         }
         if (idleTimeout < 0) {
-            throw new IllegalArgumentException(
-                    "Idle timeout must be positive: " + idleTimeout);
+            throw new IllegalArgumentException("Idle timeout must be positive: " + idleTimeout);
         }
         if (intentBacklogSize < 0) {
-            throw new IllegalArgumentException(
-                    "Intent backlog size must be positive: "
-                            + intentBacklogSize);
+            throw new IllegalArgumentException("Intent backlog size must be positive: "
+                    + intentBacklogSize);
         }
         this.serviceName = serviceName;
         this.idleTimeout = idleTimeout;
@@ -100,8 +98,8 @@ public abstract class ActionService extends Service {
         super.onCreate();
         
         final PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-            ActionService.class.getName() + "#" + serviceName);
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, ActionService.class.getName()
+                + "#" + serviceName);
         
         intentBacklog = new ArrayBlockingQueue<Intent>(intentBacklogSize);
         
@@ -129,8 +127,7 @@ public abstract class ActionService extends Service {
         try {
             actionCancelled = isActionCancelled(intent);
         } catch (Exception e) {
-            Log.e(TAG,
-                serviceName + " got an error when executing isCancelled", e);
+            Log.e(TAG, serviceName + " got an error when executing isCancelled", e);
         }
         
         if (actionCancelled) {
@@ -141,8 +138,7 @@ public abstract class ActionService extends Service {
             try {
                 onActionRejected(intent);
             } catch (Exception e) {
-                Log.e(TAG, serviceName
-                        + " got an error when executing onActionRejected", e);
+                Log.e(TAG, serviceName + " got an error when executing onActionRejected", e);
             }
         } else {
             Log.d(TAG, "Action queued for " + serviceName + ": " + intent);
@@ -155,8 +151,7 @@ public abstract class ActionService extends Service {
      * @param intent rejected action
      */
     protected void onActionRejected(Intent intent) {
-        Log.w(TAG, "Action backlog is full for " + serviceName
-                + ": cannot queue intent " + intent);
+        Log.w(TAG, "Action backlog is full for " + serviceName + ": cannot queue intent " + intent);
     }
     
     /**
@@ -165,8 +160,7 @@ public abstract class ActionService extends Service {
      * @param error action error
      */
     protected void onActionError(Intent intent, Exception error) {
-        Log.w(TAG, serviceName + " got an error when executing action: "
-                + intent, error);
+        Log.w(TAG, serviceName + " got an error when executing action: " + intent, error);
     }
     
     /**
@@ -193,8 +187,8 @@ public abstract class ActionService extends Service {
      * @throws ActionExecutionFailedException if the action failed to execute
      * @see #isActionCancelled(Intent)
      */
-    protected abstract void handleAction(Intent intent)
-            throws ActionExecutionFailedException, InterruptedException;
+    protected abstract void handleAction(Intent intent) throws ActionExecutionFailedException,
+            InterruptedException;
     
     /**
      * Internal thread for executing actions.
@@ -218,15 +212,13 @@ public abstract class ActionService extends Service {
                 
                 while (running) {
                     try {
-                        nextIntent = intentBacklog.poll(idleTimeout,
-                            TimeUnit.MILLISECONDS);
+                        nextIntent = intentBacklog.poll(idleTimeout, TimeUnit.MILLISECONDS);
                         if (nextIntent == null) {
-                            Log.d(TAG, "No action was recently received: "
-                                    + serviceName + " is stopping");
+                            Log.d(TAG, "No action was recently received: " + serviceName
+                                    + " is stopping");
                             running = false;
                         } else {
-                            Log.d(TAG, serviceName + " is executing action "
-                                    + nextIntent);
+                            Log.d(TAG, serviceName + " is executing action " + nextIntent);
                             
                             // reset the cancel flag
                             cancelAction.set(false);
@@ -241,8 +233,7 @@ public abstract class ActionService extends Service {
                         } else {
                             // the action was canceled as the result of
                             // interrupting the thread
-                            Log.d(TAG, "Action was canceled: rescheduling "
-                                    + serviceName);
+                            Log.d(TAG, "Action was canceled: rescheduling " + serviceName);
                         }
                     } catch (Exception e) {
                         onActionError(nextIntent, e);

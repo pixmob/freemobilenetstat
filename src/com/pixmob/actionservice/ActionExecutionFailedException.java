@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Alexandre Roman
+ * Copyright (C) 2011 Pixmob (http://github.com/pixmob)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,7 @@ public class ActionExecutionFailedException extends Exception {
         this("Action execution failed", cause);
     }
     
-    public ActionExecutionFailedException(final String message,
-            final Throwable cause) {
+    public ActionExecutionFailedException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }
