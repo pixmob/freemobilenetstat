@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pixmob.actionservice;
+package org.pixmob.actionservice;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -165,7 +165,7 @@ public abstract class ActionService extends Service {
     
     /**
      * Check if this intent should interrupt the current action. The internal
-     * thread executing the action will be interrupted: the methode
+     * thread executing the action will be interrupted: the method
      * {@link #onHandleAction(Intent)} will have to handle the
      * {@link InterruptedException} error.
      * @param intent to check

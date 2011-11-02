@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.pixmob.actionservice" android:versionCode="1"
+    package="org.pixmob.actionservice" android:versionCode="1"
     android:versionName="1.0">
     <uses-sdk android:targetSdkVersion="7" android:minSdkVersion="7"></uses-sdk>
 </manifest> 
