@@ -102,9 +102,6 @@ public abstract class ActionService extends Service {
                 + "#" + serviceName);
         
         intentBacklog = new ArrayBlockingQueue<Intent>(intentBacklogSize);
-        
-        actionDispatcher = new ActionDispatcher();
-        actionDispatcher.start();
     }
     
     @Override
@@ -123,6 +120,11 @@ public abstract class ActionService extends Service {
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if(actionDispatcher == null || !actionDispatcher.isAlive()) {
+            actionDispatcher = new ActionDispatcher();
+            actionDispatcher.start();
+        }
+
         boolean actionCancelled = false;
         try {
             actionCancelled = isActionCancelled(intent);
