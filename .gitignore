@@ -1,0 +1,7 @@
+local.properties
+bin
+gen
+.settings
+*.log
+assets/bugsense.txt
+

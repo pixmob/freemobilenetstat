@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:installLocation="auto"
+    package="org.pixmob.freemobile.netstat"
+    android:versionCode="1"
+    android:versionName="0.1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="7"
+        android:targetSdkVersion="15" />
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <uses-feature
+        android:name="android.hardware.telephony.gsm"
+        android:required="true" />
+
+    <application
+        android:name=".Application"
+        android:debuggable="true"
+        android:icon="@drawable/ic_launcher_main"
+        android:label="@string/app_name" >
+        <activity
+            android:name=".ui.Netstat"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name=".event.EventProducer" >
+            <intent-filter>
+                <action android:name="android.intent.action.ANY_DATA_STATE" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".event.EventWriter"
+            android:label="@string/service_event_writer" >
+        </service>
+        <service
+            android:name=".event.EventNotifier"
+            android:label="@string/service_event_notifier" >
+        </service>
+        <service
+            android:name=".power.BatteryOptimizer"
+            android:label="@string/service_battery_optimizer" >
+        </service>
+        <service
+            android:name=".power.ScreenMonitor"
+            android:label="@string/service_screen_monitor" >
+        </service>
+
+        <provider
+            android:name=".provider.NetstatContentProvider"
+            android:authorities="org.pixmob.freemobile.netstat"
+            android:exported="false"
+            android:label="@string/app_name" >
+        </provider>
+    </application>
+
+</manifest>

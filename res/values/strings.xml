@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Free Mobile Netstat</string>
+    <string name="stat_connected_to_mobile_network">Connecté au réseau %s</string>
+    <string name="mobile_network_type">Réseau mobile %s</string>
+    <string name="network_free_mobile">Free Mobile</string>
+    <string name="network_orange">Orange</string>
+    <string name="network_type_unknown">inconnu</string>
+    <string name="network_type_gprs">2G</string>
+    <string name="network_type_edge">2G</string>
+    <string name="network_type_umts">3G</string>
+    <string name="network_type_hsdpa">3G+</string>
+    <string name="network_type_hsupa">3G+</string>
+    <string name="network_type_hspa">3G+</string>
+    <string name="network_type_hspap">3G+</string>
+    <string name="tap_to_open_stats">Cliquez pour afficher les statistiques</string>
+    <string name="service_event_writer">Service de persistance</string>
+    <string name="service_event_notifier">Service de notification</string>
+    <string name="service_battery_optimizer">Service d\'économie d\'énergie</string>
+    <string name="service_screen_monitor">Service de supervision</string>
+
+</resources>
