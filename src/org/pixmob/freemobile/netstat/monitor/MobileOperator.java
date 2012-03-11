@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.pixmob.freemobile.netstat.event;
+package org.pixmob.freemobile.netstat.monitor;
 
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 

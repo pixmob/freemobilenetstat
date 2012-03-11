@@ -20,9 +20,7 @@ import static org.pixmob.freemobile.netstat.Constants.TAG;
 
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.StrictModeFeature;
-import org.pixmob.freemobile.netstat.power.ScreenMonitor;
 
-import android.content.Intent;
 import android.util.Log;
 
 /**
@@ -39,7 +37,5 @@ public class Application extends android.app.Application {
             Log.i(TAG, "Enabling StrictMode settings");
             Features.getFeature(StrictModeFeature.class).enable();
         }
-        
-        startService(new Intent(this, ScreenMonitor.class));
     }
 }

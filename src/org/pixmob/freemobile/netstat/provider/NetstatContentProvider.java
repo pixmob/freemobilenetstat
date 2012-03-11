@@ -19,7 +19,8 @@ import static org.pixmob.freemobile.netstat.Constants.TAG;
 
 import java.util.ArrayList;
 
-import org.pixmob.freemobile.netstat.provider.NetstatContract.Events;
+import org.pixmob.freemobile.netstat.provider.NetstatContract.PhoneEvents;
+import org.pixmob.freemobile.netstat.provider.NetstatContract.WifiEvents;
 
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
@@ -42,16 +43,25 @@ import android.util.Log;
  * @author Pixmob
  */
 public class NetstatContentProvider extends ContentProvider {
-    private static final String EVENTS_TABLE = "events";
+    private static final String PHONE_EVENTS_TABLE = "phone_events";
+    private static final String WIFI_EVENTS_TABLE = "wifi_events";
     
-    private static final int EVENTS = 1;
-    private static final int EVENT_ID = 2;
+    private static final int PHONE_EVENTS = 1;
+    private static final int PHONE_EVENT_ID = 2;
+    private static final int WIFI_EVENTS = 3;
+    private static final int WIFI_EVENT_ID = 4;
     
     private static final UriMatcher URI_MATCHER;
     static {
         URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
-        URI_MATCHER.addURI(NetstatContract.AUTHORITY, "events", EVENTS);
-        URI_MATCHER.addURI(NetstatContract.AUTHORITY, "event/*", EVENT_ID);
+        URI_MATCHER.addURI(NetstatContract.AUTHORITY, "phoneEvents",
+            PHONE_EVENTS);
+        URI_MATCHER.addURI(NetstatContract.AUTHORITY, "phoneEvent/*",
+            PHONE_EVENT_ID);
+        URI_MATCHER
+                .addURI(NetstatContract.AUTHORITY, "wifiEvents", WIFI_EVENTS);
+        URI_MATCHER.addURI(NetstatContract.AUTHORITY, "wifiEvent/*",
+            WIFI_EVENT_ID);
     }
     
     private SQLiteOpenHelper dbHelper;
@@ -70,10 +80,14 @@ public class NetstatContentProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         switch (URI_MATCHER.match(uri)) {
-            case EVENTS:
-                return Events.CONTENT_TYPE;
-            case EVENT_ID:
-                return Events.CONTENT_ITEM_TYPE;
+            case PHONE_EVENTS:
+                return PhoneEvents.CONTENT_TYPE;
+            case PHONE_EVENT_ID:
+                return PhoneEvents.CONTENT_ITEM_TYPE;
+            case WIFI_EVENTS:
+                return WifiEvents.CONTENT_TYPE;
+            case WIFI_EVENT_ID:
+                return WifiEvents.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unsupported Uri: " + uri);
         }
@@ -105,17 +119,32 @@ public class NetstatContentProvider extends ContentProvider {
     
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        final SQLiteDatabase db = dbHelper.getWritableDatabase();
-        final long rowId = db.insertOrThrow(EVENTS_TABLE, "notNull", values);
-        if (rowId == -1) {
-            throw new SQLException("Failed to insert new event");
+        final String table;
+        final Uri contentUri;
+        switch (URI_MATCHER.match(uri)) {
+            case PHONE_EVENTS:
+                table = PHONE_EVENTS_TABLE;
+                contentUri = PhoneEvents.CONTENT_URI;
+                break;
+            case WIFI_EVENTS:
+                table = WIFI_EVENTS_TABLE;
+                contentUri = WifiEvents.CONTENT_URI;
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported Uri: " + uri);
         }
         
-        final Uri eventUri = Uri.withAppendedPath(Events.CONTENT_URI,
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final long rowId = db.insertOrThrow(table, "notNull", values);
+        if (rowId == -1) {
+            throw new SQLException("Failed to insert new row");
+        }
+        
+        final Uri rowUri = Uri.withAppendedPath(contentUri,
             String.valueOf(rowId));
         getContext().getContentResolver().notifyChange(uri, null, false);
         
-        return eventUri;
+        return rowUri;
     }
     
     @Override
@@ -124,16 +153,30 @@ public class NetstatContentProvider extends ContentProvider {
         final int count;
         
         switch (URI_MATCHER.match(uri)) {
-            case EVENTS:
-                count = db.delete(EVENTS_TABLE, selection, selectionArgs);
+            case PHONE_EVENTS:
+                count = db.delete(PHONE_EVENTS_TABLE, selection, selectionArgs);
                 break;
-            case EVENT_ID:
-                final String id = uri.getPathSegments().get(1);
-                String fullSelection = Events._ID + "='" + id + "'";
+            case PHONE_EVENT_ID:
+                final String phoneId = uri.getPathSegments().get(1);
+                String phoneFullSelection = PhoneEvents._ID + "='" + phoneId
+                        + "'";
                 if (!TextUtils.isEmpty(selection)) {
-                    fullSelection += " AND (" + selection + ")";
+                    phoneFullSelection += " AND (" + selection + ")";
                 }
-                count = db.delete(EVENTS_TABLE, fullSelection, selectionArgs);
+                count = db.delete(PHONE_EVENTS_TABLE, phoneFullSelection,
+                    selectionArgs);
+                break;
+            case WIFI_EVENTS:
+                count = db.delete(WIFI_EVENTS_TABLE, selection, selectionArgs);
+                break;
+            case WIFI_EVENT_ID:
+                final String wifiId = uri.getPathSegments().get(1);
+                String wifiFullSelection = WifiEvents._ID + "='" + wifiId + "'";
+                if (!TextUtils.isEmpty(selection)) {
+                    wifiFullSelection += " AND (" + selection + ")";
+                }
+                count = db.delete(WIFI_EVENTS_TABLE, wifiFullSelection,
+                    selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported Uri: " + uri);
@@ -150,15 +193,27 @@ public class NetstatContentProvider extends ContentProvider {
         
         final SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         switch (URI_MATCHER.match(uri)) {
-            case EVENTS:
-                qb.setTables(EVENTS_TABLE);
+            case PHONE_EVENTS:
+                qb.setTables(PHONE_EVENTS_TABLE);
                 if (TextUtils.isEmpty(realSortOrder)) {
-                    realSortOrder = Events.TIMESTAMP + " DESC";
+                    realSortOrder = PhoneEvents.TIMESTAMP + " DESC";
                 }
                 break;
-            case EVENT_ID:
-                qb.setTables(EVENTS_TABLE);
-                qb.appendWhere(Events._ID + "=" + uri.getPathSegments().get(1));
+            case PHONE_EVENT_ID:
+                qb.setTables(PHONE_EVENTS_TABLE);
+                qb.appendWhere(PhoneEvents._ID + "="
+                        + uri.getPathSegments().get(1));
+                break;
+            case WIFI_EVENTS:
+                qb.setTables(WIFI_EVENTS_TABLE);
+                if (TextUtils.isEmpty(realSortOrder)) {
+                    realSortOrder = WifiEvents.TIMESTAMP + " DESC";
+                }
+                break;
+            case WIFI_EVENT_ID:
+                qb.setTables(WIFI_EVENTS_TABLE);
+                qb.appendWhere(WifiEvents._ID + "="
+                        + uri.getPathSegments().get(1));
                 break;
         }
         
@@ -176,17 +231,32 @@ public class NetstatContentProvider extends ContentProvider {
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
         final int count;
         switch (URI_MATCHER.match(uri)) {
-            case EVENTS:
-                count = db.update(EVENTS_TABLE, values, selection,
+            case PHONE_EVENTS:
+                count = db.update(PHONE_EVENTS_TABLE, values, selection,
                     selectionArgs);
                 break;
-            case EVENT_ID:
-                final String id = uri.getPathSegments().get(1);
-                String fullSelection = Events._ID + "='" + id + "'";
+            case PHONE_EVENT_ID:
+                final String phoneId = uri.getPathSegments().get(1);
+                String phoneFullSelection = PhoneEvents._ID + "='" + phoneId
+                        + "'";
                 if (!TextUtils.isEmpty(selection)) {
-                    fullSelection += " AND (" + selection + ")";
+                    phoneFullSelection += " AND (" + selection + ")";
                 }
-                count = db.update(EVENTS_TABLE, values, fullSelection,
+                count = db.update(PHONE_EVENTS_TABLE, values,
+                    phoneFullSelection, selectionArgs);
+                break;
+            case WIFI_EVENTS:
+                count = db.update(WIFI_EVENTS_TABLE, values, selection,
+                    selectionArgs);
+                break;
+            case WIFI_EVENT_ID:
+                final String wifiId = uri.getPathSegments().get(1);
+                String wifiFullSelection = PhoneEvents._ID + "='" + wifiId
+                        + "'";
+                if (!TextUtils.isEmpty(selection)) {
+                    wifiFullSelection += " AND (" + selection + ")";
+                }
+                count = db.update(WIFI_EVENTS_TABLE, values, wifiFullSelection,
                     selectionArgs);
                 break;
             default:
@@ -211,14 +281,23 @@ public class NetstatContentProvider extends ContentProvider {
         @Override
         public void onCreate(SQLiteDatabase db) {
             if (!db.isReadOnly()) {
-                final String req = "CREATE TABLE " + EVENTS_TABLE + " ("
-                        + Events._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                        + Events.TIMESTAMP + " TIMESTAMP NOT NULL, "
-                        + Events.MOBILE_ENABLED + " INTEGER NOT NULL, "
-                        + Events.MOBILE_ROAMING + " INTEGER NOT NULL, "
-                        + Events.SYNC_ID + " TEXT NOT NULL, "
-                        + Events.SYNC_STATUS + " INTEGER NOT NULL, "
-                        + Events.MOBILE_OPERATOR + " TEXT)";
+                String req = "CREATE TABLE " + PHONE_EVENTS_TABLE + " ("
+                        + PhoneEvents._ID
+                        + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        + PhoneEvents.TIMESTAMP + " TIMESTAMP NOT NULL, "
+                        + PhoneEvents.MOBILE_CONNECTED + " INTEGER NOT NULL, "
+                        + PhoneEvents.SYNC_ID + " TEXT NOT NULL, "
+                        + PhoneEvents.SYNC_STATUS + " INTEGER NOT NULL, "
+                        + PhoneEvents.MOBILE_OPERATOR + " TEXT)";
+                db.execSQL(req);
+                
+                req = "CREATE TABLE " + WIFI_EVENTS_TABLE + " ("
+                        + PhoneEvents._ID
+                        + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        + PhoneEvents.TIMESTAMP + " TIMESTAMP NOT NULL, "
+                        + WifiEvents.WIFI_CONNECTED + " INTEGER NOT NULL, "
+                        + PhoneEvents.SYNC_ID + " TEXT NOT NULL, "
+                        + PhoneEvents.SYNC_STATUS + " INTEGER NOT NULL)";
                 db.execSQL(req);
             }
         }
@@ -228,7 +307,8 @@ public class NetstatContentProvider extends ContentProvider {
             if (!db.isReadOnly()) {
                 Log.w(TAG, "Upgrading database from version " + oldVersion
                         + " to " + newVersion + " which will destroy all data");
-                db.execSQL("DROP TABLE IF EXISTS " + EVENTS_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + PHONE_EVENTS_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + WIFI_EVENTS_TABLE);
                 onCreate(db);
             }
         }

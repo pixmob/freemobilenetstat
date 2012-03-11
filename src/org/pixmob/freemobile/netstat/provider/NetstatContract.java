@@ -29,35 +29,64 @@ public class NetstatContract {
      */
     public static final String AUTHORITY = "org.pixmob.freemobile.netstat";
     
-    protected static interface EventsColumns {
+    protected static interface PhoneEventsColumns {
         String TIMESTAMP = "timestamp";
-        String MOBILE_ENABLED = "mobile_enabled";
+        String MOBILE_CONNECTED = "mobile_connected";
         String MOBILE_OPERATOR = "mobile_operator";
-        String MOBILE_ROAMING = "mobile_roaming";
+        String SYNC_STATUS = "sync_status";
+        String SYNC_ID = "sync_id";
+    }
+    
+    protected static interface WifiEventsColumns {
+        String TIMESTAMP = "timestamp";
+        String WIFI_CONNECTED = "wifi_connected";
         String SYNC_STATUS = "sync_status";
         String SYNC_ID = "sync_id";
     }
     
     /**
-     * Table for network events.
+     * Table for phone events.
      * @author Pixmob
      */
-    public static class Events implements BaseColumns, EventsColumns {
+    public static class PhoneEvents implements BaseColumns, PhoneEventsColumns {
         /**
          * The content:// style URI for this table.
          */
         public static final Uri CONTENT_URI = new Uri.Builder()
                 .scheme(ContentResolver.SCHEME_CONTENT).authority(AUTHORITY)
-                .appendPath("events").build();
+                .appendPath("phoneEvents").build();
         /**
          * The MIME type of a {@link #CONTENT_URI} subdirectory of a single
          * entry.
          */
-        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/event";
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/phoneEvent";
         /**
          * The MIME type of {@link #CONTENT_TYPE} providing a directory of
          * entries.
          */
-        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/event";
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/phoneEvent";
+    }
+    
+    /**
+     * Table for Wi-Fi events.
+     * @author Pixmob
+     */
+    public static class WifiEvents implements BaseColumns, WifiEventsColumns {
+        /**
+         * The content:// style URI for this table.
+         */
+        public static final Uri CONTENT_URI = new Uri.Builder()
+                .scheme(ContentResolver.SCHEME_CONTENT).authority(AUTHORITY)
+                .appendPath("wifiEvents").build();
+        /**
+         * The MIME type of a {@link #CONTENT_URI} subdirectory of a single
+         * entry.
+         */
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/wifiEvent";
+        /**
+         * The MIME type of {@link #CONTENT_TYPE} providing a directory of
+         * entries.
+         */
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/wifiEvent";
     }
 }

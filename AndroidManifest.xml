@@ -33,27 +33,9 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".event.EventProducer" >
-            <intent-filter>
-                <action android:name="android.intent.action.ANY_DATA_STATE" />
-            </intent-filter>
-        </receiver>
-
         <service
-            android:name=".event.EventWriter"
-            android:label="@string/service_event_writer" >
-        </service>
-        <service
-            android:name=".event.EventNotifier"
-            android:label="@string/service_event_notifier" >
-        </service>
-        <service
-            android:name=".power.BatteryOptimizer"
-            android:label="@string/service_battery_optimizer" >
-        </service>
-        <service
-            android:name=".power.ScreenMonitor"
-            android:label="@string/service_screen_monitor" >
+            android:name=".monitor.MonitorService"
+            android:label="@string/service_monitor" >
         </service>
 
         <provider

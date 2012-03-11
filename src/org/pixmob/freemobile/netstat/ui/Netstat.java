@@ -16,9 +16,10 @@
 package org.pixmob.freemobile.netstat.ui;
 
 import org.pixmob.freemobile.netstat.R;
-import org.pixmob.freemobile.netstat.event.EventNotifier;
+import org.pixmob.freemobile.netstat.monitor.MonitorService;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -29,7 +30,8 @@ public class Netstat extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        final Intent i = new Intent(this, EventNotifier.class);
-        startService(i);
+        final Context c = getApplicationContext();
+        final Intent i = new Intent(c, MonitorService.class);
+        c.startService(i);
     }
 }
