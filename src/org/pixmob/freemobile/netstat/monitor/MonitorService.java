@@ -40,6 +40,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.IBinder;
+import android.os.Process;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
@@ -378,6 +379,9 @@ public class MonitorService extends Service {
             if (DEBUG) {
                 Log.d(TAG, "PendingInsert worker thread is started");
             }
+            
+            // Set a lower priority to prevent UI from lagging.
+            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             
             boolean running = true;
             while (running) {
