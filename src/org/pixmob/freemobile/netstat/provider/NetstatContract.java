@@ -44,6 +44,13 @@ public class NetstatContract {
         String SYNC_ID = "sync_id";
     }
     
+    protected static interface BatteryEventsColumns {
+        String TIMESTAMP = "timestamp";
+        String LEVEL = "level";
+        String SYNC_STATUS = "sync_status";
+        String SYNC_ID = "sync_id";
+    }
+    
     /**
      * Table for phone events.
      * @author Pixmob
@@ -88,5 +95,29 @@ public class NetstatContract {
          * entries.
          */
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/wifiEvent";
+    }
+    
+    /**
+     * Table for battery events.
+     * @author Pixmob
+     */
+    public static class BatteryEvents implements BaseColumns,
+            BatteryEventsColumns {
+        /**
+         * The content:// style URI for this table.
+         */
+        public static final Uri CONTENT_URI = new Uri.Builder()
+                .scheme(ContentResolver.SCHEME_CONTENT).authority(AUTHORITY)
+                .appendPath("batteryEvents").build();
+        /**
+         * The MIME type of a {@link #CONTENT_URI} subdirectory of a single
+         * entry.
+         */
+        public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/batteryEvent";
+        /**
+         * The MIME type of {@link #CONTENT_TYPE} providing a directory of
+         * entries.
+         */
+        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/batteryEvent";
     }
 }

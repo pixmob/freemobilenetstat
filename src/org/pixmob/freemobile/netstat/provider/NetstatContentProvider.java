@@ -19,6 +19,7 @@ import static org.pixmob.freemobile.netstat.Constants.TAG;
 
 import java.util.ArrayList;
 
+import org.pixmob.freemobile.netstat.provider.NetstatContract.BatteryEvents;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.PhoneEvents;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.WifiEvents;
 
@@ -45,11 +46,14 @@ import android.util.Log;
 public class NetstatContentProvider extends ContentProvider {
     private static final String PHONE_EVENTS_TABLE = "phone_events";
     private static final String WIFI_EVENTS_TABLE = "wifi_events";
+    private static final String BATTERY_EVENTS_TABLE = "battery_events";
     
     private static final int PHONE_EVENTS = 1;
     private static final int PHONE_EVENT_ID = 2;
     private static final int WIFI_EVENTS = 3;
     private static final int WIFI_EVENT_ID = 4;
+    private static final int BATTERY_EVENTS = 5;
+    private static final int BATTERY_EVENT_ID = 6;
     
     private static final UriMatcher URI_MATCHER;
     static {
@@ -62,6 +66,10 @@ public class NetstatContentProvider extends ContentProvider {
                 .addURI(NetstatContract.AUTHORITY, "wifiEvents", WIFI_EVENTS);
         URI_MATCHER.addURI(NetstatContract.AUTHORITY, "wifiEvent/*",
             WIFI_EVENT_ID);
+        URI_MATCHER.addURI(NetstatContract.AUTHORITY, "batteryEvents",
+            BATTERY_EVENTS);
+        URI_MATCHER.addURI(NetstatContract.AUTHORITY, "batteryEvent/*",
+            BATTERY_EVENT_ID);
     }
     
     private SQLiteOpenHelper dbHelper;
@@ -88,6 +96,10 @@ public class NetstatContentProvider extends ContentProvider {
                 return WifiEvents.CONTENT_TYPE;
             case WIFI_EVENT_ID:
                 return WifiEvents.CONTENT_ITEM_TYPE;
+            case BATTERY_EVENTS:
+                return BatteryEvents.CONTENT_TYPE;
+            case BATTERY_EVENT_ID:
+                return BatteryEvents.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unsupported Uri: " + uri);
         }
@@ -129,6 +141,10 @@ public class NetstatContentProvider extends ContentProvider {
             case WIFI_EVENTS:
                 table = WIFI_EVENTS_TABLE;
                 contentUri = WifiEvents.CONTENT_URI;
+                break;
+            case BATTERY_EVENTS:
+                table = BATTERY_EVENTS_TABLE;
+                contentUri = BatteryEvents.CONTENT_URI;
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported Uri: " + uri);
@@ -178,6 +194,20 @@ public class NetstatContentProvider extends ContentProvider {
                 count = db.delete(WIFI_EVENTS_TABLE, wifiFullSelection,
                     selectionArgs);
                 break;
+            case BATTERY_EVENTS:
+                count = db.delete(BATTERY_EVENTS_TABLE, selection,
+                    selectionArgs);
+                break;
+            case BATTERY_EVENT_ID:
+                final String batId = uri.getPathSegments().get(1);
+                String batFullSelection = BatteryEvents._ID + "='" + batId
+                        + "'";
+                if (!TextUtils.isEmpty(selection)) {
+                    batFullSelection += " AND (" + selection + ")";
+                }
+                count = db.delete(BATTERY_EVENTS_TABLE, batFullSelection,
+                    selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported Uri: " + uri);
         }
@@ -213,6 +243,17 @@ public class NetstatContentProvider extends ContentProvider {
             case WIFI_EVENT_ID:
                 qb.setTables(WIFI_EVENTS_TABLE);
                 qb.appendWhere(WifiEvents._ID + "="
+                        + uri.getPathSegments().get(1));
+                break;
+            case BATTERY_EVENTS:
+                qb.setTables(BATTERY_EVENTS_TABLE);
+                if (TextUtils.isEmpty(realSortOrder)) {
+                    realSortOrder = BatteryEvents.TIMESTAMP + " DESC";
+                }
+                break;
+            case BATTERY_EVENT_ID:
+                qb.setTables(BATTERY_EVENTS_TABLE);
+                qb.appendWhere(BatteryEvents._ID + "="
                         + uri.getPathSegments().get(1));
                 break;
         }
@@ -251,13 +292,26 @@ public class NetstatContentProvider extends ContentProvider {
                 break;
             case WIFI_EVENT_ID:
                 final String wifiId = uri.getPathSegments().get(1);
-                String wifiFullSelection = PhoneEvents._ID + "='" + wifiId
-                        + "'";
+                String wifiFullSelection = WifiEvents._ID + "='" + wifiId + "'";
                 if (!TextUtils.isEmpty(selection)) {
                     wifiFullSelection += " AND (" + selection + ")";
                 }
                 count = db.update(WIFI_EVENTS_TABLE, values, wifiFullSelection,
                     selectionArgs);
+                break;
+            case BATTERY_EVENTS:
+                count = db.update(BATTERY_EVENTS_TABLE, values, selection,
+                    selectionArgs);
+                break;
+            case BATTERY_EVENT_ID:
+                final String batId = uri.getPathSegments().get(1);
+                String batFullSelection = BatteryEvents._ID + "='" + batId
+                        + "'";
+                if (!TextUtils.isEmpty(selection)) {
+                    batFullSelection += " AND (" + selection + ")";
+                }
+                count = db.update(BATTERY_EVENTS_TABLE, values,
+                    batFullSelection, selectionArgs);
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported Uri: " + uri);
@@ -292,12 +346,21 @@ public class NetstatContentProvider extends ContentProvider {
                 db.execSQL(req);
                 
                 req = "CREATE TABLE " + WIFI_EVENTS_TABLE + " ("
-                        + PhoneEvents._ID
+                        + WifiEvents._ID
                         + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                        + PhoneEvents.TIMESTAMP + " TIMESTAMP NOT NULL, "
+                        + WifiEvents.TIMESTAMP + " TIMESTAMP NOT NULL, "
                         + WifiEvents.WIFI_CONNECTED + " INTEGER NOT NULL, "
-                        + PhoneEvents.SYNC_ID + " TEXT NOT NULL, "
-                        + PhoneEvents.SYNC_STATUS + " INTEGER NOT NULL)";
+                        + WifiEvents.SYNC_ID + " TEXT NOT NULL, "
+                        + WifiEvents.SYNC_STATUS + " INTEGER NOT NULL)";
+                db.execSQL(req);
+                
+                req = "CREATE TABLE " + BATTERY_EVENTS_TABLE + " ("
+                        + BatteryEvents._ID
+                        + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        + BatteryEvents.TIMESTAMP + " TIMESTAMP NOT NULL, "
+                        + BatteryEvents.LEVEL + " INTEGER NOT NULL, "
+                        + BatteryEvents.SYNC_ID + " TEXT NOT NULL, "
+                        + BatteryEvents.SYNC_STATUS + " INTEGER NOT NULL)";
                 db.execSQL(req);
             }
         }
@@ -309,6 +372,7 @@ public class NetstatContentProvider extends ContentProvider {
                         + " to " + newVersion + " which will destroy all data");
                 db.execSQL("DROP TABLE IF EXISTS " + PHONE_EVENTS_TABLE);
                 db.execSQL("DROP TABLE IF EXISTS " + WIFI_EVENTS_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + BATTERY_EVENTS_TABLE);
                 onCreate(db);
             }
         }

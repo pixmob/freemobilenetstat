@@ -23,6 +23,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import org.pixmob.freemobile.netstat.R;
+import org.pixmob.freemobile.netstat.provider.NetstatContract.BatteryEvents;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.PhoneEvents;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.WifiEvents;
 import org.pixmob.freemobile.netstat.ui.Netstat;
@@ -79,7 +80,6 @@ public class MonitorService extends Service {
     private Boolean lastMobileNetworkConnected;
     private String lastMobileOperatorId;
     private Integer lastBatteryLevel;
-    private Integer lastBatteryScale;
     private String mobileOperatorId;
     private boolean mobileNetworkConnected;
     private int mobileNetworkType;
@@ -173,7 +173,9 @@ public class MonitorService extends Service {
                     BatteryManager.EXTRA_LEVEL, 0);
                 final int scale = intent.getIntExtra(
                     BatteryManager.EXTRA_SCALE, 0);
-                onBatteryUpdated(level, scale);
+                
+                final int levelPercent = (int) Math.round(level * 100d / scale);
+                onBatteryUpdated(levelPercent);
             }
         };
         
@@ -328,17 +330,25 @@ public class MonitorService extends Service {
     /**
      * This method is called when the battery level is updated.
      */
-    private void onBatteryUpdated(int level, int scale) {
+    private void onBatteryUpdated(int level) {
         // Prevent duplicated inserts.
-        if (lastBatteryLevel != null && lastBatteryLevel.intValue() == level
-                && lastBatteryScale != null
-                && lastBatteryScale.intValue() == scale) {
+        if (lastBatteryLevel != null && lastBatteryLevel.intValue() == level) {
             return;
         }
         lastBatteryLevel = level;
-        lastBatteryScale = scale;
         
-        Log.i(TAG, "Baterry level updated: " + level + "/" + scale);
+        Log.i(TAG, "Baterry level updated: " + level + "%");
+        
+        final ContentValues cv = new ContentValues(4);
+        cv.put(BatteryEvents.LEVEL, level);
+        cv.put(WifiEvents.TIMESTAMP, System.currentTimeMillis());
+        cv.put(WifiEvents.SYNC_ID, UUID.randomUUID().toString());
+        cv.put(WifiEvents.SYNC_STATUS, 0);
+        
+        if (!pendingInsert.offer(new PendingContent(BatteryEvents.CONTENT_URI,
+                cv))) {
+            Log.w(TAG, "Failed to schedule battery event insertion");
+        }
     }
     
     /**
