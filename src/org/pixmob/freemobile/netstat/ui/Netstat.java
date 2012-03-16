@@ -19,7 +19,9 @@ import org.pixmob.freemobile.netstat.monitor.MonitorService;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.view.Window;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
@@ -41,5 +43,16 @@ public class Netstat extends SherlockFragmentActivity {
         final Context c = getApplicationContext();
         final Intent i = new Intent(c, MonitorService.class);
         c.startService(i);
+    }
+    
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        
+        // Enable "better" gradients:
+        // http://stackoverflow.com/a/2932030/422906
+        final Window window = getWindow();
+        window.setFormat(PixelFormat.RGBA_8888);
+        window.getDecorView().getBackground().setDither(true);
     }
 }

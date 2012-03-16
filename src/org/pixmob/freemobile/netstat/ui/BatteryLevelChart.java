@@ -23,8 +23,10 @@ import org.pixmob.freemobile.netstat.R;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -36,11 +38,12 @@ import android.view.View;
  */
 public class BatteryLevelChart extends View {
     private final Paint levelBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint levelBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint levelBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG
+            | Paint.FILTER_BITMAP_FLAG);
     private final Paint axisPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final int axisThickness = 3;
     private final int axisUnitThickness = 10;
-    private final int lineStrokeWidth = 6;
+    private final int lineStrokeWidth = 8;
     private int[] levels;
     private long[] timestamps;
     
@@ -55,8 +58,9 @@ public class BatteryLevelChart extends View {
         levelBorderPaint.setStyle(Paint.Style.STROKE);
         levelBorderPaint.setStrokeWidth(lineStrokeWidth);
         
-        levelBgPaint.setColor(r.getColor(R.color.chart_fg_color));
+        levelBgPaint.setColor(r.getColor(R.color.chart_bg_color_end));
         levelBgPaint.setStyle(Paint.Style.FILL);
+        levelBgPaint.setDither(true);
     }
     
     public void setData(long[] timestamps, int[] levels) {
@@ -103,6 +107,9 @@ public class BatteryLevelChart extends View {
         levelPath.lineTo(w, h);
         levelPath.lineTo(0, h);
         levelPath.close();
+        levelBgPaint.setShader(new LinearGradient(0, h, 0, 0, getResources()
+                .getColor(R.color.chart_fg_color_start), getResources()
+                .getColor(R.color.chart_bg_color_end), Shader.TileMode.CLAMP));
         canvas.drawPath(levelPath, levelBgPaint);
         
         // Draw Y axis.
