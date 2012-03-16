@@ -23,7 +23,8 @@
         android:name=".Application"
         android:debuggable="true"
         android:icon="@drawable/ic_launcher_main"
-        android:label="@string/app_name" >
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Sherlock" >
         <activity
             android:name=".ui.Netstat"
             android:label="@string/app_name" >

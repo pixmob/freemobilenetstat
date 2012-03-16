@@ -15,5 +15,6 @@
     <string name="network_type_hspa">3G+ (HSPA)</string>
     <string name="network_type_hspap">3G+ (HSPAP)</string>
     <string name="service_monitor">Service de suivi de la connexion</string>
+    <string name="menu_refresh">Actualiser</string>
 
 </resources>

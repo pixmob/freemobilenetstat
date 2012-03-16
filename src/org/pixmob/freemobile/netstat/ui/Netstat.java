@@ -15,20 +15,28 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
-import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.monitor.MonitorService;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-public class Netstat extends Activity {
-    /** Called when the activity is first created. */
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+
+/**
+ * Main application activity.
+ * @author Pixmob
+ */
+public class Netstat extends SherlockFragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        
+        if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null) {
+            final BatteryLevelChartFragment f = new BatteryLevelChartFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .add(android.R.id.content, f).commit();
+        }
         
         final Context c = getApplicationContext();
         final Intent i = new Intent(c, MonitorService.class);
