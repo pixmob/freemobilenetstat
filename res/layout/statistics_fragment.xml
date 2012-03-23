@@ -32,21 +32,21 @@
             android:id="@+id/orange_network_states"
             name="@string/orange_network_state"
             android:layout_width="match_parent"
-            android:layout_height="32dip"
+            android:layout_height="@dimen/state_chart_height"
             android:layout_marginBottom="8dip" />
 
         <org.pixmob.freemobile.netstat.ui.StateChart
             android:id="@+id/wifi_states"
             name="@string/wifi_state"
             android:layout_width="match_parent"
-            android:layout_height="32dip"
+            android:layout_height="@dimen/state_chart_height"
             android:layout_marginBottom="8dip" />
 
         <org.pixmob.freemobile.netstat.ui.StateChart
             android:id="@+id/screen_states"
             name="@string/screen_state"
             android:layout_width="match_parent"
-            android:layout_height="32dip" />
+            android:layout_height="@dimen/state_chart_height" />
     </LinearLayout>
 
 </RelativeLayout>
