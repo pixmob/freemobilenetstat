@@ -18,5 +18,6 @@
     <string name="wifi_state">Wi-Fi</string>
     <string name="screen_state">Écran</string>
     <string name="orange_network_state">Réseau Orange</string>
+    <string name="battery_level">Batterie</string>
 
 </resources>

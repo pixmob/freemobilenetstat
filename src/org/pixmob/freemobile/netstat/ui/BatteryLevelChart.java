@@ -37,6 +37,7 @@ public class BatteryLevelChart extends View {
     private Paint levelBgPaint;
     private Paint axisPaint;
     private Paint textPaint;
+    private Paint smallTextPaint;
     private final int axisThickness = 3;
     private final int axisUnitThickness = 10;
     private final int lineStrokeWidth = 8;
@@ -85,10 +86,19 @@ public class BatteryLevelChart extends View {
         if (textPaint == null) {
             textPaint = new Paint(Paint.ANTI_ALIAS_FLAG
                     | Paint.SUBPIXEL_TEXT_FLAG);
-            textPaint.setColor(getResources().getColor(
-                R.color.chart_small_text_color));
+            textPaint.setColor(getResources()
+                    .getColor(R.color.chart_text_color));
             textPaint.setTypeface(Typeface.DEFAULT_BOLD);
             textPaint.setTextSize(getResources().getInteger(
+                R.integer.chart_text_size));
+        }
+        if (smallTextPaint == null) {
+            smallTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG
+                    | Paint.SUBPIXEL_TEXT_FLAG);
+            smallTextPaint.setColor(getResources().getColor(
+                R.color.chart_small_text_color));
+            smallTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+            smallTextPaint.setTextSize(getResources().getInteger(
                 R.integer.chart_small_text_size));
         }
         
@@ -144,10 +154,14 @@ public class BatteryLevelChart extends View {
             stopTime, DateUtils.FORMAT_SHOW_TIME);
         final int textMargins = 5;
         final float textY = h - 2 * textMargins;
-        canvas.drawText(startTimeStr, textMargins, textY, textPaint);
+        canvas.drawText(startTimeStr, textMargins, textY, smallTextPaint);
         canvas.drawText(stopTimeStr,
-            w - textMargins - textPaint.measureText(stopTimeStr), textY,
-            textPaint);
+            w - textMargins - smallTextPaint.measureText(stopTimeStr), textY,
+            smallTextPaint);
+        
+        final int textMargin = 10;
+        canvas.drawText(getResources().getString(R.string.battery_level),
+            textMargin, -textPaint.ascent(), textPaint);
     }
     
     @Override

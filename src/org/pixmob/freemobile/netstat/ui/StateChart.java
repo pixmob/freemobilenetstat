@@ -85,7 +85,7 @@ public class StateChart extends View {
             }
         }
         
-        final int textMargin = 5;
+        final int textMargin = 10;
         canvas.drawText(getResources().getString(nameRes), textMargin,
             -textPaint.ascent(), textPaint);
     }
