@@ -54,6 +54,7 @@ public class StatisticsFragment extends SherlockFragment implements
     private BatteryLevelChart batteryChart;
     private StateChart wifiChart;
     private StateChart screenChart;
+    private View statisticsGroup;
     private ProgressBar progressBar;
     
     @Override
@@ -74,14 +75,13 @@ public class StatisticsFragment extends SherlockFragment implements
         batteryChart = (BatteryLevelChart) a.findViewById(R.id.battery_levels);
         wifiChart = (StateChart) a.findViewById(R.id.wifi_states);
         screenChart = (StateChart) a.findViewById(R.id.screen_states);
+        statisticsGroup = a.findViewById(R.id.statistics);
         progressBar = (ProgressBar) a.findViewById(R.id.states_progress);
-        
-        refresh();
     }
     
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
         
         final ContentResolver cr = getActivity().getContentResolver();
         cr.registerContentObserver(PhoneEvents.CONTENT_URI, true,
@@ -91,11 +91,13 @@ public class StatisticsFragment extends SherlockFragment implements
         cr.registerContentObserver(WifiEvents.CONTENT_URI, true, contentMonitor);
         cr.registerContentObserver(ScreenEvents.CONTENT_URI, true,
             contentMonitor);
+        
+        refresh();
     }
     
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         getActivity().getContentResolver().unregisterContentObserver(
             contentMonitor);
     }
@@ -113,9 +115,7 @@ public class StatisticsFragment extends SherlockFragment implements
     @Override
     public Loader<StatisticsData> onCreateLoader(int id, Bundle args) {
         progressBar.setVisibility(View.VISIBLE);
-        batteryChart.setVisibility(View.INVISIBLE);
-        wifiChart.setVisibility(View.INVISIBLE);
-        screenChart.setVisibility(View.INVISIBLE);
+        statisticsGroup.setVisibility(View.INVISIBLE);
         
         return new StatisticsLoader(getActivity());
     }
@@ -136,14 +136,12 @@ public class StatisticsFragment extends SherlockFragment implements
             screenChart.setData(d.screenTimestamps, d.screenStates);
         }
         
+        progressBar.setVisibility(View.INVISIBLE);
+        statisticsGroup.setVisibility(View.VISIBLE);
+        
         batteryChart.invalidate();
         wifiChart.invalidate();
         screenChart.invalidate();
-        
-        progressBar.setVisibility(View.INVISIBLE);
-        batteryChart.setVisibility(View.VISIBLE);
-        wifiChart.setVisibility(View.VISIBLE);
-        screenChart.setVisibility(View.VISIBLE);
     }
     
     /**

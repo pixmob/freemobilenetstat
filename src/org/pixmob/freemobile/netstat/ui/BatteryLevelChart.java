@@ -23,6 +23,8 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Shader;
+import android.graphics.Typeface;
+import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -34,6 +36,7 @@ public class BatteryLevelChart extends View {
     private Paint levelBorderPaint;
     private Paint levelBgPaint;
     private Paint axisPaint;
+    private Paint textPaint;
     private final int axisThickness = 3;
     private final int axisUnitThickness = 10;
     private final int lineStrokeWidth = 8;
@@ -78,6 +81,15 @@ public class BatteryLevelChart extends View {
                 R.color.chart_fg_color_end));
             levelBgPaint.setStyle(Paint.Style.FILL);
             levelBgPaint.setDither(true);
+        }
+        if (textPaint == null) {
+            textPaint = new Paint(Paint.ANTI_ALIAS_FLAG
+                    | Paint.SUBPIXEL_TEXT_FLAG);
+            textPaint.setColor(getResources().getColor(
+                R.color.chart_small_text_color));
+            textPaint.setTypeface(Typeface.DEFAULT_BOLD);
+            textPaint.setTextSize(getResources().getInteger(
+                R.integer.chart_small_text_size));
         }
         
         final int points = levels.length;
@@ -124,6 +136,18 @@ public class BatteryLevelChart extends View {
         }
         canvas.drawRect(0, 0, axisUnitThickness, axisThickness, axisPaint);
         
+        final long startTime = timestamps[0];
+        final long stopTime = timestamps[timestamps.length - 1];
+        final String startTimeStr = DateUtils.formatDateTime(getContext(),
+            startTime, DateUtils.FORMAT_SHOW_TIME);
+        final String stopTimeStr = DateUtils.formatDateTime(getContext(),
+            stopTime, DateUtils.FORMAT_SHOW_TIME);
+        final int textMargins = 5;
+        final float textY = h - 2 * textMargins;
+        canvas.drawText(startTimeStr, textMargins, textY, textPaint);
+        canvas.drawText(stopTimeStr,
+            w - textMargins - textPaint.measureText(stopTimeStr), textY,
+            textPaint);
     }
     
     @Override

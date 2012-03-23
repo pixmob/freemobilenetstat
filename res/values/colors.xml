@@ -6,5 +6,6 @@
     <color name="chart_fg_color_start">#336c8c</color>
     <color name="chart_fg_color_end">#5aa9e5</color>
     <color name="chart_text_color">#fff</color>
+    <color name="chart_small_text_color">#888</color>
 
 </resources>
