@@ -197,19 +197,20 @@ public class StatisticsFragment extends SherlockFragment implements
                             new String[] { String
                                     .valueOf(internalStartTimestamp) },
                             BatteryEvents.TIMESTAMP + " ASC");
-                int rowCount = c.getCount();
+                int rowCount = c.getCount() + 1;
                 batteryLevels = new int[rowCount];
                 batteryTimestamps = new long[rowCount];
                 for (int i = 0; c.moveToNext(); ++i) {
                     batteryTimestamps[i] = c.getLong(0);
                     batteryLevels[i] = c.getInt(1);
                 }
+                batteryTimestamps[rowCount - 1] = start;
+                batteryLevels[rowCount - 1] = batteryLevels[rowCount - 2];
                 
                 if (batteryTimestamps.length == 0) {
                     return null;
                 }
                 
-                final long intervalStopTimestamp = batteryTimestamps[batteryTimestamps.length - 1];
                 c.close();
                 c = getContext().getContentResolver().query(
                     WifiEvents.CONTENT_URI,
@@ -218,7 +219,7 @@ public class StatisticsFragment extends SherlockFragment implements
                     WifiEvents.TIMESTAMP + ">? AND " + WifiEvents.TIMESTAMP
                             + "<=?",
                     new String[] { String.valueOf(internalStartTimestamp),
-                            String.valueOf(intervalStopTimestamp) },
+                            String.valueOf(start) },
                     WifiEvents.TIMESTAMP + " ASC");
                 rowCount = c.getCount();
                 wifiStates = new boolean[rowCount];
@@ -236,7 +237,7 @@ public class StatisticsFragment extends SherlockFragment implements
                     ScreenEvents.TIMESTAMP + ">? AND " + ScreenEvents.TIMESTAMP
                             + "<=?",
                     new String[] { String.valueOf(internalStartTimestamp),
-                            String.valueOf(intervalStopTimestamp) },
+                            String.valueOf(start) },
                     ScreenEvents.TIMESTAMP + " ASC");
                 rowCount = c.getCount();
                 screenStates = new boolean[rowCount];
@@ -255,7 +256,7 @@ public class StatisticsFragment extends SherlockFragment implements
                     PhoneEvents.TIMESTAMP + ">? AND " + PhoneEvents.TIMESTAMP
                             + "<=?",
                     new String[] { String.valueOf(internalStartTimestamp),
-                            String.valueOf(intervalStopTimestamp) },
+                            String.valueOf(start) },
                     PhoneEvents.TIMESTAMP + " ASC");
                 rowCount = c.getCount();
                 freeMobileStates = new boolean[rowCount];
