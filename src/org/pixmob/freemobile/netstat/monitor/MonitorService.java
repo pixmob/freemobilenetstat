@@ -15,7 +15,7 @@
  */
 package org.pixmob.freemobile.netstat.monitor;
 
-import static org.pixmob.freemobile.netstat.Constants.DEBUG;
+import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 
 import java.util.UUID;
@@ -43,6 +43,7 @@ import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.IBinder;
 import android.os.Process;
+import android.support.v4.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
@@ -250,9 +251,11 @@ public class MonitorService extends Service {
                 getString(R.string.stat_connected_to_mobile_network),
                 getString(R.string.network_orange));
         }
-        final Notification n = new Notification(iconRes, tickerText, 0);
-        n.setLatestEventInfo(getApplicationContext(), tickerText, contentText,
-            openUIPendingIntent);
+        final Notification n = new NotificationCompat.Builder(
+                getApplicationContext()).setSmallIcon(iconRes)
+                .setTicker(tickerText).setContentText(contentText)
+                .setContentTitle(tickerText)
+                .setContentIntent(openUIPendingIntent).getNotification();
         
         startForeground(R.string.stat_connected_to_mobile_network, n);
     }
