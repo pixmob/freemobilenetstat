@@ -15,7 +15,7 @@
  */
 package org.pixmob.freemobile.netstat;
 
-import static org.pixmob.freemobile.netstat.Constants.DEBUG;
+import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 
 import org.pixmob.freemobile.netstat.feature.Features;

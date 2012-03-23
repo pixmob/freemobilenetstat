@@ -26,10 +26,6 @@ public final class Constants {
      * Logging tag.
      */
     public static final String TAG = "FreeMobileNetstat";
-    /**
-     * Is this application running in debug mode?
-     */
-    public static final boolean DEBUG = true;
     
     /**
      * Global {@link SharedPreferences} name.
