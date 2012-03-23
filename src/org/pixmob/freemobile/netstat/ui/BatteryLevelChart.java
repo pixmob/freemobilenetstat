@@ -15,52 +15,33 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
-import static org.pixmob.freemobile.netstat.Constants.DEBUG;
-import static org.pixmob.freemobile.netstat.Constants.TAG;
-
 import org.pixmob.freemobile.netstat.R;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Shader;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 /**
- * Custom component showing a chart with battery levels since the device was
- * turned on.
+ * Custom component showing a chart with battery levels.
  * @author Pixmob
  */
 public class BatteryLevelChart extends View {
-    private final Paint levelBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint levelBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG
-            | Paint.FILTER_BITMAP_FLAG);
-    private final Paint axisPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint levelBorderPaint;
+    private Paint levelBgPaint;
+    private Paint axisPaint;
     private final int axisThickness = 3;
     private final int axisUnitThickness = 10;
     private final int lineStrokeWidth = 8;
     private int[] levels;
     private long[] timestamps;
     
-    public BatteryLevelChart(Context context, AttributeSet attrs) {
+    public BatteryLevelChart(final Context context, final AttributeSet attrs) {
         super(context, attrs);
-        
-        final Resources r = getResources();
-        axisPaint.setColor(r.getColor(R.color.chart_axis_color));
-        axisPaint.setStyle(Paint.Style.FILL);
-        
-        levelBorderPaint.setColor(r.getColor(R.color.chart_line_color));
-        levelBorderPaint.setStyle(Paint.Style.STROKE);
-        levelBorderPaint.setStrokeWidth(lineStrokeWidth);
-        
-        levelBgPaint.setColor(r.getColor(R.color.chart_bg_color_end));
-        levelBgPaint.setStyle(Paint.Style.FILL);
-        levelBgPaint.setDither(true);
     }
     
     public void setData(long[] timestamps, int[] levels) {
@@ -77,15 +58,33 @@ public class BatteryLevelChart extends View {
             return;
         }
         
+        if (axisPaint == null) {
+            axisPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            axisPaint.setColor(getResources()
+                    .getColor(R.color.chart_axis_color));
+            axisPaint.setStyle(Paint.Style.FILL);
+        }
+        if (levelBorderPaint == null) {
+            levelBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            levelBorderPaint.setColor(getResources().getColor(
+                R.color.chart_line_color));
+            levelBorderPaint.setStyle(Paint.Style.STROKE);
+            levelBorderPaint.setStrokeWidth(lineStrokeWidth);
+        }
+        if (levelBgPaint == null) {
+            levelBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG
+                    | Paint.FILTER_BITMAP_FLAG);
+            levelBgPaint.setColor(getResources().getColor(
+                R.color.chart_fg_color_end));
+            levelBgPaint.setStyle(Paint.Style.FILL);
+            levelBgPaint.setDither(true);
+        }
+        
         final int points = levels.length;
         final int w = getWidth();
         final int h = getHeight();
         final float xScale = w / (float) points;
         final float yScale = h / 10f;
-        
-        if (DEBUG) {
-            Log.d(TAG, "Drawing battery levels: w=" + w + "; h=" + h);
-        }
         
         // Plot data.
         final Path levelPath = new Path();
@@ -109,7 +108,7 @@ public class BatteryLevelChart extends View {
         levelPath.close();
         levelBgPaint.setShader(new LinearGradient(0, h, 0, 0, getResources()
                 .getColor(R.color.chart_fg_color_start), getResources()
-                .getColor(R.color.chart_bg_color_end), Shader.TileMode.CLAMP));
+                .getColor(R.color.chart_fg_color_end), Shader.TileMode.CLAMP));
         canvas.drawPath(levelPath, levelBgPaint);
         
         // Draw Y axis.

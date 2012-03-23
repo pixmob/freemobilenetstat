@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import org.pixmob.freemobile.netstat.provider.NetstatContract.BatteryEvents;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.PhoneEvents;
+import org.pixmob.freemobile.netstat.provider.NetstatContract.ScreenEvents;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.WifiEvents;
 
 import android.content.ContentProvider;
@@ -47,6 +48,7 @@ public class NetstatContentProvider extends ContentProvider {
     private static final String PHONE_EVENTS_TABLE = "phone_events";
     private static final String WIFI_EVENTS_TABLE = "wifi_events";
     private static final String BATTERY_EVENTS_TABLE = "battery_events";
+    private static final String SCREEN_EVENTS_TABLE = "screen_events";
     
     private static final int PHONE_EVENTS = 1;
     private static final int PHONE_EVENT_ID = 2;
@@ -54,6 +56,8 @@ public class NetstatContentProvider extends ContentProvider {
     private static final int WIFI_EVENT_ID = 4;
     private static final int BATTERY_EVENTS = 5;
     private static final int BATTERY_EVENT_ID = 6;
+    private static final int SCREEN_EVENTS = 7;
+    private static final int SCREEN_EVENT_ID = 8;
     
     private static final UriMatcher URI_MATCHER;
     static {
@@ -70,6 +74,10 @@ public class NetstatContentProvider extends ContentProvider {
             BATTERY_EVENTS);
         URI_MATCHER.addURI(NetstatContract.AUTHORITY, "batteryEvent/*",
             BATTERY_EVENT_ID);
+        URI_MATCHER.addURI(NetstatContract.AUTHORITY, "screenEvents",
+            SCREEN_EVENTS);
+        URI_MATCHER.addURI(NetstatContract.AUTHORITY, "screenEvent/*",
+            SCREEN_EVENT_ID);
     }
     
     private SQLiteOpenHelper dbHelper;
@@ -100,6 +108,10 @@ public class NetstatContentProvider extends ContentProvider {
                 return BatteryEvents.CONTENT_TYPE;
             case BATTERY_EVENT_ID:
                 return BatteryEvents.CONTENT_ITEM_TYPE;
+            case SCREEN_EVENTS:
+                return ScreenEvents.CONTENT_TYPE;
+            case SCREEN_EVENT_ID:
+                return ScreenEvents.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalArgumentException("Unsupported Uri: " + uri);
         }
@@ -145,6 +157,10 @@ public class NetstatContentProvider extends ContentProvider {
             case BATTERY_EVENTS:
                 table = BATTERY_EVENTS_TABLE;
                 contentUri = BatteryEvents.CONTENT_URI;
+                break;
+            case SCREEN_EVENTS:
+                table = SCREEN_EVENTS_TABLE;
+                contentUri = ScreenEvents.CONTENT_URI;
                 break;
             default:
                 throw new IllegalArgumentException("Unsupported Uri: " + uri);
@@ -208,6 +224,19 @@ public class NetstatContentProvider extends ContentProvider {
                 count = db.delete(BATTERY_EVENTS_TABLE, batFullSelection,
                     selectionArgs);
                 break;
+            case SCREEN_EVENTS:
+                count = db
+                        .delete(SCREEN_EVENTS_TABLE, selection, selectionArgs);
+                break;
+            case SCREEN_EVENT_ID:
+                final String sId = uri.getPathSegments().get(1);
+                String sFullSelection = ScreenEvents._ID + "='" + sId + "'";
+                if (!TextUtils.isEmpty(selection)) {
+                    sFullSelection += " AND (" + selection + ")";
+                }
+                count = db.delete(SCREEN_EVENTS_TABLE, sFullSelection,
+                    selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported Uri: " + uri);
         }
@@ -254,6 +283,17 @@ public class NetstatContentProvider extends ContentProvider {
             case BATTERY_EVENT_ID:
                 qb.setTables(BATTERY_EVENTS_TABLE);
                 qb.appendWhere(BatteryEvents._ID + "="
+                        + uri.getPathSegments().get(1));
+                break;
+            case SCREEN_EVENTS:
+                qb.setTables(SCREEN_EVENTS_TABLE);
+                if (TextUtils.isEmpty(realSortOrder)) {
+                    realSortOrder = ScreenEvents.TIMESTAMP + " DESC";
+                }
+                break;
+            case SCREEN_EVENT_ID:
+                qb.setTables(SCREEN_EVENTS_TABLE);
+                qb.appendWhere(ScreenEvents._ID + "="
                         + uri.getPathSegments().get(1));
                 break;
         }
@@ -313,6 +353,19 @@ public class NetstatContentProvider extends ContentProvider {
                 count = db.update(BATTERY_EVENTS_TABLE, values,
                     batFullSelection, selectionArgs);
                 break;
+            case SCREEN_EVENTS:
+                count = db.update(SCREEN_EVENTS_TABLE, values, selection,
+                    selectionArgs);
+                break;
+            case SCREEN_EVENT_ID:
+                final String sId = uri.getPathSegments().get(1);
+                String sFullSelection = ScreenEvents._ID + "='" + sId + "'";
+                if (!TextUtils.isEmpty(selection)) {
+                    sFullSelection += " AND (" + selection + ")";
+                }
+                count = db.update(SCREEN_EVENTS_TABLE, values, sFullSelection,
+                    selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported Uri: " + uri);
         }
@@ -362,6 +415,15 @@ public class NetstatContentProvider extends ContentProvider {
                         + BatteryEvents.SYNC_ID + " TEXT NOT NULL, "
                         + BatteryEvents.SYNC_STATUS + " INTEGER NOT NULL)";
                 db.execSQL(req);
+                
+                req = "CREATE TABLE " + SCREEN_EVENTS_TABLE + " ("
+                        + ScreenEvents._ID
+                        + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        + ScreenEvents.TIMESTAMP + " TIMESTAMP NOT NULL, "
+                        + ScreenEvents.SCREEN_ON + " INTEGER NOT NULL, "
+                        + ScreenEvents.SYNC_ID + " TEXT NOT NULL, "
+                        + ScreenEvents.SYNC_STATUS + " INTEGER NOT NULL)";
+                db.execSQL(req);
             }
         }
         
@@ -373,6 +435,7 @@ public class NetstatContentProvider extends ContentProvider {
                 db.execSQL("DROP TABLE IF EXISTS " + PHONE_EVENTS_TABLE);
                 db.execSQL("DROP TABLE IF EXISTS " + WIFI_EVENTS_TABLE);
                 db.execSQL("DROP TABLE IF EXISTS " + BATTERY_EVENTS_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + SCREEN_EVENTS_TABLE);
                 onCreate(db);
             }
         }

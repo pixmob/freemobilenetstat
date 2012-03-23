@@ -35,7 +35,7 @@ public class Netstat extends SherlockFragmentActivity {
         super.onCreate(savedInstanceState);
         
         if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null) {
-            final BatteryLevelChartFragment f = new BatteryLevelChartFragment();
+            final StatisticsFragment f = new StatisticsFragment();
             getSupportFragmentManager().beginTransaction()
                     .add(android.R.id.content, f).commit();
         }

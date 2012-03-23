@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ProgressBar
+        android:id="@+id/states_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="8dip"
+        android:layout_marginLeft="2dip"
+        android:layout_marginRight="2dip"
+        android:layout_marginTop="8dip"
+        android:orientation="vertical" >
+
+        <org.pixmob.freemobile.netstat.ui.BatteryLevelChart
+            android:id="@+id/battery_levels"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_marginBottom="8dip"
+            android:layout_weight="1"
+            android:visibility="invisible" />
+
+        <org.pixmob.freemobile.netstat.ui.StateChart
+            android:id="@+id/wifi_states"
+            name="@string/wifi_state"
+            android:layout_width="match_parent"
+            android:layout_height="32dip"
+            android:layout_marginBottom="8dip"
+            android:visibility="invisible" />
+
+        <org.pixmob.freemobile.netstat.ui.StateChart
+            android:id="@+id/screen_states"
+            name="@string/screen_state"
+            android:layout_width="match_parent"
+            android:layout_height="32dip"
+            android:visibility="invisible" />
+    </LinearLayout>
+
+</RelativeLayout>

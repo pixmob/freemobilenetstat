@@ -25,6 +25,7 @@ import java.util.concurrent.BlockingQueue;
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.BatteryEvents;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.PhoneEvents;
+import org.pixmob.freemobile.netstat.provider.NetstatContract.ScreenEvents;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.WifiEvents;
 import org.pixmob.freemobile.netstat.ui.Netstat;
 
@@ -261,6 +262,17 @@ public class MonitorService extends Service {
      */
     private void onScreenUpdated(boolean screenOn) {
         Log.i(TAG, "Screen is " + (screenOn ? "on" : "off"));
+        
+        final ContentValues cv = new ContentValues(4);
+        cv.put(ScreenEvents.SCREEN_ON, screenOn ? 1 : 0);
+        cv.put(ScreenEvents.TIMESTAMP, System.currentTimeMillis());
+        cv.put(ScreenEvents.SYNC_ID, UUID.randomUUID().toString());
+        cv.put(ScreenEvents.SYNC_STATUS, 0);
+        
+        if (!pendingInsert.offer(new PendingContent(ScreenEvents.CONTENT_URI,
+                cv))) {
+            Log.w(TAG, "Failed to schedule screen event insertion");
+        }
     }
     
     /**
