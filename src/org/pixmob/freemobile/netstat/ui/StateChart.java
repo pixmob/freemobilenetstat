@@ -67,21 +67,36 @@ public class StateChart extends View {
                 R.integer.chart_text_size));
         }
         
-        final int w = getWidth();
-        final int h = getHeight();
-        final long t0 = timestamps[0];
-        final float xScale = w
-                / (float) (timestamps[timestamps.length - 1] - t0);
-        
-        final int lastStateIdx = states.length - 1;
-        for (int i = 0; i < lastStateIdx; ++i) {
-            final boolean state = states[i];
-            if (state) {
-                final float x1 = xScale * (timestamps[i] - t0);
-                final float y1 = 0;
-                final float x2 = xScale * (timestamps[i + 1] - t0);
-                final float y2 = h;
-                canvas.drawRect(x1, y1, x2, y2, statePaint);
+        if (timestamps.length > 0) {
+            final int w = getWidth();
+            final int h = getHeight();
+            final long t0 = timestamps[0];
+            final float xScale = w
+                    / (float) (timestamps[timestamps.length - 1] - t0);
+            
+            final int lastStateIdx = states.length - 1;
+            for (int i = 0; i < lastStateIdx; ++i) {
+                final boolean state = states[i];
+                if (state) {
+                    final float x1 = xScale * (timestamps[i] - t0);
+                    final float y1 = 0;
+                    final float x2 = xScale * (timestamps[i + 1] - t0);
+                    final float y2 = h;
+                    canvas.drawRect(x1, y1, x2, y2, statePaint);
+                }
+            }
+            if (lastStateIdx != 0) {
+                final boolean state = states[lastStateIdx];
+                if (state) {
+                    float x1 = xScale * (timestamps[lastStateIdx] - t0);
+                    if (x1 >= w) {
+                        x1 = w - 1;
+                    }
+                    final float y1 = 0;
+                    final float x2 = w;
+                    final float y2 = h;
+                    canvas.drawRect(x1, y1, x2, y2, statePaint);
+                }
             }
         }
         

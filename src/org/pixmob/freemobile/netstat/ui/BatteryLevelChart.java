@@ -105,33 +105,36 @@ public class BatteryLevelChart extends View {
         final int points = levels.length;
         final int w = getWidth();
         final int h = getHeight();
-        final float xScale = w / (float) points;
         final float yScale = h / 10f;
-        
-        // Plot data.
-        final Path levelPath = new Path();
-        final int lastPointIdx = points - 1;
-        for (int i = 0; i < points; ++i) {
-            final int level = levels[i];
-            final float x = i == lastPointIdx ? w : i * xScale;
-            float y = h - level * yScale / 10f;
-            if (y <= 0) {
-                y = lineStrokeWidth / 2;
+        if (points > 0) {
+            final float xScale = w / (float) points;
+            
+            // Plot data.
+            final Path levelPath = new Path();
+            final int lastPointIdx = points - 1;
+            for (int i = 0; i < points; ++i) {
+                final int level = levels[i];
+                final float x = i == lastPointIdx ? w : i * xScale;
+                float y = h - level * yScale / 10f;
+                if (y <= 0) {
+                    y = lineStrokeWidth / 2;
+                }
+                if (i != 0) {
+                    levelPath.lineTo(x, y);
+                } else {
+                    levelPath.moveTo(x, y);
+                }
             }
-            if (i != 0) {
-                levelPath.lineTo(x, y);
-            } else {
-                levelPath.moveTo(x, y);
-            }
+            canvas.drawPath(levelPath, levelBorderPaint);
+            levelPath.lineTo(w, h);
+            levelPath.lineTo(0, h);
+            levelPath.close();
+            levelBgPaint.setShader(new LinearGradient(0, h, 0, 0,
+                    getResources().getColor(R.color.chart_fg_color_start),
+                    getResources().getColor(R.color.chart_fg_color_end),
+                    Shader.TileMode.CLAMP));
+            canvas.drawPath(levelPath, levelBgPaint);
         }
-        canvas.drawPath(levelPath, levelBorderPaint);
-        levelPath.lineTo(w, h);
-        levelPath.lineTo(0, h);
-        levelPath.close();
-        levelBgPaint.setShader(new LinearGradient(0, h, 0, 0, getResources()
-                .getColor(R.color.chart_fg_color_start), getResources()
-                .getColor(R.color.chart_fg_color_end), Shader.TileMode.CLAMP));
-        canvas.drawPath(levelPath, levelBgPaint);
         
         // Draw Y axis.
         canvas.drawRect(0, 0, axisThickness, h, axisPaint);
@@ -146,18 +149,20 @@ public class BatteryLevelChart extends View {
         }
         canvas.drawRect(0, 0, axisUnitThickness, axisThickness, axisPaint);
         
-        final long startTime = timestamps[0];
-        final long stopTime = timestamps[timestamps.length - 1];
-        final String startTimeStr = DateUtils.formatDateTime(getContext(),
-            startTime, DateUtils.FORMAT_SHOW_TIME);
-        final String stopTimeStr = DateUtils.formatDateTime(getContext(),
-            stopTime, DateUtils.FORMAT_SHOW_TIME);
-        final int textMargins = 5;
-        final float textY = h - 2 * textMargins;
-        canvas.drawText(startTimeStr, textMargins, textY, smallTextPaint);
-        canvas.drawText(stopTimeStr,
-            w - textMargins - smallTextPaint.measureText(stopTimeStr), textY,
-            smallTextPaint);
+        if (points > 0) {
+            final long startTime = timestamps[0];
+            final long stopTime = timestamps[timestamps.length - 1];
+            final String startTimeStr = DateUtils.formatDateTime(getContext(),
+                startTime, DateUtils.FORMAT_SHOW_TIME);
+            final String stopTimeStr = DateUtils.formatDateTime(getContext(),
+                stopTime, DateUtils.FORMAT_SHOW_TIME);
+            final int textMargins = 5;
+            final float textY = h - 2 * textMargins;
+            canvas.drawText(startTimeStr, textMargins, textY, smallTextPaint);
+            canvas.drawText(stopTimeStr,
+                w - textMargins - smallTextPaint.measureText(stopTimeStr),
+                textY, smallTextPaint);
+        }
         
         final int textMargin = 10;
         canvas.drawText(getResources().getString(R.string.battery_level),
