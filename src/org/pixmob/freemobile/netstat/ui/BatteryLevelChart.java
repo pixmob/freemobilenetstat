@@ -56,8 +56,8 @@ public class BatteryLevelChart extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         
-        if (levels == null || levels.length == 0 || timestamps == null
-                || timestamps.length == 0 || levels.length != timestamps.length) {
+        if (levels == null || timestamps == null
+                || levels.length != timestamps.length) {
             return;
         }
         

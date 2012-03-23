@@ -19,6 +19,7 @@ import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 
 import org.pixmob.freemobile.netstat.R;
+import org.pixmob.freemobile.netstat.monitor.MobileOperator;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.BatteryEvents;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.PhoneEvents;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.ScreenEvents;
@@ -52,6 +53,7 @@ public class StatisticsFragment extends SherlockFragment implements
         LoaderCallbacks<StatisticsData> {
     private ContentObserver contentMonitor;
     private BatteryLevelChart batteryChart;
+    private StateChart orangeNetworkChart;
     private StateChart wifiChart;
     private StateChart screenChart;
     private View statisticsGroup;
@@ -73,6 +75,8 @@ public class StatisticsFragment extends SherlockFragment implements
         
         final Activity a = getActivity();
         batteryChart = (BatteryLevelChart) a.findViewById(R.id.battery_levels);
+        orangeNetworkChart = (StateChart) a
+                .findViewById(R.id.orange_network_states);
         wifiChart = (StateChart) a.findViewById(R.id.wifi_states);
         screenChart = (StateChart) a.findViewById(R.id.screen_states);
         statisticsGroup = a.findViewById(R.id.statistics);
@@ -128,10 +132,13 @@ public class StatisticsFragment extends SherlockFragment implements
     public void onLoadFinished(Loader<StatisticsData> loader, StatisticsData d) {
         if (d == null) {
             batteryChart.setData(null, null);
+            orangeNetworkChart.setData(null, null);
             wifiChart.setData(null, null);
             screenChart.setData(null, null);
         } else {
             batteryChart.setData(d.batteryTimestamps, d.batteryLevels);
+            orangeNetworkChart.setData(d.orangeNetworkTimestamps,
+                d.orangeNetworkStates);
             wifiChart.setData(d.wifiTimestamps, d.wifiStates);
             screenChart.setData(d.screenTimestamps, d.screenStates);
         }
@@ -164,6 +171,8 @@ public class StatisticsFragment extends SherlockFragment implements
         public StatisticsData loadInBackground() {
             int[] batteryLevels = null;
             long[] batteryTimestamps = null;
+            boolean[] freeMobileStates;
+            long[] freeMobileTimestamps;
             boolean[] wifiStates = null;
             long[] wifiTimestamps = null;
             boolean[] screenStates = null;
@@ -236,6 +245,27 @@ public class StatisticsFragment extends SherlockFragment implements
                     screenTimestamps[i] = c.getLong(0);
                     screenStates[i] = c.getInt(1) == 1;
                 }
+                
+                c.close();
+                c = getContext().getContentResolver().query(
+                    PhoneEvents.CONTENT_URI,
+                    new String[] { PhoneEvents.TIMESTAMP,
+                            PhoneEvents.MOBILE_OPERATOR,
+                            PhoneEvents.MOBILE_CONNECTED },
+                    PhoneEvents.TIMESTAMP + ">? AND " + PhoneEvents.TIMESTAMP
+                            + "<=?",
+                    new String[] { String.valueOf(internalStartTimestamp),
+                            String.valueOf(intervalStopTimestamp) },
+                    PhoneEvents.TIMESTAMP + " ASC");
+                rowCount = c.getCount();
+                freeMobileStates = new boolean[rowCount];
+                freeMobileTimestamps = new long[rowCount];
+                for (int i = 0; c.moveToNext(); ++i) {
+                    freeMobileTimestamps[i] = c.getLong(0);
+                    freeMobileStates[i] = c.getInt(2) == 1
+                            && MobileOperator.ORANGE.equals(MobileOperator
+                                    .fromString(c.getString(1)));
+                }
             } catch (Exception e) {
                 Log.e(TAG, "Failed to load statistics", e);
                 return null;
@@ -254,7 +284,8 @@ public class StatisticsFragment extends SherlockFragment implements
             }
             
             return new StatisticsData(batteryTimestamps, batteryLevels,
-                    wifiTimestamps, wifiStates, screenTimestamps, screenStates);
+                    freeMobileTimestamps, freeMobileStates, wifiTimestamps,
+                    wifiStates, screenTimestamps, screenStates);
         }
     }
     
@@ -265,17 +296,22 @@ public class StatisticsFragment extends SherlockFragment implements
     public static class StatisticsData {
         public final int[] batteryLevels;
         public final long[] batteryTimestamps;
+        public final long[] orangeNetworkTimestamps;
+        public final boolean[] orangeNetworkStates;
         public final boolean[] wifiStates;
         public final long[] wifiTimestamps;
         public final boolean[] screenStates;
         public final long[] screenTimestamps;
         
         public StatisticsData(final long[] batteryTimestamps,
-                final int[] batteryLevels, final long[] wifiTimestamps,
+                final int[] batteryLevels, final long[] freeMobileTimestamps,
+                final boolean[] freeMobileStates, final long[] wifiTimestamps,
                 final boolean[] wifiStates, final long[] screenTimestamps,
                 final boolean[] screenStates) {
             this.batteryTimestamps = batteryTimestamps;
             this.batteryLevels = batteryLevels;
+            this.orangeNetworkTimestamps = freeMobileTimestamps;
+            this.orangeNetworkStates = freeMobileStates;
             this.wifiTimestamps = wifiTimestamps;
             this.wifiStates = wifiStates;
             this.screenTimestamps = screenTimestamps;

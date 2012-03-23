@@ -17,5 +17,6 @@
     <string name="service_monitor">Service de suivi de la connexion</string>
     <string name="wifi_state">Wi-Fi</string>
     <string name="screen_state">Écran</string>
+    <string name="orange_network_state">Réseau Orange</string>
 
 </resources>

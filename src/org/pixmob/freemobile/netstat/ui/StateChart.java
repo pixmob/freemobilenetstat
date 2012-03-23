@@ -46,8 +46,8 @@ public class StateChart extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         
-        if (states == null || states.length == 0 || timestamps == null
-                || timestamps.length == 0 || states.length != timestamps.length) {
+        if (states == null || timestamps == null
+                || states.length != timestamps.length) {
             return;
         }
         
@@ -85,7 +85,8 @@ public class StateChart extends View {
             }
         }
         
-        canvas.drawText(getResources().getString(nameRes), 0,
+        final int textMargin = 5;
+        canvas.drawText(getResources().getString(nameRes), textMargin,
             -textPaint.ascent(), textPaint);
     }
     
