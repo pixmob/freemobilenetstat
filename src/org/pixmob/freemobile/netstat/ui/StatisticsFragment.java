@@ -20,13 +20,18 @@ import static org.pixmob.freemobile.netstat.Constants.TAG;
 
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.BatteryEvents;
+import org.pixmob.freemobile.netstat.provider.NetstatContract.PhoneEvents;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.ScreenEvents;
 import org.pixmob.freemobile.netstat.provider.NetstatContract.WifiEvents;
 import org.pixmob.freemobile.netstat.ui.StatisticsFragment.StatisticsData;
 
+import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
@@ -45,6 +50,7 @@ import com.actionbarsherlock.app.SherlockFragment;
  */
 public class StatisticsFragment extends SherlockFragment implements
         LoaderCallbacks<StatisticsData> {
+    private ContentObserver contentMonitor;
     private BatteryLevelChart batteryChart;
     private StateChart wifiChart;
     private StateChart screenChart;
@@ -54,15 +60,44 @@ public class StatisticsFragment extends SherlockFragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-        batteryChart = (BatteryLevelChart) getActivity().findViewById(
-            R.id.battery_levels);
-        wifiChart = (StateChart) getActivity().findViewById(R.id.wifi_states);
-        screenChart = (StateChart) getActivity().findViewById(
-            R.id.screen_states);
-        progressBar = (ProgressBar) getActivity().findViewById(
-            R.id.states_progress);
+        contentMonitor = new ContentObserver(new Handler()) {
+            @Override
+            public void onChange(boolean selfChange) {
+                super.onChange(selfChange);
+                
+                Log.i(TAG, "Content updated: refresh statistics");
+                refresh();
+            }
+        };
+        
+        final Activity a = getActivity();
+        batteryChart = (BatteryLevelChart) a.findViewById(R.id.battery_levels);
+        wifiChart = (StateChart) a.findViewById(R.id.wifi_states);
+        screenChart = (StateChart) a.findViewById(R.id.screen_states);
+        progressBar = (ProgressBar) a.findViewById(R.id.states_progress);
         
         refresh();
+    }
+    
+    @Override
+    public void onStart() {
+        super.onStart();
+        
+        final ContentResolver cr = getActivity().getContentResolver();
+        cr.registerContentObserver(PhoneEvents.CONTENT_URI, true,
+            contentMonitor);
+        cr.registerContentObserver(BatteryEvents.CONTENT_URI, true,
+            contentMonitor);
+        cr.registerContentObserver(WifiEvents.CONTENT_URI, true, contentMonitor);
+        cr.registerContentObserver(ScreenEvents.CONTENT_URI, true,
+            contentMonitor);
+    }
+    
+    @Override
+    public void onStop() {
+        super.onStop();
+        getActivity().getContentResolver().unregisterContentObserver(
+            contentMonitor);
     }
     
     @Override
