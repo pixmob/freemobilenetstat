@@ -15,21 +15,20 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
-import org.pixmob.freemobile.netstat.monitor.MonitorService;
+import org.pixmob.freemobile.netstat.MonitorService;
 
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Window;
-
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 /**
  * Main application activity.
  * @author Pixmob
  */
-public class Netstat extends SherlockFragmentActivity {
+public class Netstat extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

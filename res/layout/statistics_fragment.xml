@@ -13,40 +13,186 @@
         android:id="@+id/statistics"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="8dip"
-        android:layout_marginLeft="2dip"
-        android:layout_marginRight="2dip"
-        android:layout_marginTop="8dip"
-        android:orientation="vertical"
-        android:visibility="invisible" >
+        android:orientation="vertical" >
 
-        <org.pixmob.freemobile.netstat.ui.BatteryLevelChart
-            android:id="@+id/battery_levels"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_marginBottom="8dip"
-            android:layout_weight="1" />
+            android:layout_height="wrap_content"
+            android:gravity="center" >
 
-        <org.pixmob.freemobile.netstat.ui.StateChart
-            android:id="@+id/orange_network_states"
-            name="@string/orange_network_state"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/state_chart_height"
-            android:layout_marginBottom="8dip" />
+            <org.pixmob.freemobile.netstat.ui.MobileNetworkChart
+                android:id="@+id/mobile_network_chart"
+                android:layout_width="@dimen/network_pie_width"
+                android:layout_height="@dimen/network_pie_width"
+                android:layout_marginRight="8dip" />
 
-        <org.pixmob.freemobile.netstat.ui.StateChart
-            android:id="@+id/wifi_states"
-            name="@string/wifi_state"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/state_chart_height"
-            android:layout_marginBottom="8dip" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8dip"
+                android:orientation="vertical" >
 
-        <org.pixmob.freemobile.netstat.ui.StateChart
-            android:id="@+id/screen_states"
-            name="@string/screen_state"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="@string/network_orange"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/orange_network_color" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:text="@string/network_free_mobile"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/free_mobile_network_color" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center|right"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/on_orange_network"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="87%"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/orange_network_color" />
+
+                <TextView
+                    android:id="@+id/on_free_mobile_network"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="13%"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/free_mobile_network_color" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/state_chart_height" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                style="@style/stat_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    style="@style/stat_row_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stat_mobile_network" />
+
+                <TextView
+                    android:id="@+id/stat_mobile_network"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Orange" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/stat_row_even"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    style="@style/stat_row_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stat_mobile_code" />
+
+                <TextView
+                    android:id="@+id/stat_mobile_code"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="20810" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/stat_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    style="@style/stat_row_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stat_connected_since" />
+
+                <TextView
+                    android:id="@+id/stat_connected_since"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="8h 26m" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/stat_row_even"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    style="@style/stat_row_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stat_started_since" />
+
+                <TextView
+                    android:id="@+id/stat_started_since"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="8h 32m" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/stat_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    style="@style/stat_row_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stat_screen" />
+
+                <TextView
+                    android:id="@+id/stat_screen"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="1h 27m" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/stat_row_even"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    style="@style/stat_row_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stat_wifi" />
+
+                <TextView
+                    android:id="@+id/stat_wifi"
+                    android:layout_width="0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="27m" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 
 </RelativeLayout>
