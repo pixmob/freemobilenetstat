@@ -7,5 +7,9 @@
     <color name="chart_fg_color_end">#5aa9e5</color>
     <color name="chart_text_color">#fff</color>
     <color name="chart_small_text_color">#888</color>
+    <color name="orange_network_color">#FF6600</color>
+    <color name="free_mobile_network_color">#CD1E25</color>
+    <color name="unknown_mobile_network_color">#444444</color>
+    <color name="pie_border_color">#222222</color>
 
 </resources>

@@ -6,6 +6,7 @@
     <string name="mobile_network_type">Réseau mobile %s</string>
     <string name="network_free_mobile">Free Mobile</string>
     <string name="network_orange">Orange</string>
+    <string name="network_unknown">Inconnu</string>
     <string name="network_type_unknown">inconnu</string>
     <string name="network_type_gprs">2G (GPRS)</string>
     <string name="network_type_edge">2G (EDGE)</string>
@@ -15,9 +16,17 @@
     <string name="network_type_hspa">3G+ (HSPA)</string>
     <string name="network_type_hspap">3G+ (HSPAP)</string>
     <string name="service_monitor">Service de suivi de la connexion</string>
-    <string name="wifi_state">Wi-Fi</string>
-    <string name="screen_state">Écran</string>
-    <string name="orange_network_state">Réseau Orange</string>
-    <string name="battery_level">Batterie</string>
+    <string name="percent_on_orange_network">Orange : %s</string>
+    <string name="percent_on_free_mobile_network">Free Mobile : %s</string>
+    <string name="stat_mobile_network">Réseau actuel</string>
+    <string name="stat_mobile_code">Code MNC+MCC</string>
+    <string name="stat_connected_since">Connecté depuis</string>
+    <string name="stat_started_since">Démarré depuis</string>
+    <string name="stat_screen">Écran allumé</string>
+    <string name="stat_wifi">Wi-Fi actif</string>
+    <string name="days">j</string>
+    <string name="hours">h</string>
+    <string name="minutes">m</string>
+    <string name="seconds">s</string>
 
 </resources>

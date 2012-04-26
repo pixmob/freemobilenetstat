@@ -2,5 +2,6 @@
 <resources>
 
     <dimen name="state_chart_height">48dip</dimen>
+    <dimen name="network_pie_width">64dip</dimen>
 
 </resources>
