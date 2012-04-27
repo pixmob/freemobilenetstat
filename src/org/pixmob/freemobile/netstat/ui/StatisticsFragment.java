@@ -164,7 +164,7 @@ public class StatisticsFragment extends Fragment implements
         
         final StringBuilder buf = new StringBuilder(32);
         if (ds < 60) {
-            buf.append(ds);
+            buf.append(ds).append(getString(R.string.seconds));
         } else if (ds < 3600) {
             final long m = ds / 60;
             buf.append(m).append(getString(R.string.minutes));
