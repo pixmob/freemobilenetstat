@@ -177,11 +177,12 @@ public class StatisticsFragment extends Fragment implements
             return STAT_NO_VALUE;
         }
         final long ds = duration / 1000;
+        if (ds < 60) {
+            return STAT_NO_VALUE;
+        }
         
         final StringBuilder buf = new StringBuilder(32);
-        if (ds < 60) {
-            buf.append(ds).append(getString(R.string.just_now));
-        } else if (ds < 3600) {
+        if (ds < 3600) {
             final long m = ds / 60;
             buf.append(m).append(getString(R.string.minutes));
         } else if (ds < 86400) {
