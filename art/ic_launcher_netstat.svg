@@ -14,7 +14,10 @@
    id="svg3982"
    version="1.1"
    inkscape:version="0.48.2 r9819"
-   sodipodi:docname="Nouveau document 12">
+   sodipodi:docname="ic_launcher_netstat.svg"
+   inkscape:export-filename="/home/aro/Projets/perso/pixmob/freemobilenetstat/res/drawable-hdpi/ic_launcher_netstat.png"
+   inkscape:export-xdpi="67.5"
+   inkscape:export-ydpi="67.5">
   <defs
      id="defs3984">
     <linearGradient
@@ -36,9 +39,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.8"
-     inkscape:cx="45.440782"
-     inkscape:cy="16.333483"
+     inkscape:zoom="1.979899"
+     inkscape:cx="3.8590886"
+     inkscape:cy="18.100399"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -65,23 +68,14 @@
      id="layer1"
      transform="translate(0,-956.3622)">
     <path
-       sodipodi:type="arc"
-       style="fill:#ff7f2a;fill-opacity:1;stroke:#000000;stroke-width:0.69495211999999995;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="path3081"
-       sodipodi:cx="68.690376"
-       sodipodi:cy="340.96225"
-       sodipodi:rx="28.789347"
-       sodipodi:ry="28.789347"
-       d="m 97.479723,340.96225 a 28.789347,28.789347 0 1 1 -57.578693,0 28.789347,28.789347 0 1 1 57.578693,0 z"
-       transform="matrix(1.4389417,0,0,1.4389544,-50.841449,513.77828)"
-       inkscape:export-xdpi="29.569782"
-       inkscape:export-ydpi="29.569782" />
+       style="fill:#ff7f2a;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 76.875,974.75283 C 69.408908,967.46805 59.255178,962.94033 48,962.94033 c -22.879054,0 -41.4375,18.52699 -41.4375,41.40627 0,22.8792 18.558446,41.4375 41.4375,41.4375 11.495698,0 21.86979,-4.6883 29.375,-12.25 L 47.75,1004.5028 76.875,974.75283 z"
+       id="path3007"
+       inkscape:connector-curvature="0" />
     <path
        style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 48.008771,962.94045 0,41.33075 36.061609,-20.29166 C 76.952219,971.41338 63.47727,962.94045 48.008771,962.94045 z"
-       id="path3081-8"
-       inkscape:connector-curvature="0"
-       inkscape:export-xdpi="29.569782"
-       inkscape:export-ydpi="29.569782" />
+       d="M 76.875 18.4375 L 47.75 48.1875 L 77.375 77.21875 C 84.806865 69.730923 89.4375 59.414706 89.4375 48.03125 C 89.4375 36.407272 84.585666 25.960913 76.875 18.4375 z "
+       id="path3081"
+       transform="translate(0,956.3622)" />
   </g>
 </svg>

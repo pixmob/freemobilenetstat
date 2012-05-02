@@ -16,6 +16,8 @@
 package org.pixmob.freemobile.netstat;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_ICON_GRAY;
+import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -33,6 +35,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
@@ -233,7 +236,7 @@ public class MonitorService extends Service {
             getString(R.string.mobile_network_type),
             getString(NETWORK_TYPE_STRINGS.get(mobileNetworkType)));
         
-        final int iconRes = R.drawable.ic_stat_notify_service;
+        final int iconRes = getStatIcon(mobOp);
         final String tickerText = String.format(
             getString(R.string.stat_connected_to_mobile_network),
             mobOp.toName(this));
@@ -244,6 +247,20 @@ public class MonitorService extends Service {
                 .setContentIntent(openUIPendingIntent).getNotification();
         
         startForeground(R.string.stat_connected_to_mobile_network, n);
+    }
+    
+    private int getStatIcon(MobileOperator op) {
+        final SharedPreferences prefs = getSharedPreferences(SP_NAME,
+            MODE_PRIVATE);
+        if (!prefs.getBoolean(SP_KEY_STAT_NOTIF_ICON_GRAY, false)) {
+            if (MobileOperator.FREE_MOBILE.equals(op)) {
+                return R.drawable.ic_stat_notify_service_free;
+            }
+            if (MobileOperator.ORANGE.equals(op)) {
+                return R.drawable.ic_stat_notify_service_orange;
+            }
+        }
+        return R.drawable.ic_stat_notify_service;
     }
     
     /**

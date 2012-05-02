@@ -32,15 +32,10 @@ public final class Constants {
      */
     public static final String SP_NAME = "netstat";
     /**
-     * {@link SharedPreferences} key: do not display a notification when the
-     * mobile operator is Free Mobile.
+     * {@link SharedPreferences} key: use a gray icon for the status bar
+     * notification.
      */
-    public static final String SP_KEY_SKIP_FREE_MOBILE_NOTIF = "skipFreeMobileNotif";
-    /**
-     * {@link SharedPreferences} key: do not display a notification when the
-     * mobile operator is Orange.
-     */
-    public static final String SP_KEY_SKIP_ORANGE_NOTIF = "skipOrangeNotif";
+    public static final String SP_KEY_STAT_NOTIF_ICON_GRAY = "statNotifIconGray";
     
     private Constants() {
     }
