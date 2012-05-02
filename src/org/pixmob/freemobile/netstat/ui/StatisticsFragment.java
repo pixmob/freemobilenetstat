@@ -55,6 +55,7 @@ public class StatisticsFragment extends Fragment implements
     private View statisticsGroup;
     private ProgressBar progressBar;
     private MobileNetworkChart mobileNetworkChart;
+    private BatteryChart batteryChart;
     private TextView onFreeMobileNetwork;
     private TextView onOrangeNetwork;
     private TextView statMobileNetwork;
@@ -84,6 +85,7 @@ public class StatisticsFragment extends Fragment implements
         progressBar = (ProgressBar) a.findViewById(R.id.states_progress);
         mobileNetworkChart = (MobileNetworkChart) a
                 .findViewById(R.id.mobile_network_chart);
+        batteryChart = (BatteryChart) a.findViewById(R.id.battery_chart);
         onOrangeNetwork = (TextView) a.findViewById(R.id.on_orange_network);
         onFreeMobileNetwork = (TextView) a
                 .findViewById(R.id.on_free_mobile_network);
@@ -152,6 +154,8 @@ public class StatisticsFragment extends Fragment implements
         setDurationText(statStartedSince, s.bootTime);
         setDurationText(statScreenOn, s.screenOnTime);
         setDurationText(statWifiOn, s.wifiOnTime);
+        
+        batteryChart.setData(s.events);
         
         progressBar.setVisibility(View.INVISIBLE);
         statisticsGroup.setVisibility(View.VISIBLE);
