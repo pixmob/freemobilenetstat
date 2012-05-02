@@ -81,7 +81,7 @@ public class BatteryChart extends View {
         final int h = getHeight() - margins * 2;
         final float x0Graph = yTextPaint.measureText("100") + 2;
         
-        final float[] lines = new float[7 * 4];
+        final float[] lines = new float[12 * 4];
         int lineIdx = 0;
         lines[lineIdx++] = x0Graph;
         lines[lineIdx++] = 0;
@@ -95,9 +95,10 @@ public class BatteryChart extends View {
         // Draw Y units.
         final float x0Text = x0Graph - 5;
         final float yFactor = h / 100f;
-        final float yBand = yFactor * 20;
+        final int bandSize = 10;
+        final float yBand = yFactor * bandSize;
         final float yAscent2 = yTextPaint.ascent() / 2;
-        for (int i = 20; i <= 100; i += 20) {
+        for (int i = bandSize; i <= 100; i += bandSize) {
             if (bgPaint.getColor() == bgColor2) {
                 bgPaint.setColor(bgColor1);
             } else {
