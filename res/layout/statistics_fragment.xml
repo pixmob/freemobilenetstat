@@ -77,119 +77,98 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dip"
-            android:orientation="vertical" >
+            android:baselineAligned="false"
+            android:orientation="horizontal" >
 
             <LinearLayout
-                style="@style/stat_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
 
                 <TextView
-                    style="@style/stat_row_header"
-                    android:layout_width="wrap_content"
+                    style="@style/stat_row_even"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/stat_mobile_network" />
 
                 <TextView
-                    android:id="@+id/stat_mobile_network"
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Orange" />
-            </LinearLayout>
-
-            <LinearLayout
-                style="@style/stat_row_even"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-
-                <TextView
-                    style="@style/stat_row_header"
-                    android:layout_width="wrap_content"
+                    style="@style/stat_row"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/stat_mobile_code" />
 
                 <TextView
-                    android:id="@+id/stat_mobile_code"
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="20810" />
-            </LinearLayout>
-
-            <LinearLayout
-                style="@style/stat_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-
-                <TextView
-                    style="@style/stat_row_header"
-                    android:layout_width="wrap_content"
+                    style="@style/stat_row_even"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/stat_connected_since" />
 
                 <TextView
-                    android:id="@+id/stat_connected_since"
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="8h 26m" />
-            </LinearLayout>
-
-            <LinearLayout
-                style="@style/stat_row_even"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-
-                <TextView
-                    style="@style/stat_row_header"
-                    android:layout_width="wrap_content"
+                    style="@style/stat_row"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/stat_started_since" />
 
                 <TextView
-                    android:id="@+id/stat_started_since"
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="8h 32m" />
-            </LinearLayout>
-
-            <LinearLayout
-                style="@style/stat_row"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-
-                <TextView
-                    style="@style/stat_row_header"
-                    android:layout_width="wrap_content"
+                    style="@style/stat_row_even"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/stat_screen" />
 
                 <TextView
-                    android:id="@+id/stat_screen"
-                    android:layout_width="0dip"
+                    style="@style/stat_row"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="1h 27m" />
+                    android:text="@string/stat_wifi" />
             </LinearLayout>
 
             <LinearLayout
-                style="@style/stat_row_even"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical" >
 
                 <TextView
-                    style="@style/stat_row_header"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/stat_mobile_network"
+                    style="@style/stat_row_even"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/stat_wifi" />
+                    android:text="Orange" />
+
+                <TextView
+                    android:id="@+id/stat_mobile_code"
+                    style="@style/stat_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="20810" />
+
+                <TextView
+                    android:id="@+id/stat_connected_since"
+                    style="@style/stat_row_even"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="8h 26m" />
+
+                <TextView
+                    android:id="@+id/stat_started_since"
+                    style="@style/stat_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="8h 32m" />
+
+                <TextView
+                    android:id="@+id/stat_screen"
+                    style="@style/stat_row_even"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1h 27m" />
 
                 <TextView
                     android:id="@+id/stat_wifi"
-                    android:layout_width="0dip"
+                    style="@style/stat_row"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:text="27m" />
             </LinearLayout>
         </LinearLayout>

@@ -14,10 +14,4 @@
         <item name="android:background">#383840</item>
     </style>
 
-    <style name="stat_row_header">
-        <item name="android:width">150dip</item>
-        <item name="android:paddingRight">8dip</item>
-        <item name="android:singleLine">true</item>
-    </style>
-
 </resources>
