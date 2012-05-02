@@ -4,4 +4,5 @@ gen
 .settings
 *.log
 assets/bugsense.txt
+.directory
 
