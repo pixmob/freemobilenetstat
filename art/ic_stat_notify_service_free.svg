@@ -15,8 +15,8 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.2 r9819"
-   sodipodi:docname="ic_stat_notify_service.svg"
-   inkscape:export-filename="/home/aro/Projets/perso/pixmob/freemobilenetstat/res/drawable-hdpi/ic_stat_notify_service.png"
+   sodipodi:docname="ic_stat_notify_service_free.svg"
+   inkscape:export-filename="/home/aro/Projets/perso/pixmob/freemobilenetstat/res/drawable-hdpi/ic_stat_notify_service_free.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -79,7 +79,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="24.785784"
+     inkscape:cx="10.098284"
      inkscape:cy="18.064325"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -101,7 +101,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -117,7 +117,7 @@
        inkscape:connector-curvature="0" />
     <path
        inkscape:connector-curvature="0"
-       style="fill:#e6e6e6;fill-opacity:1;stroke:#000000;stroke-width:0.28329011999999998;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:0.28329011999999998;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m 53.21381,347.9228 -8.250824,8.42788 8.39247,8.22427 c 2.105372,-2.12123 3.417187,-5.04371 3.417187,-8.26853 0,-3.29296 -1.374479,-6.25231 -3.558833,-8.38362 z"
        id="path3081-6" />
   </g>
