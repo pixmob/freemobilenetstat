@@ -144,16 +144,25 @@ public class StatisticsFragment extends Fragment implements
         mobileNetworkChart.setData(s.orangeUsePercent, s.freeMobileUsePercent);
         
         final Activity a = getActivity();
-        statMobileNetwork.setText(s.mobileOperator.toName(a));
+        statMobileNetwork.setText(s.mobileOperator == null ? STAT_NO_VALUE
+                : s.mobileOperator.toName(a));
         statMobileCode.setText(s.mobileOperatorCode == null ? STAT_NO_VALUE
                 : s.mobileOperatorCode);
-        statConnectedSince.setText(formatDuration(s.connectionTime));
-        statStartedSince.setText(formatDuration(s.bootTime));
-        statScreenOn.setText(formatDuration(s.screenOnTime));
-        statWifiOn.setText(formatDuration(s.wifiOnTime));
+        setDurationText(statConnectedSince, s.connectionTime);
+        setDurationText(statStartedSince, s.bootTime);
+        setDurationText(statScreenOn, s.screenOnTime);
+        setDurationText(statWifiOn, s.wifiOnTime);
         
         progressBar.setVisibility(View.INVISIBLE);
         statisticsGroup.setVisibility(View.VISIBLE);
+    }
+    
+    private void setDurationText(TextView tv, long duration) {
+        if (duration < 1) {
+            tv.setText(STAT_NO_VALUE);
+        } else {
+            tv.setText(formatDuration(duration));
+        }
     }
     
     private CharSequence formatDuration(long duration) {
@@ -246,6 +255,7 @@ public class StatisticsFragment extends Fragment implements
             
             long orangeNetworkTime = 0;
             long freeMobileNetworkTime = 0;
+            long connectionTimestamp = 0;
             
             Cursor c = null;
             try {
@@ -282,6 +292,12 @@ public class StatisticsFragment extends Fragment implements
                                 }
                             }
                         }
+                        if (e.mobileConnected && !e0.mobileConnected) {
+                            connectionTimestamp = e.timestamp;
+                        }
+                        if (!e.mobileConnected) {
+                            connectionTimestamp = 0;
+                        }
                         if (e.wifiConnected && e0.wifiConnected) {
                             s.wifiOnTime += dt;
                         }
@@ -291,18 +307,12 @@ public class StatisticsFragment extends Fragment implements
                     }
                 }
                 
-                final double sTime = (double) (now - deviceBootTimestamp);
+                final double sTime = (double) (orangeNetworkTime + freeMobileNetworkTime);
                 s.freeMobileUsePercent = (int) Math.round(freeMobileNetworkTime
                         / sTime * 100d);
-                s.orangeUsePercent = (int) Math.round(orangeNetworkTime / sTime
-                        * 100d);
+                s.orangeUsePercent = 100 - s.freeMobileUsePercent;
                 s.bootTime = now - deviceBootTimestamp;
-                
-                if (MobileOperator.FREE_MOBILE.equals(s.mobileOperator)) {
-                    s.connectionTime = freeMobileNetworkTime;
-                } else if (MobileOperator.ORANGE.equals(s.mobileOperator)) {
-                    s.connectionTime = orangeNetworkTime;
-                }
+                s.connectionTime = now - connectionTimestamp;
             } catch (Exception e) {
                 Log.e(TAG, "Failed to load statistics", e);
                 s.events = new Event[0];
