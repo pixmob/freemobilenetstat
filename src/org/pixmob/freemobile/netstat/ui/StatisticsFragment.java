@@ -173,15 +173,10 @@ public class StatisticsFragment extends Fragment implements
         
         final StringBuilder buf = new StringBuilder(32);
         if (ds < 60) {
-            buf.append(ds).append(getString(R.string.seconds));
+            buf.append(ds).append(getString(R.string.just_now));
         } else if (ds < 3600) {
             final long m = ds / 60;
             buf.append(m).append(getString(R.string.minutes));
-            
-            final long s = ds - m * 60;
-            if (s != 0) {
-                buf.append(" ").append(s).append(getString(R.string.seconds));
-            }
         } else if (ds < 86400) {
             final long h = ds / 3600;
             buf.append(h).append(getString(R.string.hours));
@@ -189,11 +184,6 @@ public class StatisticsFragment extends Fragment implements
             final long m = (ds - h * 3600) / 60;
             if (m != 0) {
                 buf.append(" ").append(m).append(getString(R.string.minutes));
-            }
-            
-            final long s = ds - h * 3600 - m * 60;
-            if (s != 0) {
-                buf.append(" ").append(s).append(getString(R.string.seconds));
             }
         } else {
             final long d = ds / 86400;
@@ -207,11 +197,6 @@ public class StatisticsFragment extends Fragment implements
             final long m = (ds - d * 86400 - h * 3600) / 60;
             if (m != 0) {
                 buf.append(" ").append(m).append(getString(R.string.minutes));
-            }
-            
-            final long s = ds - d * 86400 - h * 3600 - m * 60;
-            if (s != 0) {
-                buf.append(" ").append(s).append(getString(R.string.seconds));
             }
         }
         
