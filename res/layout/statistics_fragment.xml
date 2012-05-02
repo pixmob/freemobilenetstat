@@ -76,6 +76,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dip"
             android:layout_marginTop="8dip"
             android:baselineAligned="false"
             android:orientation="horizontal" >
@@ -172,6 +173,13 @@
                     android:text="27m" />
             </LinearLayout>
         </LinearLayout>
+
+        <org.pixmob.freemobile.netstat.ui.BatteryChart
+            android:id="@+id/battery_chart"
+            android:layout_width="wrap_content"
+            android:layout_height="0dip"
+            android:layout_marginBottom="16dip"
+            android:layout_weight="1" />
     </LinearLayout>
 
 </RelativeLayout>
