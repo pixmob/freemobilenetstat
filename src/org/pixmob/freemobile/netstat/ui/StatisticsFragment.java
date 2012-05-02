@@ -60,10 +60,11 @@ public class StatisticsFragment extends Fragment implements
     private TextView onOrangeNetwork;
     private TextView statMobileNetwork;
     private TextView statMobileCode;
-    private TextView statConnectedSince;
     private TextView statStartedSince;
     private TextView statScreenOn;
     private TextView statWifiOn;
+    private TextView statOnOrange;
+    private TextView statOnFreeMobile;
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -91,11 +92,11 @@ public class StatisticsFragment extends Fragment implements
                 .findViewById(R.id.on_free_mobile_network);
         statMobileNetwork = (TextView) a.findViewById(R.id.stat_mobile_network);
         statMobileCode = (TextView) a.findViewById(R.id.stat_mobile_code);
-        statConnectedSince = (TextView) a
-                .findViewById(R.id.stat_connected_since);
         statStartedSince = (TextView) a.findViewById(R.id.stat_started_since);
         statScreenOn = (TextView) a.findViewById(R.id.stat_screen);
         statWifiOn = (TextView) a.findViewById(R.id.stat_wifi);
+        statOnOrange = (TextView) a.findViewById(R.id.stat_on_orange);
+        statOnFreeMobile = (TextView) a.findViewById(R.id.stat_on_free_mobile);
     }
     
     @Override
@@ -150,10 +151,11 @@ public class StatisticsFragment extends Fragment implements
                 : s.mobileOperator.toName(a));
         statMobileCode.setText(s.mobileOperatorCode == null ? STAT_NO_VALUE
                 : s.mobileOperatorCode);
-        setDurationText(statConnectedSince, s.connectionTime);
         setDurationText(statStartedSince, s.bootTime);
         setDurationText(statScreenOn, s.screenOnTime);
         setDurationText(statWifiOn, s.wifiOnTime);
+        setDurationText(statOnOrange, s.orangeTime);
+        setDurationText(statOnFreeMobile, s.freeMobileTime);
         
         batteryChart.setData(s.events);
         
@@ -242,8 +244,6 @@ public class StatisticsFragment extends Fragment implements
                 s.mobileOperatorCode = null;
             }
             
-            long orangeNetworkTime = 0;
-            long freeMobileNetworkTime = 0;
             long connectionTimestamp = 0;
             
             Cursor c = null;
@@ -274,10 +274,10 @@ public class StatisticsFragment extends Fragment implements
                                     .fromString(e0.mobileOperator);
                             if (op != null && op.equals(op0)) {
                                 if (MobileOperator.ORANGE.equals(op)) {
-                                    orangeNetworkTime += dt;
+                                    s.orangeTime += dt;
                                 } else if (MobileOperator.FREE_MOBILE
                                         .equals(op)) {
-                                    freeMobileNetworkTime += dt;
+                                    s.freeMobileTime += dt;
                                 }
                             }
                         }
@@ -296,8 +296,8 @@ public class StatisticsFragment extends Fragment implements
                     }
                 }
                 
-                final double sTime = (double) (orangeNetworkTime + freeMobileNetworkTime);
-                s.freeMobileUsePercent = (int) Math.round(freeMobileNetworkTime
+                final double sTime = (double) (s.orangeTime + s.freeMobileTime);
+                s.freeMobileUsePercent = (int) Math.round(s.freeMobileTime
                         / sTime * 100d);
                 s.orangeUsePercent = 100 - s.freeMobileUsePercent;
                 s.bootTime = now - deviceBootTimestamp;
@@ -329,6 +329,8 @@ public class StatisticsFragment extends Fragment implements
      */
     public static class Statistics {
         public Event[] events = new Event[0];
+        public long orangeTime;
+        public long freeMobileTime;
         public int orangeUsePercent;
         public int freeMobileUsePercent;
         public MobileOperator mobileOperator;

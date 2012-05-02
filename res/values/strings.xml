@@ -20,10 +20,11 @@
     <string name="percent_on_free_mobile_network">Free Mobile : %s</string>
     <string name="stat_mobile_network">Réseau actuel</string>
     <string name="stat_mobile_code">Code MNC+MCC</string>
-    <string name="stat_connected_since">Connecté depuis</string>
     <string name="stat_started_since">Démarré depuis</string>
     <string name="stat_screen">Écran allumé</string>
     <string name="stat_wifi">Wi-Fi actif</string>
+    <string name="stat_on_orange">Sur Orange</string>
+    <string name="stat_on_free_mobile">Sur Free Mobile</string>
     <string name="days">j</string>
     <string name="hours">h</string>
     <string name="minutes">m</string>
