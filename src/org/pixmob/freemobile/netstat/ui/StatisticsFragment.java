@@ -97,6 +97,8 @@ public class StatisticsFragment extends Fragment implements
         statWifiOn = (TextView) a.findViewById(R.id.stat_wifi);
         statOnOrange = (TextView) a.findViewById(R.id.stat_on_orange);
         statOnFreeMobile = (TextView) a.findViewById(R.id.stat_on_free_mobile);
+        
+        statisticsGroup.setVisibility(View.INVISIBLE);
     }
     
     @Override
@@ -129,7 +131,6 @@ public class StatisticsFragment extends Fragment implements
     @Override
     public Loader<Statistics> onCreateLoader(int id, Bundle args) {
         progressBar.setVisibility(View.VISIBLE);
-        statisticsGroup.setVisibility(View.INVISIBLE);
         
         return new StatisticsLoader(getActivity());
     }
