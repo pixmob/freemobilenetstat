@@ -116,6 +116,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/stat_wifi" />
+
+            <TextView
+                style="@style/stat_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/stat_battery" />
         </LinearLayout>
 
         <LinearLayout
@@ -172,6 +178,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="27m" />
+
+            <TextView
+                android:id="@+id/stat_battery"
+                style="@style/stat_row"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="74%" />
         </LinearLayout>
     </LinearLayout>
 

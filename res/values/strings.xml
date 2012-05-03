@@ -23,6 +23,7 @@
     <string name="stat_started_since">Démarré depuis</string>
     <string name="stat_screen">Écran allumé</string>
     <string name="stat_wifi">Wi-Fi actif</string>
+    <string name="stat_battery">Batterie</string>
     <string name="stat_on_orange">Sur Orange</string>
     <string name="stat_on_free_mobile">Sur Free Mobile</string>
     <string name="days">j</string>
