@@ -27,7 +27,7 @@
                 android:singleLine="true"
                 android:text="@string/network_orange"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/orange_network_color" />
+                android:textColor="@color/orange_network_color1" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -35,7 +35,7 @@
                 android:singleLine="true"
                 android:text="@string/network_free_mobile"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/free_mobile_network_color" />
+                android:textColor="@color/free_mobile_network_color1" />
         </LinearLayout>
 
         <LinearLayout
@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:text="87%"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/orange_network_color" />
+                android:textColor="@color/orange_network_color1" />
 
             <TextView
                 android:id="@+id/on_free_mobile_network"
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:text="13%"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@color/free_mobile_network_color" />
+                android:textColor="@color/free_mobile_network_color1" />
         </LinearLayout>
     </LinearLayout>
 

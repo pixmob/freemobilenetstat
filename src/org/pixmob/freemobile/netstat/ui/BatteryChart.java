@@ -20,8 +20,10 @@ import org.pixmob.freemobile.netstat.R;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -49,8 +51,13 @@ public class BatteryChart extends View {
         if (batteryLevelPaint == null) {
             batteryLevelPaint = new Paint();
             batteryLevelPaint.setStyle(Paint.Style.FILL);
-            batteryLevelPaint.setColor(getResources().getColor(
-                R.color.battery_level_color));
+            
+            final int c1 = getResources()
+                    .getColor(R.color.battery_level_color1);
+            final int c2 = getResources()
+                    .getColor(R.color.battery_level_color2);
+            batteryLevelPaint.setShader(new LinearGradient(0, 0, 0,
+                    getHeight(), c1, c2, Shader.TileMode.CLAMP));
         }
         if (bgPaint == null) {
             bgColor1 = getResources().getColor(R.color.battery_bg_color1);

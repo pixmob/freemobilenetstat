@@ -19,8 +19,10 @@ import org.pixmob.freemobile.netstat.R;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -33,9 +35,9 @@ public class MobileNetworkChart extends View {
     private float freeMobileAngle;
     private Paint arcBorderPaint;
     private Paint arcFillPaint;
-    private int orangeColor = -1;
-    private int freeMobileColor = -1;
-    private int unknownColor = -1;
+    private Paint orangePaint;
+    private Paint freeMobilePaint;
+    private Paint unknownPaint;
     private int circleColor = -1;
     
     public MobileNetworkChart(final Context context, final AttributeSet attrs) {
@@ -47,16 +49,36 @@ public class MobileNetworkChart extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         
-        if (orangeColor == -1) {
-            orangeColor = getResources().getColor(R.color.orange_network_color);
+        if (orangePaint == null) {
+            orangePaint = new Paint();
+            orangePaint.setAntiAlias(true);
+            orangePaint.setStyle(Paint.Style.FILL);
+            
+            final int c1 = getResources().getColor(
+                R.color.orange_network_color1);
+            final int c2 = getResources().getColor(
+                R.color.orange_network_color2);
+            orangePaint.setShader(new LinearGradient(0, 0, 0, getHeight(), c1,
+                    c2, Shader.TileMode.CLAMP));
         }
-        if (freeMobileColor == -1) {
-            freeMobileColor = getResources().getColor(
-                R.color.free_mobile_network_color);
+        if (freeMobilePaint == null) {
+            freeMobilePaint = new Paint();
+            freeMobilePaint.setAntiAlias(true);
+            freeMobilePaint.setStyle(Paint.Style.FILL);
+            
+            final int c1 = getResources().getColor(
+                R.color.free_mobile_network_color1);
+            final int c2 = getResources().getColor(
+                R.color.free_mobile_network_color2);
+            freeMobilePaint.setShader(new LinearGradient(0, 0, 0, getHeight(),
+                    c1, c2, Shader.TileMode.CLAMP));
         }
-        if (unknownColor == -1) {
-            unknownColor = getResources().getColor(
-                R.color.unknown_mobile_network_color);
+        if (unknownPaint == null) {
+            unknownPaint = new Paint();
+            unknownPaint.setAntiAlias(true);
+            unknownPaint.setStyle(Paint.Style.FILL);
+            unknownPaint.setColor(getResources().getColor(
+                R.color.unknown_mobile_network_color));
         }
         if (circleColor == -1) {
             circleColor = getResources().getColor(R.color.pie_border_color);
@@ -87,25 +109,22 @@ public class MobileNetworkChart extends View {
         if (orangeAngle > 0) {
             canvas.drawArc(circleBounds, startAngle, orangeAngle, true,
                 arcBorderPaint);
-            arcFillPaint.setColor(orangeColor);
             canvas.drawArc(circleBounds, startAngle, orangeAngle, true,
-                arcFillPaint);
+                orangePaint);
         }
         if (freeMobileAngle > 0) {
             canvas.drawArc(circleBounds, startAngle + orangeAngle,
                 freeMobileAngle, true, arcBorderPaint);
-            arcFillPaint.setColor(freeMobileColor);
             canvas.drawArc(circleBounds, startAngle + orangeAngle,
-                freeMobileAngle, true, arcFillPaint);
+                freeMobileAngle, true, freeMobilePaint);
         }
         
         final float unknownAngle = 360 - orangeAngle - freeMobileAngle;
         if (unknownAngle > 0) {
             canvas.drawArc(circleBounds, startAngle + orangeAngle
                     + freeMobileAngle, unknownAngle, true, arcBorderPaint);
-            arcFillPaint.setColor(unknownColor);
             canvas.drawArc(circleBounds, startAngle + orangeAngle
-                    + freeMobileAngle, unknownAngle, true, arcFillPaint);
+                    + freeMobileAngle, unknownAngle, true, unknownPaint);
         }
     }
     
