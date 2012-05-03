@@ -196,7 +196,10 @@ public class StatisticsFragment extends Fragment implements
             
             final long m = (ds - h * 3600) / 60;
             if (m != 0) {
-                buf.append(" ").append(m).append(getString(R.string.minutes));
+                if (m < 10) {
+                    buf.append("0");
+                }
+                buf.append(m);
             }
         } else {
             final long d = ds / 86400;
@@ -209,7 +212,15 @@ public class StatisticsFragment extends Fragment implements
             
             final long m = (ds - d * 86400 - h * 3600) / 60;
             if (m != 0) {
-                buf.append(" ").append(m).append(getString(R.string.minutes));
+                if (h == 0) {
+                    buf.append(" ");
+                } else if (m < 10) {
+                    buf.append("0");
+                }
+                buf.append(m);
+                if (h == 0) {
+                    buf.append(getString(R.string.minutes));
+                }
             }
         }
         
