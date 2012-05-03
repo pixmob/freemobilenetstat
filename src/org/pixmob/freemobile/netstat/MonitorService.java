@@ -334,7 +334,7 @@ public class MonitorService extends Service {
         final int level = i.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
         final int scale = i.getIntExtra(BatteryManager.EXTRA_SCALE, 0);
         
-        return (int) Math.round(level * 100d / scale);
+        return scale == 0 ? 100 : (int) Math.round(level * 100d / scale);
     }
     
     /**
