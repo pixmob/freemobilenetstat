@@ -19,7 +19,7 @@
     <string name="percent_on_orange_network">Orange : %s</string>
     <string name="percent_on_free_mobile_network">Free Mobile : %s</string>
     <string name="stat_mobile_network">Réseau actuel</string>
-    <string name="stat_mobile_code">Code MNC+MCC</string>
+    <string name="stat_mobile_code">MCC+MNC</string>
     <string name="stat_started_since">Démarré depuis</string>
     <string name="stat_screen">Écran allumé</string>
     <string name="stat_wifi">Wi-Fi actif</string>
