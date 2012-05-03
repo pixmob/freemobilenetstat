@@ -136,11 +136,11 @@ public class MobileNetworkChart extends View {
     
     public void setData(int percentOnOrange, int percentOnFreeMobile) {
         orangeAngle = percentToAngle(normalizePercent(percentOnOrange));
-        freeMobileAngle = 360 - orangeAngle;
+        freeMobileAngle = percentToAngle(normalizePercent(percentOnFreeMobile));
     }
     
     private static float percentToAngle(int p) {
-        return p * 360 / 100;
+        return p * 360 / 100f;
     }
     
     private static int normalizePercent(int p) {
