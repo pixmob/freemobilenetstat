@@ -31,6 +31,7 @@ import android.view.View;
  * @author Pixmob
  */
 public class MobileNetworkChart extends View {
+    private float startAngle = 270;
     private float orangeAngle;
     private float freeMobileAngle;
     private Paint arcBorderPaint;
@@ -105,7 +106,6 @@ public class MobileNetworkChart extends View {
         final RectF circleBounds = new RectF(startX, startY, startX + radius,
                 startY + radius);
         
-        final int startAngle = 270;
         if (orangeAngle > 0) {
             canvas.drawArc(circleBounds, startAngle, orangeAngle, true,
                 arcBorderPaint);
@@ -137,6 +137,7 @@ public class MobileNetworkChart extends View {
     public void setData(int percentOnOrange, int percentOnFreeMobile) {
         orangeAngle = percentToAngle(normalizePercent(percentOnOrange));
         freeMobileAngle = percentToAngle(normalizePercent(percentOnFreeMobile));
+        startAngle = freeMobileAngle / 2f;
     }
     
     private static float percentToAngle(int p) {
