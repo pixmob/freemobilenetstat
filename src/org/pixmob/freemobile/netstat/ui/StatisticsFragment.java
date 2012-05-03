@@ -65,6 +65,7 @@ public class StatisticsFragment extends Fragment implements
     private TextView statWifiOn;
     private TextView statOnOrange;
     private TextView statOnFreeMobile;
+    private TextView statBattery;
     
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -97,6 +98,7 @@ public class StatisticsFragment extends Fragment implements
         statWifiOn = (TextView) a.findViewById(R.id.stat_wifi);
         statOnOrange = (TextView) a.findViewById(R.id.stat_on_orange);
         statOnFreeMobile = (TextView) a.findViewById(R.id.stat_on_free_mobile);
+        statBattery = (TextView) a.findViewById(R.id.stat_battery);
         
         statisticsGroup.setVisibility(View.INVISIBLE);
     }
@@ -157,6 +159,9 @@ public class StatisticsFragment extends Fragment implements
         setDurationText(statWifiOn, s.wifiOnTime);
         setDurationText(statOnOrange, s.orangeTime);
         setDurationText(statOnFreeMobile, s.freeMobileTime);
+        
+        statBattery.setText(s.battery == 0 ? STAT_NO_VALUE : (String
+                .valueOf(s.battery) + "%"));
         
         batteryChart.setData(s.events);
         
@@ -298,6 +303,10 @@ public class StatisticsFragment extends Fragment implements
                     }
                 }
                 
+                if (s.events.length > 0) {
+                    s.battery = s.events[s.events.length - 1].batteryLevel;
+                }
+                
                 final double sTime = (double) (s.orangeTime + s.freeMobileTime);
                 s.freeMobileUsePercent = (int) Math.round(s.freeMobileTime
                         / sTime * 100d);
@@ -341,6 +350,7 @@ public class StatisticsFragment extends Fragment implements
         public long bootTime;
         public long screenOnTime;
         public long wifiOnTime;
+        public int battery;
         
         @Override
         public String toString() {
