@@ -367,6 +367,9 @@ public class MonitorService extends Service {
             final ContentValues cv = new ContentValues(6);
             final ContentResolver cr = context.getContentResolver();
             
+            final ContentValues lastCV = new ContentValues(6);
+            long lastEventHashCode = 0;
+            
             boolean running = true;
             while (running) {
                 try {
@@ -374,13 +377,26 @@ public class MonitorService extends Service {
                     if (STOP_PENDING_CONTENT_MARKER == e) {
                         running = false;
                     } else {
-                        if (DEBUG) {
-                            Log.d(TAG, "Inserting new event into database: "
-                                    + e);
-                        }
-                        
                         e.write(cv);
-                        cr.insert(Events.CONTENT_URI, cv);
+                        
+                        // Check the last inserted event hash code:
+                        // if the hash code is the same, the event is not
+                        // inserted.
+                        lastCV.putAll(cv);
+                        lastCV.remove(Events.TIMESTAMP);
+                        if (lastCV.hashCode() == lastEventHashCode) {
+                            if (DEBUG) {
+                                Log.d(TAG, "Skip event insertion: " + e);
+                            }
+                        } else {
+                            if (DEBUG) {
+                                Log.d(TAG,
+                                    "Inserting new event into database: " + e);
+                            }
+                            cr.insert(Events.CONTENT_URI, cv);
+                        }
+                        lastEventHashCode = lastCV.hashCode();
+                        lastCV.clear();
                     }
                     cv.clear();
                 } catch (InterruptedException e) {
