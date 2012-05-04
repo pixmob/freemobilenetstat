@@ -15,11 +15,14 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
+import java.lang.ref.WeakReference;
+
 import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.R;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
@@ -33,6 +36,7 @@ import android.view.View;
  * @author Pixmob
  */
 public class BatteryChart extends View {
+    private WeakReference<Bitmap> cacheRef;
     private int freeMobileColor;
     private int orangeColor;
     private int unknownOperatorColor;
@@ -49,57 +53,7 @@ public class BatteryChart extends View {
         super(context, attrs);
     }
     
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-        
-        // Lazy initialize paint properties, once.
-        if (batteryLevelPaint == null) {
-            batteryLevelPaint = new Paint();
-            batteryLevelPaint.setStyle(Paint.Style.FILL);
-            
-            final int c1 = getResources()
-                    .getColor(R.color.battery_level_color1);
-            final int c2 = getResources()
-                    .getColor(R.color.battery_level_color2);
-            batteryLevelPaint.setShader(new LinearGradient(0, 0, 0,
-                    getHeight(), c1, c2, Shader.TileMode.CLAMP));
-        }
-        if (bgPaint == null) {
-            bgColor1 = getResources().getColor(R.color.battery_bg_color1);
-            bgColor2 = getResources().getColor(R.color.battery_bg_color2);
-            bgPaint = new Paint();
-            bgPaint.setStyle(Paint.Style.FILL);
-        }
-        if (yTextPaint == null) {
-            yTextPaint = new Paint();
-            yTextPaint.setAntiAlias(true);
-            yTextPaint.setSubpixelText(true);
-            yTextPaint.setColor(getResources().getColor(
-                R.color.battery_y_text_color));
-            yTextPaint.setTextSize(getResources().getDimension(
-                R.dimen.battery_y_text_size));
-            yTextPaint.setTextAlign(Paint.Align.RIGHT);
-            yTextPaint.setStrokeWidth(2);
-        }
-        if (yBarPaint == null) {
-            yBarPaint = new Paint();
-            yBarPaint.setColor(getResources().getColor(
-                R.color.battery_y_bar_color));
-            yBarPaint.setStrokeWidth(2);
-        }
-        if (mobileOperatorPaint == null) {
-            mobileOperatorPaint = new Paint();
-            mobileOperatorPaint.setStrokeWidth(12);
-            
-            orangeColor = getResources()
-                    .getColor(R.color.orange_network_color1);
-            freeMobileColor = getResources().getColor(
-                R.color.free_mobile_network_color1);
-            unknownOperatorColor = getResources().getColor(
-                R.color.unknown_mobile_network_color);
-        }
-        
+    private void doDraw(Canvas canvas) {
         final int margins = 8;
         final int w = getWidth() - margins * 2;
         final int h = getHeight() - margins * 2;
@@ -208,12 +162,88 @@ public class BatteryChart extends View {
     }
     
     @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        
+        // Lazy initialize paint properties, once.
+        if (batteryLevelPaint == null) {
+            batteryLevelPaint = new Paint();
+            batteryLevelPaint.setStyle(Paint.Style.FILL);
+            
+            final int c1 = getResources()
+                    .getColor(R.color.battery_level_color1);
+            final int c2 = getResources()
+                    .getColor(R.color.battery_level_color2);
+            batteryLevelPaint.setShader(new LinearGradient(0, 0, 0,
+                    getHeight(), c1, c2, Shader.TileMode.CLAMP));
+        }
+        if (bgPaint == null) {
+            bgColor1 = getResources().getColor(R.color.battery_bg_color1);
+            bgColor2 = getResources().getColor(R.color.battery_bg_color2);
+            bgPaint = new Paint();
+            bgPaint.setStyle(Paint.Style.FILL);
+        }
+        if (yTextPaint == null) {
+            yTextPaint = new Paint();
+            yTextPaint.setAntiAlias(true);
+            yTextPaint.setSubpixelText(true);
+            yTextPaint.setColor(getResources().getColor(
+                R.color.battery_y_text_color));
+            yTextPaint.setTextSize(getResources().getDimension(
+                R.dimen.battery_y_text_size));
+            yTextPaint.setTextAlign(Paint.Align.RIGHT);
+            yTextPaint.setStrokeWidth(2);
+        }
+        if (yBarPaint == null) {
+            yBarPaint = new Paint();
+            yBarPaint.setColor(getResources().getColor(
+                R.color.battery_y_bar_color));
+            yBarPaint.setStrokeWidth(2);
+        }
+        if (mobileOperatorPaint == null) {
+            mobileOperatorPaint = new Paint();
+            mobileOperatorPaint.setStrokeWidth(12);
+            
+            orangeColor = getResources()
+                    .getColor(R.color.orange_network_color1);
+            freeMobileColor = getResources().getColor(
+                R.color.free_mobile_network_color1);
+            unknownOperatorColor = getResources().getColor(
+                R.color.unknown_mobile_network_color);
+        }
+        
+        // Get the previously drawn image.
+        Bitmap cache = null;
+        if (cacheRef != null) {
+            cache = cacheRef.get();
+        }
+        
+        // No image is available in the cache: render a new one.
+        if (cache == null) {
+            cache = Bitmap.createBitmap(getWidth(), getHeight(),
+                Bitmap.Config.ARGB_8888);
+            final Canvas c = new Canvas(cache);
+            doDraw(c);
+            cacheRef = new WeakReference<Bitmap>(cache);
+        }
+        
+        canvas.drawBitmap(cache, 0, 0, null);
+    }
+    
+    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec),
             MeasureSpec.getSize(heightMeasureSpec));
     }
     
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        cacheRef = null;
+    }
+    
     public void setData(Event[] events) {
         this.events = events;
+        cacheRef = null;
     }
 }
