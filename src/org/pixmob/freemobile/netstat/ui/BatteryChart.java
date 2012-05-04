@@ -109,10 +109,10 @@ public class BatteryChart extends View {
         final float yBand = yFactor * bandSize;
         final float yAscent2 = yTextPaint.ascent() / 2;
         for (int i = bandSize; i <= 100; i += bandSize) {
-            if (bgPaint.getColor() == bgColor2) {
-                bgPaint.setColor(bgColor1);
-            } else {
+            if (bgPaint.getColor() == bgColor1) {
                 bgPaint.setColor(bgColor2);
+            } else {
+                bgPaint.setColor(bgColor1);
             }
             final float y = h - yFactor * i;
             canvas.drawRect(x0Graph, y, w, y + yBand, bgPaint);
