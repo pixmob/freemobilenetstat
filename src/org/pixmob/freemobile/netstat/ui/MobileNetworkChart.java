@@ -50,6 +50,7 @@ public class MobileNetworkChart extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         
+        // Lazy initialize paint properties, once.
         if (orangePaint == null) {
             orangePaint = new Paint();
             orangePaint.setAntiAlias(true);

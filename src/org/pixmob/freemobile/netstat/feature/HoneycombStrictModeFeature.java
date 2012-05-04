@@ -15,12 +15,15 @@
  */
 package org.pixmob.freemobile.netstat.feature;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.StrictMode;
 
 /**
  * Honeycomb {@link StrictModeFeature} implementation.
  * @author Pixmob
  */
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 class HoneycombStrictModeFeature implements StrictModeFeature {
     @Override
     public void enable() {

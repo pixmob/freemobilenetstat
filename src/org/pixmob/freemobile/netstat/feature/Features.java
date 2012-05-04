@@ -21,7 +21,7 @@ import java.util.Map;
 import android.os.Build;
 
 /**
- * The feature helper enable backward compatibility for every Android devices,
+ * The feature helper enables backward compatibility for every Android devices,
  * from API level 8 to the latest available.
  * @author Pixmob
  */

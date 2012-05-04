@@ -71,6 +71,8 @@ public class StatisticsFragment extends Fragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
+        // Monitor database updates: when new data is available, this fragment
+        // is updated with the new values.
         contentMonitor = new ContentObserver(new Handler()) {
             @Override
             public void onChange(boolean selfChange) {
@@ -81,6 +83,7 @@ public class StatisticsFragment extends Fragment implements
             }
         };
         
+        // Get widgets.
         final Activity a = getActivity();
         statisticsGroup = a.findViewById(R.id.statistics);
         statisticsGroup.setVisibility(View.INVISIBLE);
@@ -100,6 +103,8 @@ public class StatisticsFragment extends Fragment implements
         statOnFreeMobile = (TextView) a.findViewById(R.id.stat_on_free_mobile);
         statBattery = (TextView) a.findViewById(R.id.stat_battery);
         
+        // The fields are hidden the first time this fragment is displayed,
+        // while statistics data are being loaded.
         statisticsGroup.setVisibility(View.INVISIBLE);
     }
     
@@ -107,6 +112,7 @@ public class StatisticsFragment extends Fragment implements
     public void onResume() {
         super.onResume();
         
+        // Monitor database updates if the fragment is displayed.
         final ContentResolver cr = getActivity().getContentResolver();
         cr.registerContentObserver(Events.CONTENT_URI, true, contentMonitor);
         
@@ -116,6 +122,7 @@ public class StatisticsFragment extends Fragment implements
     @Override
     public void onPause() {
         super.onPause();
+        // Stop monitoring database updates.
         getActivity().getContentResolver().unregisterContentObserver(
             contentMonitor);
     }
@@ -177,6 +184,9 @@ public class StatisticsFragment extends Fragment implements
         }
     }
     
+    /**
+     * Return a formatted string for a duration value.
+     */
     private CharSequence formatDuration(long duration) {
         if (duration == 0) {
             return STAT_NO_VALUE;
@@ -226,6 +236,7 @@ public class StatisticsFragment extends Fragment implements
         
         return buf;
     }
+    
     /**
      * {@link Loader} implementation for loading events from the database, and
      * computing statistics.

@@ -33,6 +33,10 @@ public class Event {
     public String mobileOperator;
     public int batteryLevel;
     
+    /**
+     * Read an {@link Event} instance from a database {@link Cursor}. The cursor
+     * should include every columns defined in {@link Events}.
+     */
     public void read(Cursor c) {
         timestamp = c.getLong(c.getColumnIndexOrThrow(Events.TIMESTAMP));
         screenOn = c.getInt(c.getColumnIndexOrThrow(Events.SCREEN_ON)) == 1;
@@ -45,6 +49,9 @@ public class Event {
         batteryLevel = c.getInt(c.getColumnIndexOrThrow(Events.BATTERY_LEVEL));
     }
     
+    /**
+     * Fill a {@link ContentValues} instance with values from this instance.
+     */
     public void write(ContentValues values) {
         values.put(Events.TIMESTAMP, timestamp);
         values.put(Events.SCREEN_ON, screenOn ? 1 : 0);
