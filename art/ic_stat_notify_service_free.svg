@@ -16,7 +16,7 @@
    version="1.1"
    inkscape:version="0.48.2 r9819"
    sodipodi:docname="ic_stat_notify_service_free.svg"
-   inkscape:export-filename="/home/aro/Projets/perso/pixmob/freemobilenetstat/res/drawable-hdpi/ic_stat_notify_service_free.png"
+   inkscape:export-filename="D:\Projets\pixmob\freemobilenetstat\res\drawable-hdpi\ic_stat_notify_service_free.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -61,15 +61,6 @@
        y1="311.69885"
        x2="68.640434"
        y2="379.27325" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient3821"
-       id="linearGradient3827"
-       x1="45.028328"
-       y1="344.77972"
-       x2="45.028328"
-       y2="372.48071"
-       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -79,7 +70,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="10.098284"
+     inkscape:cx="-5.2588589"
      inkscape:cy="18.064325"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -89,7 +80,7 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      inkscape:window-width="1135"
-     inkscape:window-height="876"
+     inkscape:window-height="742"
      inkscape:window-x="116"
      inkscape:window-y="80"
      inkscape:window-maximized="0" />
@@ -111,7 +102,7 @@
      id="layer1"
      transform="translate(-33.033808,-337.29757)">
     <path
-       style="fill:url(#linearGradient3827);fill-opacity:1;stroke:#000000;stroke-width:0.28329011999999998;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#b3b3b3;fill-opacity:1;stroke:#000000;stroke-width:0.28329011999999998;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        d="m 53.21381,347.90952 c -2.11507,-2.0637 -4.99152,-3.34636 -8.180002,-3.34636 -6.481409,0 -11.738835,5.24851 -11.738835,11.72999 0,6.48145 5.257425,11.73883 11.738834,11.73883 3.256618,0 6.195496,-1.32815 8.321648,-3.4703 l -8.39247,-8.22428 8.250825,-8.42788 z"
        id="path3007"
        inkscape:connector-curvature="0" />
