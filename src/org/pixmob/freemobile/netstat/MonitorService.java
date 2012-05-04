@@ -244,7 +244,8 @@ public class MonitorService extends Service {
                 getApplicationContext()).setSmallIcon(iconRes)
                 .setTicker(tickerText).setContentText(contentText)
                 .setContentTitle(tickerText)
-                .setContentIntent(openUIPendingIntent).getNotification();
+                .setContentIntent(openUIPendingIntent).setWhen(0)
+                .getNotification();
         
         startForeground(R.string.stat_connected_to_mobile_network, n);
     }
