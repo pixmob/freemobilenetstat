@@ -16,6 +16,7 @@
 package org.pixmob.freemobile.netstat.ui;
 
 import org.pixmob.freemobile.netstat.Event;
+import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.R;
 
 import android.content.Context;
@@ -32,6 +33,10 @@ import android.view.View;
  * @author Pixmob
  */
 public class BatteryChart extends View {
+    private int freeMobileColor;
+    private int orangeColor;
+    private int unknownOperatorColor;
+    private Paint mobileOperatorPaint;
     private int bgColor1;
     private int bgColor2;
     private Paint bgPaint;
@@ -83,15 +88,28 @@ public class BatteryChart extends View {
                 R.color.battery_y_bar_color));
             yBarPaint.setStrokeWidth(2);
         }
+        if (mobileOperatorPaint == null) {
+            mobileOperatorPaint = new Paint();
+            mobileOperatorPaint.setStrokeWidth(12);
+            
+            orangeColor = getResources()
+                    .getColor(R.color.orange_network_color1);
+            freeMobileColor = getResources().getColor(
+                R.color.free_mobile_network_color1);
+            unknownOperatorColor = getResources().getColor(
+                R.color.unknown_mobile_network_color);
+        }
         
         final int margins = 8;
         final int w = getWidth() - margins * 2;
         final int h = getHeight() - margins * 2;
         final float x0Graph = yTextPaint.measureText("100") + 2;
+        final float y0Graph = margins;
+        final float y0Mob = 0;
         
         // Draw every lines with a single call to Canvas#drawLines, for better
         // performance.
-        final float[] lines = new float[12 * 4];
+        final float[] lines = new float[11 * 4];
         int lineIdx = 0;
         lines[lineIdx++] = x0Graph;
         lines[lineIdx++] = 0;
@@ -114,18 +132,17 @@ public class BatteryChart extends View {
             } else {
                 bgPaint.setColor(bgColor1);
             }
-            final float y = h - yFactor * i;
+            final float y = h - yFactor * i + y0Graph;
             canvas.drawRect(x0Graph, y, w, y + yBand, bgPaint);
             if (i != 100) {
                 canvas.drawText(String.valueOf(i), x0Text, y - yAscent2,
                     yTextPaint);
+                
+                lines[lineIdx++] = x0Graph;
+                lines[lineIdx++] = y;
+                lines[lineIdx++] = w;
+                lines[lineIdx++] = y;
             }
-            canvas.drawLine(x0Graph, y, w, y, yTextPaint);
-            
-            lines[lineIdx++] = x0Graph;
-            lines[lineIdx++] = y;
-            lines[lineIdx++] = w;
-            lines[lineIdx++] = y;
         }
         
         if (events != null && events.length > 1) {
@@ -133,31 +150,57 @@ public class BatteryChart extends View {
             final float xFactor = (w - x0Graph)
                     / (events[events.length - 1].timestamp - t0);
             
-            final Path p = new Path();
-            p.moveTo(x0Graph, h);
-            float lastY = 0;
-            
             final int eventCount = events.length;
-            p.incReserve(eventCount + 2);
+            final int lastEventIdx = eventCount - 1;
+            
+            final Path batteryPath = new Path();
+            batteryPath.moveTo(x0Graph, h);
+            batteryPath.incReserve(eventCount + 2);
+            float lastY = 0;
             
             for (int i = 0; i < eventCount; ++i) {
                 final Event e = events[i];
-                final float x = (e.timestamp - t0) * xFactor + x0Graph;
-                final float y = h - e.batteryLevel * yFactor;
+                float x = (e.timestamp - t0) * xFactor + x0Graph;
+                if (x < x0Graph) {
+                    continue;
+                }
+                final float y = h - e.batteryLevel * yFactor + y0Graph;
                 
                 if (i != 0) {
-                    p.lineTo(x, y);
+                    batteryPath.lineTo(x, y);
                 } else {
-                    p.moveTo(x, y);
+                    batteryPath.moveTo(x, y);
+                }
+                lastY = y;
+                
+                final MobileOperator mobOp = MobileOperator
+                        .fromString(e.mobileOperator);
+                if (MobileOperator.FREE_MOBILE.equals(mobOp)) {
+                    mobileOperatorPaint.setColor(freeMobileColor);
+                } else if (MobileOperator.ORANGE.equals(mobOp)) {
+                    mobileOperatorPaint.setColor(orangeColor);
+                } else {
+                    mobileOperatorPaint.setColor(unknownOperatorColor);
                 }
                 
-                lastY = y;
+                float x2 = w;
+                if (i != lastEventIdx) {
+                    final Event e1 = events[i + 1];
+                    x2 = (e1.timestamp - t0) * xFactor;
+                    if (x2 < x0Graph) {
+                        x2 = x;
+                    }
+                    if (x2 > w) {
+                        x2 = w;
+                    }
+                }
+                canvas.drawLine(x, y0Mob, x2, y0Mob, mobileOperatorPaint);
             }
             
-            p.lineTo(w, lastY);
-            p.lineTo(w, h);
-            p.lineTo(x0Graph, h);
-            canvas.drawPath(p, batteryLevelPaint);
+            batteryPath.lineTo(w, lastY);
+            batteryPath.lineTo(w, h);
+            batteryPath.lineTo(x0Graph, h);
+            canvas.drawPath(batteryPath, batteryLevelPaint);
         }
         
         // Draw axes.
