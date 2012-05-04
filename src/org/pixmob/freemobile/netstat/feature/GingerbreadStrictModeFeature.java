@@ -15,12 +15,15 @@
  */
 package org.pixmob.freemobile.netstat.feature;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.StrictMode;
 
 /**
  * Gingerbread {@link StrictModeFeature} implementation.
  * @author Pixmob
  */
+@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 class GingerbreadStrictModeFeature implements StrictModeFeature {
     @Override
     public void enable() {

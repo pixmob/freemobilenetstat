@@ -48,6 +48,7 @@ public class BatteryChart extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         
+        // Lazy initialize paint properties, once.
         if (batteryLevelPaint == null) {
             batteryLevelPaint = new Paint();
             batteryLevelPaint.setStyle(Paint.Style.FILL);
@@ -88,6 +89,8 @@ public class BatteryChart extends View {
         final int h = getHeight() - margins * 2;
         final float x0Graph = yTextPaint.measureText("100") + 2;
         
+        // Draw every lines with a single call to Canvas#drawLines, for better
+        // performance.
         final float[] lines = new float[12 * 4];
         int lineIdx = 0;
         lines[lineIdx++] = x0Graph;
