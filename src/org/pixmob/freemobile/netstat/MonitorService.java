@@ -312,8 +312,8 @@ public class MonitorService extends Service {
         e.timestamp = System.currentTimeMillis();
         e.screenOn = pm.isScreenOn();
         e.batteryLevel = getBatteryLevel();
-        e.wifiConnected = lastWifiConnected;
-        e.mobileConnected = lastMobileNetworkConnected;
+        e.wifiConnected = Boolean.TRUE.equals(lastWifiConnected);
+        e.mobileConnected = Boolean.TRUE.equals(lastMobileNetworkConnected);
         e.mobileOperator = lastMobileOperatorId;
         
         try {
