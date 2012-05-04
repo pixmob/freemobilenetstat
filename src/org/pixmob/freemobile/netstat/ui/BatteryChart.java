@@ -39,7 +39,6 @@ public class BatteryChart extends View {
     private WeakReference<Bitmap> cacheRef;
     private int freeMobileColor;
     private int orangeColor;
-    private int unknownOperatorColor;
     private Paint mobileOperatorPaint;
     private int bgColor1;
     private int bgColor2;
@@ -129,26 +128,26 @@ public class BatteryChart extends View {
                 
                 final MobileOperator mobOp = MobileOperator
                         .fromString(e.mobileOperator);
-                if (MobileOperator.FREE_MOBILE.equals(mobOp)) {
-                    mobileOperatorPaint.setColor(freeMobileColor);
-                } else if (MobileOperator.ORANGE.equals(mobOp)) {
-                    mobileOperatorPaint.setColor(orangeColor);
-                } else {
-                    mobileOperatorPaint.setColor(unknownOperatorColor);
-                }
-                
-                float x2 = w;
-                if (i != lastEventIdx) {
-                    final Event e1 = events[i + 1];
-                    x2 = (e1.timestamp - t0) * xFactor;
-                    if (x2 < x0Graph) {
-                        x2 = x;
+                if (mobOp != null) {
+                    if (MobileOperator.FREE_MOBILE.equals(mobOp)) {
+                        mobileOperatorPaint.setColor(freeMobileColor);
+                    } else if (MobileOperator.ORANGE.equals(mobOp)) {
+                        mobileOperatorPaint.setColor(orangeColor);
                     }
-                    if (x2 > w) {
-                        x2 = w;
+                    
+                    float x2 = w;
+                    if (i != lastEventIdx) {
+                        final Event e1 = events[i + 1];
+                        x2 = (e1.timestamp - t0) * xFactor;
+                        if (x2 < x0Graph) {
+                            x2 = x;
+                        }
+                        if (x2 > w) {
+                            x2 = w;
+                        }
                     }
+                    canvas.drawLine(x, y0Mob, x2, y0Mob, mobileOperatorPaint);
                 }
-                canvas.drawLine(x, y0Mob, x2, y0Mob, mobileOperatorPaint);
             }
             
             batteryPath.lineTo(w, lastY);
@@ -208,8 +207,6 @@ public class BatteryChart extends View {
                     .getColor(R.color.orange_network_color1);
             freeMobileColor = getResources().getColor(
                 R.color.free_mobile_network_color1);
-            unknownOperatorColor = getResources().getColor(
-                R.color.unknown_mobile_network_color);
         }
         
         // Get the previously drawn image.
