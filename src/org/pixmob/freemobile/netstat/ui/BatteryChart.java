@@ -17,6 +17,7 @@ package org.pixmob.freemobile.netstat.ui;
 
 import java.lang.ref.WeakReference;
 
+import org.pixmob.freemobile.netstat.Constants;
 import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.R;
@@ -30,6 +31,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Shader;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -127,7 +129,6 @@ public class BatteryChart extends View {
                     / (events[events.length - 1].timestamp - t0);
             
             final int eventCount = events.length;
-            final int lastEventIdx = eventCount - 1;
             
             final Path batteryPath = new Path();
             batteryPath.moveTo(x0Graph, graphHeight);
@@ -159,10 +160,14 @@ public class BatteryChart extends View {
                         mobileOperatorPaint.setColor(orangeColor);
                     }
                     
+                    if (!e.mobileConnected) {
+                        Log.d(Constants.TAG, "Not connected: " + e);
+                    }
+                    
                     float x2 = graphWidth;
-                    if (i != lastEventIdx) {
-                        final Event e1 = events[i + 1];
-                        x2 = (e1.timestamp - t0) * xFactor;
+                    if (i != 0) {
+                        final Event e0 = events[i - 1];
+                        x2 = (e0.timestamp - t0) * xFactor;
                         if (x2 < x0Graph) {
                             x2 = x;
                         }
@@ -170,7 +175,7 @@ public class BatteryChart extends View {
                             x2 = graphWidth;
                         }
                     }
-                    canvas.drawLine(x, y0Mob, x2, y0Mob, mobileOperatorPaint);
+                    canvas.drawLine(x2, y0Mob, x, y0Mob, mobileOperatorPaint);
                 }
             }
             
