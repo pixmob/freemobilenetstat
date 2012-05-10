@@ -174,6 +174,7 @@ public class StatisticsFragment extends Fragment implements
         
         progressBar.setVisibility(View.INVISIBLE);
         statisticsGroup.setVisibility(View.VISIBLE);
+        statisticsGroup.invalidate();
     }
     
     private void setDurationText(TextView tv, long duration) {
