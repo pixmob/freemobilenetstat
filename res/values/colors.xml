@@ -12,6 +12,6 @@
     <color name="battery_bg_color1">#282830</color>
     <color name="battery_bg_color2">#383840</color>
     <color name="battery_level_color1">#345100</color>
-    <color name="battery_level_color2">#1A2900</color>
+    <color name="battery_level_color2">#325000</color>
 
 </resources>
