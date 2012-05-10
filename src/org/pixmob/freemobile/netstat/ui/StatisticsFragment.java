@@ -297,18 +297,15 @@ public class StatisticsFragment extends Fragment implements
                         final Event e0 = s.events[i - 1];
                         final long dt = e.timestamp - e0.timestamp;
                         
-                        if (e.mobileConnected && e0.mobileConnected) {
-                            final MobileOperator op = MobileOperator
-                                    .fromString(e.mobileOperator);
-                            final MobileOperator op0 = MobileOperator
-                                    .fromString(e0.mobileOperator);
-                            if (op != null && op.equals(op0)) {
-                                if (MobileOperator.ORANGE.equals(op)) {
-                                    s.orangeTime += dt;
-                                } else if (MobileOperator.FREE_MOBILE
-                                        .equals(op)) {
-                                    s.freeMobileTime += dt;
-                                }
+                        final MobileOperator op = MobileOperator
+                                .fromString(e.mobileOperator);
+                        final MobileOperator op0 = MobileOperator
+                                .fromString(e0.mobileOperator);
+                        if (op != null && op.equals(op0)) {
+                            if (MobileOperator.ORANGE.equals(op)) {
+                                s.orangeTime += dt;
+                            } else if (MobileOperator.FREE_MOBILE.equals(op)) {
+                                s.freeMobileTime += dt;
                             }
                         }
                         if (e.mobileConnected && !e0.mobileConnected) {
