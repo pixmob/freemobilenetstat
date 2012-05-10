@@ -25,11 +25,11 @@ import org.pixmob.freemobile.netstat.R;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Shader;
+import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -51,12 +51,16 @@ public class BatteryChart extends View {
     private Paint yTextPaint;
     private Paint batteryLevelPaint;
     private Paint cursorPaint;
+    private Paint textCursorPaint;
     private Event[] events;
     private float touchX = -1;
-    private float x0Graph;
-    private int graphWidth;
-    private int graphHeight;
-    private float y0Graph;
+    private float graphLeft;
+    private int graphRight;
+    private int graphBottom;
+    private float graphTop;
+    private float textCursorLeft;
+    private float textCursorBottom;
+    private String textCursor;
     
     public BatteryChart(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -68,10 +72,19 @@ public class BatteryChart extends View {
         if (MotionEvent.ACTION_DOWN == action
                 || MotionEvent.ACTION_MOVE == action) {
             final float x = event.getX();
-            if (x >= x0Graph && x <= graphWidth) {
-                touchX = x;
-                invalidate();
-                return true;
+            if (x >= graphLeft && x <= graphRight) {
+                if (events != null && events.length != 0) {
+                    final long t0 = events[0].timestamp;
+                    final long t = (long) Math.round((x - graphLeft)
+                            / getXFactor())
+                            + t0;
+                    textCursor = DateUtils.formatDateTime(getContext(), t,
+                        DateUtils.FORMAT_SHOW_TIME);
+                    
+                    touchX = x;
+                    invalidate();
+                    return true;
+                }
             }
         }
         if (MotionEvent.ACTION_UP == action) {
@@ -82,6 +95,15 @@ public class BatteryChart extends View {
         return super.onTouchEvent(event);
     }
     
+    private float getXFactor() {
+        if (events == null || events.length == 0) {
+            return 0;
+        }
+        
+        return (graphRight - graphLeft)
+                / (events[events.length - 1].timestamp - events[0].timestamp);
+    }
+    
     private void doDraw(Canvas canvas) {
         final float y0Mob = 0;
         
@@ -89,18 +111,18 @@ public class BatteryChart extends View {
         // performance.
         final float[] lines = new float[11 * 4];
         int lineIdx = 0;
-        lines[lineIdx++] = x0Graph;
+        lines[lineIdx++] = graphLeft;
         lines[lineIdx++] = 0;
-        lines[lineIdx++] = x0Graph;
-        lines[lineIdx++] = graphHeight;
-        lines[lineIdx++] = x0Graph;
-        lines[lineIdx++] = graphHeight;
-        lines[lineIdx++] = graphWidth;
-        lines[lineIdx++] = graphHeight;
+        lines[lineIdx++] = graphLeft;
+        lines[lineIdx++] = graphBottom;
+        lines[lineIdx++] = graphLeft;
+        lines[lineIdx++] = graphBottom;
+        lines[lineIdx++] = graphRight;
+        lines[lineIdx++] = graphBottom;
         
         // Draw Y units.
-        final float x0Text = x0Graph - 5;
-        final float yFactor = graphHeight / 100f;
+        final float x0Text = graphLeft - 5;
+        final float yFactor = graphBottom / 100f;
         final int bandSize = 10;
         final float yBand = yFactor * bandSize;
         final float yAscent2 = yTextPaint.ascent() / 2;
@@ -110,39 +132,38 @@ public class BatteryChart extends View {
             } else {
                 bgPaint.setColor(bgColor1);
             }
-            final float y = graphHeight - yFactor * i + y0Graph;
-            canvas.drawRect(x0Graph, y, graphWidth, y + yBand, bgPaint);
+            final float y = graphBottom - yFactor * i;
+            canvas.drawRect(graphLeft, y, graphRight, y + yBand, bgPaint);
             if (i != 100) {
                 canvas.drawText(String.valueOf(i), x0Text, y - yAscent2,
                     yTextPaint);
                 
-                lines[lineIdx++] = x0Graph;
+                lines[lineIdx++] = graphLeft;
                 lines[lineIdx++] = y;
-                lines[lineIdx++] = graphWidth;
+                lines[lineIdx++] = graphRight;
                 lines[lineIdx++] = y;
             }
         }
         
         if (events != null && events.length > 1) {
             final long t0 = events[0].timestamp;
-            final float xFactor = (graphWidth - x0Graph)
-                    / (events[events.length - 1].timestamp - t0);
+            final float xFactor = getXFactor();
             
             final int eventCount = events.length;
             
             final Path batteryPath = new Path();
-            batteryPath.moveTo(x0Graph, graphHeight);
+            batteryPath.moveTo(graphLeft, graphBottom);
             batteryPath.incReserve(eventCount + 2);
             float lastY = 0;
             
             for (int i = 0; i < eventCount; ++i) {
                 final Event e = events[i];
-                float x = (e.timestamp - t0) * xFactor + x0Graph;
-                if (x < x0Graph) {
+                float x = (e.timestamp - t0) * xFactor + graphLeft;
+                if (x < graphLeft) {
                     continue;
                 }
-                final float y = graphHeight - e.batteryLevel * yFactor
-                        + y0Graph;
+                final float y = graphBottom - e.batteryLevel * yFactor
+                        + graphTop;
                 
                 if (i != 0) {
                     batteryPath.lineTo(x, y);
@@ -164,24 +185,24 @@ public class BatteryChart extends View {
                         Log.d(Constants.TAG, "Not connected: " + e);
                     }
                     
-                    float x2 = graphWidth;
+                    float x2 = graphRight;
                     if (i != 0) {
                         final Event e0 = events[i - 1];
                         x2 = (e0.timestamp - t0) * xFactor;
-                        if (x2 < x0Graph) {
+                        if (x2 < graphLeft) {
                             x2 = x;
                         }
-                        if (x2 > graphWidth) {
-                            x2 = graphWidth;
+                        if (x2 > graphRight) {
+                            x2 = graphRight;
                         }
                     }
                     canvas.drawLine(x2, y0Mob, x, y0Mob, mobileOperatorPaint);
                 }
             }
             
-            batteryPath.lineTo(graphWidth, lastY);
-            batteryPath.lineTo(graphWidth, graphHeight);
-            batteryPath.lineTo(x0Graph, graphHeight);
+            batteryPath.lineTo(graphRight, lastY);
+            batteryPath.lineTo(graphRight, graphBottom);
+            batteryPath.lineTo(graphLeft, graphBottom);
             canvas.drawPath(batteryPath, batteryLevelPaint);
         }
         
@@ -222,7 +243,7 @@ public class BatteryChart extends View {
             yTextPaint.setTextAlign(Paint.Align.RIGHT);
             yTextPaint.setStrokeWidth(2);
             
-            x0Graph = yTextPaint.measureText("100") + 2;
+            graphLeft = yTextPaint.measureText("100") + 2;
         }
         if (yBarPaint == null) {
             yBarPaint = new Paint();
@@ -241,8 +262,23 @@ public class BatteryChart extends View {
         }
         if (cursorPaint == null) {
             cursorPaint = new Paint();
-            cursorPaint.setColor(Color.WHITE);
+            cursorPaint.setAntiAlias(true);
+            cursorPaint.setColor(getResources().getColor(
+                R.color.battery_cursor_color));
             cursorPaint.setStrokeWidth(2);
+            cursorPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        }
+        if (textCursorPaint == null) {
+            textCursorPaint = new Paint();
+            textCursorPaint.setAntiAlias(true);
+            textCursorPaint.setSubpixelText(true);
+            textCursorPaint.setColor(getResources().getColor(
+                R.color.battery_text_cursor_color));
+            textCursorPaint.setTextSize(getResources().getDimension(
+                R.dimen.battery_y_text_size));
+            textCursorPaint.setTextAlign(Paint.Align.RIGHT);
+            
+            textCursorBottom = -textCursorPaint.ascent() + 5;
         }
         
         // Get the previously drawn image.
@@ -264,6 +300,9 @@ public class BatteryChart extends View {
         
         if (touchX != -1) {
             canvas.drawLine(touchX, 0, touchX, getHeight(), cursorPaint);
+            canvas.drawCircle(touchX, 8, 8, cursorPaint);
+            canvas.drawText(textCursor, textCursorLeft, textCursorBottom,
+                textCursorPaint);
         }
     }
     
@@ -279,9 +318,10 @@ public class BatteryChart extends View {
         cacheRef = null;
         
         final int margins = 8;
-        graphWidth = getWidth() - margins * 2;
-        graphHeight = getHeight() - margins * 2;
-        y0Graph = margins;
+        graphRight = getWidth() - margins * 2;
+        graphBottom = getHeight() - margins * 2;
+        graphTop = margins;
+        textCursorLeft = graphRight - 2;
     }
     
     public void setData(Event[] events) {
