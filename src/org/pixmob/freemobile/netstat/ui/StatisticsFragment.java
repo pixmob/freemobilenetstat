@@ -39,6 +39,9 @@ import android.support.v4.content.Loader;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -106,6 +109,42 @@ public class StatisticsFragment extends Fragment implements
         // The fields are hidden the first time this fragment is displayed,
         // while statistics data are being loaded.
         statisticsGroup.setVisibility(View.INVISIBLE);
+        
+        setHasOptionsMenu(true);
+    }
+    
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_statistics, menu);
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_export:
+                onMenuExport();
+                return true;
+            case R.id.menu_preferences:
+                onMenuPreferences();
+                return true;
+            case R.id.menu_about:
+                onMenuAbout();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    
+    private void onMenuExport() {
+        final DataExportDialogFragment f = new DataExportDialogFragment();
+        f.setRetainInstance(true);
+        f.show(getFragmentManager(), "export");
+    }
+    
+    private void onMenuPreferences() {
+    }
+    
+    private void onMenuAbout() {
     }
     
     @Override
