@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_export"
+        android:icon="@drawable/ic_menu_save"
+        android:showAsAction="ifRoom"
+        android:title="Exporter">
+    </item>
+    <item
+        android:id="@+id/menu_preferences"
+        android:icon="@drawable/ic_menu_preferences"
+        android:showAsAction="ifRoom"
+        android:title="Paramètres">
+    </item>
+    <item
+        android:id="@+id/menu_about"
+        android:icon="@drawable/ic_menu_help"
+        android:showAsAction="ifRoom"
+        android:title="À propos">
+    </item>
+
+</menu>

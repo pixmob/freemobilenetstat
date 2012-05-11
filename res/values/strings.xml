@@ -29,5 +29,7 @@
     <string name="days">j</string>
     <string name="hours">h</string>
     <string name="minutes">m</string>
+    <string name="exporting_data">Export des données en cours…</string>
+    <string name="external_storage_not_available">Support externe non disponible</string>
 
 </resources>
