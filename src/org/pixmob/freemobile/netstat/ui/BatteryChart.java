@@ -17,7 +17,6 @@ package org.pixmob.freemobile.netstat.ui;
 
 import java.lang.ref.WeakReference;
 
-import org.pixmob.freemobile.netstat.Constants;
 import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.R;
@@ -31,7 +30,6 @@ import android.graphics.Path;
 import android.graphics.Shader;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -181,22 +179,23 @@ public class BatteryChart extends View {
                         mobileOperatorPaint.setColor(orangeColor);
                     }
                     
-                    if (!e.mobileConnected) {
-                        Log.d(Constants.TAG, "Not connected: " + e);
-                    }
-                    
                     float x2 = graphRight;
                     if (i != 0) {
                         final Event e0 = events[i - 1];
-                        x2 = (e0.timestamp - t0) * xFactor;
-                        if (x2 < graphLeft) {
-                            x2 = x;
-                        }
-                        if (x2 > graphRight) {
-                            x2 = graphRight;
+                        final MobileOperator mobOp0 = MobileOperator
+                                .fromString(e0.mobileOperator);
+                        if (mobOp.equals(mobOp0)) {
+                            x2 = (e0.timestamp - t0) * xFactor + graphLeft;
+                            if (x2 < graphLeft) {
+                                x2 = graphLeft;
+                            }
+                            if (x2 > graphRight) {
+                                x2 = graphRight;
+                            }
+                            canvas.drawLine(x2, y0Mob, x, y0Mob,
+                                mobileOperatorPaint);
                         }
                     }
-                    canvas.drawLine(x2, y0Mob, x, y0Mob, mobileOperatorPaint);
                 }
             }
             
