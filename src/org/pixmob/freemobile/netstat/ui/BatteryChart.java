@@ -30,6 +30,7 @@ import android.graphics.Path;
 import android.graphics.Shader;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -119,7 +120,7 @@ public class BatteryChart extends View {
         lines[lineIdx++] = graphBottom;
         
         // Draw Y units.
-        final float x0Text = graphLeft - 5;
+        final float x0Text = graphLeft - toDip(5);
         final float yFactor = graphBottom / 100f;
         final int bandSize = 10;
         final float yBand = yFactor * bandSize;
@@ -277,7 +278,7 @@ public class BatteryChart extends View {
                 R.dimen.battery_y_text_size));
             textCursorPaint.setTextAlign(Paint.Align.RIGHT);
             
-            textCursorBottom = -textCursorPaint.ascent() + 5;
+            textCursorBottom = -textCursorPaint.ascent() + toDip(5);
         }
         
         // Get the previously drawn image.
@@ -299,7 +300,8 @@ public class BatteryChart extends View {
         
         if (touchX != -1) {
             canvas.drawLine(touchX, 0, touchX, getHeight(), cursorPaint);
-            canvas.drawCircle(touchX, 8, 8, cursorPaint);
+            final float circleRadius = toDip(4);
+            canvas.drawCircle(touchX, circleRadius, circleRadius, cursorPaint);
             canvas.drawText(textCursor, textCursorLeft, textCursorBottom,
                 textCursorPaint);
         }
@@ -316,11 +318,15 @@ public class BatteryChart extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         cacheRef = null;
         
-        final int margins = 8;
-        graphRight = getWidth() - margins * 2;
-        graphBottom = getHeight() - margins * 2;
-        graphTop = margins;
-        textCursorLeft = graphRight - 2;
+        graphRight = getWidth();
+        graphBottom = getHeight();
+        graphTop = 0;
+        textCursorLeft = graphRight - toDip(2);
+    }
+    
+    private float toDip(float pixels) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels,
+            getResources().getDisplayMetrics());
     }
     
     public void setData(Event[] events) {
