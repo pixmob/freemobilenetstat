@@ -60,6 +60,7 @@ public class BatteryChart extends View {
     private float textCursorLeft;
     private float textCursorBottom;
     private String textCursor;
+    private final Path cursorArrowPath = new Path();
     
     public BatteryChart(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -266,7 +267,7 @@ public class BatteryChart extends View {
             cursorPaint.setColor(getResources().getColor(
                 R.color.battery_cursor_color));
             cursorPaint.setStrokeWidth(2);
-            cursorPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+            cursorPaint.setStyle(Paint.Style.FILL);
         }
         if (textCursorPaint == null) {
             textCursorPaint = new Paint();
@@ -299,9 +300,15 @@ public class BatteryChart extends View {
         canvas.drawBitmap(cache, 0, 0, null);
         
         if (touchX != -1) {
-            canvas.drawLine(touchX, 0, touchX, getHeight(), cursorPaint);
-            final float circleRadius = toDip(4);
-            canvas.drawCircle(touchX, circleRadius, circleRadius, cursorPaint);
+            canvas.drawLine(touchX, 3, touchX, getHeight(), cursorPaint);
+            
+            cursorArrowPath.reset();
+            cursorArrowPath.moveTo(touchX, 3);
+            cursorArrowPath.lineTo(touchX - 10, 14);
+            cursorArrowPath.lineTo(touchX + 10, 14);
+            cursorArrowPath.close();
+            
+            canvas.drawPath(cursorArrowPath, cursorPaint);
             canvas.drawText(textCursor, textCursorLeft, textCursorBottom,
                 textCursorPaint);
         }
