@@ -36,6 +36,11 @@ public final class Constants {
      * notification.
      */
     public static final String SP_KEY_STAT_NOTIF_ICON_GRAY = "statNotifIconGray";
+    /**
+     * {@link SharedPreferences} key: skip network monitoring when the device
+     * has finished its boot sequence.
+     */
+    public static final String SP_KEY_SKIP_AUTO_START = "skipAutoStart";
     
     private Constants() {
     }
