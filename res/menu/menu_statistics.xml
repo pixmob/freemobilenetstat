@@ -5,19 +5,19 @@
         android:id="@+id/menu_export"
         android:icon="@drawable/ic_menu_save"
         android:showAsAction="ifRoom"
-        android:title="Exporter">
+        android:title="@string/menu_export">
     </item>
     <item
         android:id="@+id/menu_preferences"
         android:icon="@drawable/ic_menu_preferences"
         android:showAsAction="ifRoom"
-        android:title="Paramètres">
+        android:title="@string/menu_preferences">
     </item>
     <item
         android:id="@+id/menu_about"
         android:icon="@drawable/ic_menu_help"
         android:showAsAction="ifRoom"
-        android:title="À propos">
+        android:title="@string/menu_about">
     </item>
 
 </menu>
