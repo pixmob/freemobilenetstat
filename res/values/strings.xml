@@ -31,5 +31,8 @@
     <string name="minutes">m</string>
     <string name="exporting_data">Export des données en cours…</string>
     <string name="external_storage_not_available">Support externe non disponible</string>
+    <string name="menu_export">Exporter</string>
+    <string name="menu_preferences">Préférences</string>
+    <string name="menu_about">À propos</string>
 
 </resources>
