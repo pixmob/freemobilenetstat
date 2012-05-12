@@ -15,10 +15,13 @@
  */
 package org.pixmob.freemobile.netstat;
 
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_SKIP_AUTO_START;
+import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 /**
@@ -30,10 +33,17 @@ public class MonitorServiceStarter extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            Log.i(TAG, "Starting monitor service");
-            
-            final Context c = context.getApplicationContext();
-            c.startService(new Intent(c, MonitorService.class));
+            final SharedPreferences p = context.getSharedPreferences(SP_NAME,
+                Context.MODE_PRIVATE);
+            final boolean skip = p.getBoolean(SP_KEY_SKIP_AUTO_START, false);
+            if (skip) {
+                Log.i(TAG, "Skip monitor service startup");
+            } else {
+                Log.i(TAG, "Starting monitor service");
+                
+                final Context c = context.getApplicationContext();
+                c.startService(new Intent(c, MonitorService.class));
+            }
         }
     }
 }
