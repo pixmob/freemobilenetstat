@@ -53,6 +53,11 @@
             android:exported="false"
             android:label="@string/app_name" >
         </provider>
+
+        <activity
+            android:name=".ui.Preferences"
+            android:label="@string/menu_preferences" >
+        </activity>
     </application>
 
 </manifest>

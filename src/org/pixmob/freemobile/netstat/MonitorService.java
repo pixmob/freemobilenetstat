@@ -36,6 +36,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
@@ -55,7 +56,8 @@ import android.util.SparseIntArray;
  * notification shows which mobile network is the phone is connected to.
  * @author Pixmob
  */
-public class MonitorService extends Service {
+public class MonitorService extends Service implements
+        OnSharedPreferenceChangeListener {
     /**
      * Match network types from {@link TelephonyManager} with the corresponding
      * string.
@@ -85,6 +87,7 @@ public class MonitorService extends Service {
     private boolean mobileNetworkConnected;
     private int mobileNetworkType;
     private BlockingQueue<Event> pendingInsert;
+    private SharedPreferences prefs;
     
     static {
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_EDGE,
@@ -103,6 +106,14 @@ public class MonitorService extends Service {
             R.string.network_type_umts);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_UNKNOWN,
             R.string.network_type_unknown);
+    }
+    
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+            String key) {
+        if (SP_KEY_STAT_NOTIF_ICON_GRAY.equals(key)) {
+            updateNotification();
+        }
     }
     
     @Override
@@ -180,6 +191,9 @@ public class MonitorService extends Service {
         registerReceiver(batteryMonitor, batteryIntentFilter);
         
         pm = (PowerManager) getSystemService(POWER_SERVICE);
+        
+        prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
+        prefs.registerOnSharedPreferenceChangeListener(this);
     }
     
     @Override
@@ -205,6 +219,9 @@ public class MonitorService extends Service {
         
         // Remove the status bar notification.
         stopForeground(true);
+        
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
+        prefs = null;
     }
     
     @Override
@@ -251,8 +268,6 @@ public class MonitorService extends Service {
     }
     
     private int getStatIcon(MobileOperator op) {
-        final SharedPreferences prefs = getSharedPreferences(SP_NAME,
-            MODE_PRIVATE);
         if (!prefs.getBoolean(SP_KEY_STAT_NOTIF_ICON_GRAY, false)) {
             if (MobileOperator.FREE_MOBILE.equals(op)) {
                 return R.drawable.ic_stat_notify_service_free;

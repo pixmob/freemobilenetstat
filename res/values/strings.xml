@@ -33,6 +33,13 @@
     <string name="external_storage_not_available">Support externe non disponible</string>
     <string name="menu_export">Exporter</string>
     <string name="menu_preferences">Préférences</string>
-    <string name="menu_about">À propos</string>
+    <string name="pref_background_service">Service en tâche de fond</string>
+    <string name="pref_enable_at_boot">Activer au démarrage</string>
+    <string name="pref_icon_in_gray">Icône de statut en gris</string>
+    <string name="pref_about">À propos</string>
+    <string name="pref_version">Version %s</string>
+    <string name="pref_changelog">Nouveautés</string>
+    <string name="pref_license">License</string>
+    <string name="pref_comments">Suggestions</string>
 
 </resources>

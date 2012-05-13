@@ -35,12 +35,11 @@ public final class Constants {
      * {@link SharedPreferences} key: use a gray icon for the status bar
      * notification.
      */
-    public static final String SP_KEY_STAT_NOTIF_ICON_GRAY = "statNotifIconGray";
+    public static final String SP_KEY_STAT_NOTIF_ICON_GRAY = "pref_icon_in_gray";
     /**
-     * {@link SharedPreferences} key: skip network monitoring when the device
-     * has finished its boot sequence.
+     * {@link SharedPreferences} key: start the monitor service at boot.
      */
-    public static final String SP_KEY_SKIP_AUTO_START = "skipAutoStart";
+    public static final String SP_KEY_ENABLE_AT_BOOT = "pref_enable_at_boot";
     
     private Constants() {
     }
