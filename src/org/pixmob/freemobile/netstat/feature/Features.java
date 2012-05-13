@@ -38,6 +38,14 @@ public final class Features {
         } else {
             FEATURES.put(StrictModeFeature.class, new LegacyStrictModeFeature());
         }
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+            FEATURES.put(SharedPreferencesSaverFeature.class,
+                new GingerbreadSharedPreferencesSaverFeature());
+        } else {
+            FEATURES.put(SharedPreferencesSaverFeature.class,
+                new LegacySharedPreferencesSaverFeature());
+        }
     }
     
     private Features() {

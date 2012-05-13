@@ -27,6 +27,7 @@ import org.pixmob.freemobile.netstat.ui.StatisticsFragment.Statistics;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -128,9 +129,6 @@ public class StatisticsFragment extends Fragment implements
             case R.id.menu_preferences:
                 onMenuPreferences();
                 return true;
-            case R.id.menu_about:
-                onMenuAbout();
-                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -142,9 +140,7 @@ public class StatisticsFragment extends Fragment implements
     }
     
     private void onMenuPreferences() {
-    }
-    
-    private void onMenuAbout() {
+        startActivity(new Intent(getActivity(), Preferences.class));
     }
     
     @Override

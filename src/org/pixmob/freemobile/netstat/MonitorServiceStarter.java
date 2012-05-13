@@ -15,7 +15,7 @@
  */
 package org.pixmob.freemobile.netstat;
 
-import static org.pixmob.freemobile.netstat.Constants.SP_KEY_SKIP_AUTO_START;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AT_BOOT;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 import android.content.BroadcastReceiver;
@@ -35,9 +35,9 @@ public class MonitorServiceStarter extends BroadcastReceiver {
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             final SharedPreferences p = context.getSharedPreferences(SP_NAME,
                 Context.MODE_PRIVATE);
-            final boolean skip = p.getBoolean(SP_KEY_SKIP_AUTO_START, false);
-            if (skip) {
-                Log.i(TAG, "Skip monitor service startup");
+            final boolean enabled = p.getBoolean(SP_KEY_ENABLE_AT_BOOT, false);
+            if (!enabled) {
+                Log.i(TAG, "Monitor service is not started at boot");
             } else {
                 Log.i(TAG, "Starting monitor service");
                 

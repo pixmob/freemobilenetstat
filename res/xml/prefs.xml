@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/pref_background_service" >
+        <CheckBoxPreference
+            android:enabled="true"
+            android:key="pref_enable_at_boot"
+            android:title="@string/pref_enable_at_boot" />
+        <CheckBoxPreference
+            android:key="pref_icon_in_gray"
+            android:title="@string/pref_icon_in_gray" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_about" >
+        <Preference
+            android:key="pref_version"
+            android:title="@string/pref_version" />
+        <Preference
+            android:key="pref_license"
+            android:title="@string/pref_license" />
+        <Preference
+            android:key="pref_changelog"
+            android:title="@string/pref_changelog" />
+        <Preference
+            android:key="pref_comments"
+            android:title="@string/pref_comments" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
