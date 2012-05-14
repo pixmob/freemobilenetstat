@@ -170,6 +170,23 @@ public class MonitorService extends Service implements
             
             @Override
             public void onServiceStateChanged(ServiceState serviceState) {
+                if (!DEBUG) {
+                    // Check if the SIM card is compatible.
+                    if (TelephonyManager.SIM_STATE_READY == tm.getSimState()) {
+                        final String rawMobOp = tm.getSimOperator();
+                        final MobileOperator mobOp = MobileOperator
+                                .fromString(rawMobOp);
+                        if (!MobileOperator.FREE_MOBILE.equals(mobOp)) {
+                            Log.e(TAG, "SIM card is not compatible: "
+                                    + rawMobOp);
+                            
+                            // The service is stopped, since the SIM card is not
+                            // compatible.
+                            stopSelf();
+                        }
+                    }
+                }
+                
                 mobileNetworkConnected = serviceState.getState() == ServiceState.STATE_IN_SERVICE;
                 final boolean phoneStateUpdated = onPhoneStateUpdated();
                 if (phoneStateUpdated) {
