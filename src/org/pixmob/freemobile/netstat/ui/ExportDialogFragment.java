@@ -25,12 +25,9 @@ import android.support.v4.app.DialogFragment;
 /**
  * Fragment for exporting the application database, showing a progress dialog.
  * @author Pixmob
+ * @see ExportTask
  */
 public class ExportDialogFragment extends DialogFragment {
-    public static ExportDialogFragment newInstance(ExportTask t) {
-        return new ExportDialogFragment();
-    }
-    
     public void update(int current, int total) {
         final ProgressDialog dialog = (ProgressDialog) getDialog();
         dialog.setIndeterminate(false);
