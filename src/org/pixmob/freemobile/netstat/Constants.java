@@ -40,6 +40,11 @@ public final class Constants {
      * {@link SharedPreferences} key: start the monitor service at boot.
      */
     public static final String SP_KEY_ENABLE_AT_BOOT = "pref_enable_at_boot";
+    /**
+     * {@link SharedPreferences} key: play a sound when the mobile operator is
+     * updated.
+     */
+    public static final String SP_KEY_STAT_NOTIF_SOUND = "pref_notif_sound";
     
     private Constants() {
     }
