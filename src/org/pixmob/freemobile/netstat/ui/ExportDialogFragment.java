@@ -34,7 +34,7 @@ import android.support.v4.app.FragmentManager;
  * Fragment for exporting the application database, showing a progress dialog.
  * @author Pixmob
  */
-public class DataExportDialogFragment extends DialogFragment implements
+public class ExportDialogFragment extends DialogFragment implements
         ExportService.Listener, ServiceConnection {
     private Context context;
     private ExportService exportService;
