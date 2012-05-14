@@ -20,9 +20,6 @@
         <Preference
             android:key="pref_changelog"
             android:title="@string/pref_changelog" />
-        <Preference
-            android:key="pref_comments"
-            android:title="@string/pref_comments" />
     </PreferenceCategory>
 
 </PreferenceScreen>
