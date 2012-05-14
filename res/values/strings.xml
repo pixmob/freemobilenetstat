@@ -41,5 +41,8 @@
     <string name="pref_changelog">Nouveautés</string>
     <string name="pref_license">License</string>
     <string name="pref_notif_sound">Alarme sonore</string>
+    <string name="unsupported_sim_error">Carte SIM non supportée</string>
+    <string name="unsupported_sim_message">La carte SIM installée dans le téléphone n\'est pas compatible avec cette application.</string>
+    <string name="quit_application">Fermer l\'application</string>
 
 </resources>

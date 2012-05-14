@@ -76,6 +76,11 @@ public class StatisticsFragment extends Fragment implements
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
+        if (!isSimSupported(getActivity())) {
+            new UnsupportedSimDialogFragment().show(getFragmentManager(),
+                "error");
+        }
+        
         if (exportTask != null) {
             exportTask.setFragmentManager(getFragmentManager());
         }
@@ -117,6 +122,24 @@ public class StatisticsFragment extends Fragment implements
         statisticsGroup.setVisibility(View.INVISIBLE);
         
         setHasOptionsMenu(true);
+    }
+    
+    /**
+     * Check if the SIM card is supported.
+     */
+    @SuppressWarnings("unused")
+    public static boolean isSimSupported(Context context) {
+        if (DEBUG) {
+            return true;
+        }
+        
+        final TelephonyManager tm = (TelephonyManager) context
+                .getSystemService(Context.TELEPHONY_SERVICE);
+        if (TelephonyManager.SIM_STATE_READY != tm.getSimState()) {
+            return false;
+        }
+        return MobileOperator.FREE_MOBILE.equals(MobileOperator.fromString(tm
+                .getSimOperator()));
     }
     
     @Override
