@@ -39,7 +39,6 @@ public class Preferences extends PreferenceActivity implements
     private static final String SP_KEY_VERSION = "pref_version";
     private static final String SP_KEY_CHANGELOG = "pref_changelog";
     private static final String SP_KEY_LICENSE = "pref_license";
-    private static final String SP_KEY_COMMENTS = "pref_comments";
     
     @SuppressWarnings("deprecation")
     @Override
@@ -63,7 +62,6 @@ public class Preferences extends PreferenceActivity implements
         p.setTitle(String.format(getString(R.string.pref_version), version));
         
         findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(this);
-        findPreference(SP_KEY_COMMENTS).setOnPreferenceClickListener(this);
         findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(this);
     }
     
@@ -72,8 +70,6 @@ public class Preferences extends PreferenceActivity implements
         final String k = p.getKey();
         if (SP_KEY_CHANGELOG.equals(k)) {
             openBrowser(getString(R.string.url_changelog));
-        } else if (SP_KEY_COMMENTS.equals(k)) {
-            openBrowser(getString(R.string.url_comments));
         } else if (SP_KEY_LICENSE.equals(k)) {
             openBrowser(getString(R.string.url_license));
         }

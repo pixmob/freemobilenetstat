@@ -2,7 +2,6 @@
 <resources>
 
     <string name="url_license">http://www.apache.org/licenses/LICENSE-2.0.txt</string>
-    <string name="url_comments">http://www.google.com/moderator/#16/e=1fa5ca</string>
-    <string name="url_changelog">http://github.com/pixmob/freemobilenetstat</string>
+    <string name="url_changelog">https://github.com/pixmob/freemobilenetstat/wiki/Nouveautés</string>
 
 </resources>
