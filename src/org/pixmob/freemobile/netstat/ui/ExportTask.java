@@ -82,8 +82,7 @@ class ExportTask extends AsyncTask<Void, Integer, Void> {
     
     @Override
     protected void onPreExecute() {
-        ExportDialogFragment.newInstance(this)
-                .show(fragmentManager, DIALOG_TAG);
+        new ExportDialogFragment().show(fragmentManager, DIALOG_TAG);
     }
     
     @Override
@@ -102,6 +101,9 @@ class ExportTask extends AsyncTask<Void, Integer, Void> {
         if (f != null) {
             f.dismiss();
         }
+        
+        // Clear reference to avoid memory leaks.
+        fragmentManager = null;
     }
     
     private void export() throws IOException {
