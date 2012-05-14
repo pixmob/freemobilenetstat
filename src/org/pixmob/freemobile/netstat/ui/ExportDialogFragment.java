@@ -15,109 +15,35 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
-import org.pixmob.freemobile.netstat.ExportService;
 import org.pixmob.freemobile.netstat.R;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentManager;
 
 /**
  * Fragment for exporting the application database, showing a progress dialog.
  * @author Pixmob
  */
-public class ExportDialogFragment extends DialogFragment implements
-        ExportService.Listener, ServiceConnection {
-    private Context context;
-    private ExportService exportService;
-    private ProgressDialog dialog;
-    private boolean pendingStart;
+public class ExportDialogFragment extends DialogFragment {
+    public static ExportDialogFragment newInstance(ExportTask t) {
+        return new ExportDialogFragment();
+    }
     
-    @Override
-    public void onProgress(int current, int total) {
+    public void update(int current, int total) {
+        final ProgressDialog dialog = (ProgressDialog) getDialog();
         dialog.setIndeterminate(false);
         dialog.setMax(total);
         dialog.setProgress(current);
     }
     
-    @Override
-    public void onPreExecute() {
-    }
-    
-    @Override
-    public void onPostExecute() {
-        try {
-            dismiss();
-        } catch (Exception e) {
-            // The framework throws a NPE when the device orientation
-            // has changed. Why?
-        }
-    }
-    
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        exportService = ((ExportService.Binder) service).getService();
-        exportService.setListener(this);
-        
-        if (pendingStart) {
-            exportService.start();
-            pendingStart = false;
-        }
-    }
-    
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        if (exportService != null) {
-            exportService.setListener(null);
-            exportService = null;
-        }
-        pendingStart = false;
-    }
-    
-    @Override
-    public void show(FragmentManager manager, String tag) {
-        super.show(manager, tag);
-        if (exportService != null) {
-            exportService.start();
-        } else {
-            pendingStart = true;
-        }
-    }
-    
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        context = getActivity().getApplicationContext();
-        context.bindService(new Intent(context, ExportService.class), this,
-            Context.BIND_AUTO_CREATE);
-    }
-    
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        context.unbindService(this);
-    }
-    
-    @Override
-    public void onDismiss(DialogInterface dialog) {
-        super.onDismiss(dialog);
-        context.stopService(new Intent(context, ExportService.class));
-    }
-    
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        dialog = new ProgressDialog(getActivity());
+        final ProgressDialog dialog = new ProgressDialog(getActivity());
         dialog.setMessage(getString(R.string.exporting_data));
         dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         dialog.setIndeterminate(true);
-        dialog.setCancelable(true);
+        dialog.setCancelable(false);
         return dialog;
     }
 }

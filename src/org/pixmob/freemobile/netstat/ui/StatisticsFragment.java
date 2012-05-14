@@ -55,6 +55,7 @@ import android.widget.TextView;
 public class StatisticsFragment extends Fragment implements
         LoaderCallbacks<Statistics> {
     private static final String STAT_NO_VALUE = "-";
+    private static ExportTask exportTask;
     private ContentObserver contentMonitor;
     private View statisticsGroup;
     private ProgressBar progressBar;
@@ -74,6 +75,10 @@ public class StatisticsFragment extends Fragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        
+        if (exportTask != null) {
+            exportTask.setFragmentManager(getFragmentManager());
+        }
         
         // Monitor database updates: when new data is available, this fragment
         // is updated with the new values.
@@ -134,9 +139,9 @@ public class StatisticsFragment extends Fragment implements
     }
     
     private void onMenuExport() {
-        final ExportDialogFragment f = new ExportDialogFragment();
-        f.setRetainInstance(true);
-        f.show(getFragmentManager(), "export");
+        exportTask = new ExportTask(getActivity().getApplicationContext(),
+                getFragmentManager());
+        exportTask.execute();
     }
     
     private void onMenuPreferences() {

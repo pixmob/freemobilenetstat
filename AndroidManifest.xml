@@ -34,8 +34,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name="ExportService" >
-        </service>
         <service
             android:name=".MonitorService"
             android:label="@string/service_monitor" >
