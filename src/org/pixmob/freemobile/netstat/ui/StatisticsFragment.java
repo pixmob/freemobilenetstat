@@ -134,7 +134,7 @@ public class StatisticsFragment extends Fragment implements
     }
     
     private void onMenuExport() {
-        final DataExportDialogFragment f = new DataExportDialogFragment();
+        final ExportDialogFragment f = new ExportDialogFragment();
         f.setRetainInstance(true);
         f.show(getFragmentManager(), "export");
     }
