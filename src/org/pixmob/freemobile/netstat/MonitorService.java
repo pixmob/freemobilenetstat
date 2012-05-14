@@ -17,6 +17,7 @@ package org.pixmob.freemobile.netstat;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_ICON_GRAY;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 
@@ -39,6 +40,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -112,7 +114,7 @@ public class MonitorService extends Service implements
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
             String key) {
         if (SP_KEY_STAT_NOTIF_ICON_GRAY.equals(key)) {
-            updateNotification();
+            updateNotification(false);
         }
     }
     
@@ -163,16 +165,17 @@ public class MonitorService extends Service implements
             @Override
             public void onDataConnectionStateChanged(int state, int networkType) {
                 mobileNetworkType = networkType;
-                updateNotification();
+                updateNotification(false);
             }
             
             @Override
             public void onServiceStateChanged(ServiceState serviceState) {
                 mobileNetworkConnected = serviceState.getState() == ServiceState.STATE_IN_SERVICE;
-                if (onPhoneStateUpdated()) {
+                final boolean phoneStateUpdated = onPhoneStateUpdated();
+                if (phoneStateUpdated) {
                     updateEventDatabase();
                 }
-                updateNotification();
+                updateNotification(phoneStateUpdated);
             }
         };
         
@@ -233,7 +236,7 @@ public class MonitorService extends Service implements
         // Update with current state.
         onConnectivityUpdated();
         onPhoneStateUpdated();
-        updateNotification();
+        updateNotification(false);
         
         return START_STICKY;
     }
@@ -241,7 +244,7 @@ public class MonitorService extends Service implements
     /**
      * Update the status bar notification.
      */
-    private void updateNotification() {
+    private void updateNotification(boolean playSound) {
         final MobileOperator mobOp = MobileOperator
                 .fromString(mobileOperatorId);
         if (mobOp == null || !mobileNetworkConnected) {
@@ -257,13 +260,22 @@ public class MonitorService extends Service implements
         final String tickerText = String.format(
             getString(R.string.stat_connected_to_mobile_network),
             mobOp.toName(this));
-        final Notification n = new NotificationCompat.Builder(
+        final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(
                 getApplicationContext()).setSmallIcon(iconRes)
                 .setTicker(tickerText).setContentText(contentText)
                 .setContentTitle(tickerText)
-                .setContentIntent(openUIPendingIntent).setWhen(0)
-                .getNotification();
+                .setContentIntent(openUIPendingIntent).setWhen(0);
         
+        if (playSound) {
+            final String rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND,
+                null);
+            if (rawSoundUri != null) {
+                final Uri soundUri = Uri.parse(rawSoundUri);
+                nBuilder.setSound(soundUri);
+            }
+        }
+        
+        final Notification n = nBuilder.getNotification();
         startForeground(R.string.stat_connected_to_mobile_network, n);
     }
     

@@ -9,6 +9,13 @@
         <CheckBoxPreference
             android:key="pref_icon_in_gray"
             android:title="@string/pref_icon_in_gray" />
+
+        <RingtonePreference
+            android:key="pref_notif_sound"
+            android:ringtoneType="notification"
+            android:showDefault="true"
+            android:showSilent="true"
+            android:title="@string/pref_notif_sound" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_about" >
         <Preference
