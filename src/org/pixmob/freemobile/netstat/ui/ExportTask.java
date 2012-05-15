@@ -25,6 +25,7 @@ import java.io.OutputStreamWriter;
 
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
+import org.pixmob.freemobile.netstat.util.IOUtils;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -40,7 +41,7 @@ import android.widget.Toast;
  * Export database to a file on the external storage.
  * @author Pixmob
  */
-class ExportTask extends AsyncTask<Void, Integer, Void> {
+class ExportTask extends AsyncTask<Void, Integer, Boolean> {
     private static final String DIALOG_TAG = "export";
     private static final String LINE_SEP = "\r\n";
     private static final String COL_SEP = ";";
@@ -59,14 +60,15 @@ class ExportTask extends AsyncTask<Void, Integer, Void> {
     }
     
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Boolean doInBackground(Void... params) {
         try {
             export();
             Log.i(TAG, "Export done");
         } catch (IOException e) {
             Log.e(TAG, "Failed to export database", e);
+            return false;
         }
-        return null;
+        return true;
     }
     
     @Override
@@ -82,16 +84,33 @@ class ExportTask extends AsyncTask<Void, Integer, Void> {
     
     @Override
     protected void onPreExecute() {
+        if (!Environment.getExternalStorageState().equals(
+            Environment.MEDIA_MOUNTED)) {
+            Log.w(TAG, "External storage is not available");
+            Toast.makeText(context,
+                context.getString(R.string.external_storage_not_available),
+                Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
         new ExportDialogFragment().show(fragmentManager, DIALOG_TAG);
     }
     
     @Override
-    protected void onPostExecute(Void result) {
+    protected void onPostExecute(Boolean result) {
         dismissDialog();
+        
+        if (result) {
+            Toast.makeText(context, R.string.export_done, Toast.LENGTH_SHORT)
+                    .show();
+        } else {
+            Toast.makeText(context, R.string.export_error, Toast.LENGTH_SHORT)
+                    .show();
+        }
     }
     
     @Override
-    protected void onCancelled(Void result) {
+    protected void onCancelled(Boolean result) {
         dismissDialog();
     }
     
@@ -107,15 +126,6 @@ class ExportTask extends AsyncTask<Void, Integer, Void> {
     }
     
     private void export() throws IOException {
-        if (!Environment.getExternalStorageState().equals(
-            Environment.MEDIA_MOUNTED)) {
-            Log.w(TAG, "External storage is not available");
-            Toast.makeText(context,
-                context.getString(R.string.external_storage_not_available),
-                Toast.LENGTH_SHORT).show();
-            return;
-        }
-        
         final File outputFile = new File(
                 Environment.getExternalStorageDirectory(),
                 "freemobilenetstat.csv");
@@ -160,10 +170,7 @@ class ExportTask extends AsyncTask<Void, Integer, Void> {
                 publishProgress(++currentRow, rowCount);
             }
         } finally {
-            try {
-                out.close();
-            } catch (IOException ignore) {
-            }
+            IOUtils.close(out);
             c.close();
         }
     }
