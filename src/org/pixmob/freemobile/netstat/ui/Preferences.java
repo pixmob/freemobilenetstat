@@ -19,8 +19,12 @@ import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 
 import org.pixmob.freemobile.netstat.R;
+import org.pixmob.freemobile.netstat.feature.BackupManagerFeature;
+import org.pixmob.freemobile.netstat.feature.Features;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
@@ -35,10 +39,11 @@ import android.util.Log;
  * @author Pixmob
  */
 public class Preferences extends PreferenceActivity implements
-        OnPreferenceClickListener {
+        OnPreferenceClickListener, OnSharedPreferenceChangeListener {
     private static final String SP_KEY_VERSION = "pref_version";
     private static final String SP_KEY_CHANGELOG = "pref_changelog";
     private static final String SP_KEY_LICENSE = "pref_license";
+    private SharedPreferences prefs;
     
     @SuppressWarnings("deprecation")
     @Override
@@ -63,6 +68,17 @@ public class Preferences extends PreferenceActivity implements
         
         findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(this);
         findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(this);
+        
+        prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+    }
+    
+    @Override
+    protected void onDestroy() {
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
+        prefs = null;
+        
+        super.onDestroy();
     }
     
     @Override
@@ -82,5 +98,13 @@ public class Preferences extends PreferenceActivity implements
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY
                 | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         startActivity(i);
+    }
+    
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+            String key) {
+        Log.d(TAG, "Application preferences updated: "
+                + "calling BackupManager.dataChanged()");
+        Features.getFeature(BackupManagerFeature.class).dataChanged(this);
     }
 }

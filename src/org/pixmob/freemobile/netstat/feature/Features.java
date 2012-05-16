@@ -46,6 +46,14 @@ public final class Features {
             FEATURES.put(SharedPreferencesSaverFeature.class,
                 new LegacySharedPreferencesSaverFeature());
         }
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO) {
+            FEATURES.put(BackupManagerFeature.class,
+                new FroyoBackupManagerFeature());
+        } else {
+            FEATURES.put(BackupManagerFeature.class,
+                new NoOpBackupManagerFeature());
+        }
     }
     
     private Features() {
