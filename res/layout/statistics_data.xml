@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center" >
 
@@ -34,7 +34,7 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="fill_parent"
             android:gravity="center|right"
             android:orientation="vertical" >
 
@@ -63,7 +63,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dip"
         android:baselineAligned="false"
@@ -77,49 +77,49 @@
 
             <TextView
                 style="@style/stat_row_even"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/stat_mobile_network" />
 
             <TextView
                 style="@style/stat_row"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/stat_mobile_code" />
 
             <TextView
                 style="@style/stat_row_even"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/stat_on_orange" />
 
             <TextView
                 style="@style/stat_row"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/stat_on_free_mobile" />
 
             <TextView
                 style="@style/stat_row_even"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/stat_started_since" />
 
             <TextView
                 style="@style/stat_row"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/stat_screen" />
 
             <TextView
                 style="@style/stat_row_even"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/stat_wifi" />
 
             <TextView
                 style="@style/stat_row"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/stat_battery" />
         </LinearLayout>
@@ -133,56 +133,56 @@
             <TextView
                 android:id="@+id/stat_mobile_network"
                 style="@style/stat_row_even"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="Orange" />
 
             <TextView
                 android:id="@+id/stat_mobile_code"
                 style="@style/stat_row"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="20810" />
 
             <TextView
                 android:id="@+id/stat_on_orange"
                 style="@style/stat_row_even"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="8h 14m" />
 
             <TextView
                 android:id="@+id/stat_on_free_mobile"
                 style="@style/stat_row"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="12m" />
 
             <TextView
                 android:id="@+id/stat_started_since"
                 style="@style/stat_row_even"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="8h 32m" />
 
             <TextView
                 android:id="@+id/stat_screen"
                 style="@style/stat_row"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="1h 27m" />
 
             <TextView
                 android:id="@+id/stat_wifi"
                 style="@style/stat_row_even"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="27m" />
 
             <TextView
                 android:id="@+id/stat_battery"
                 style="@style/stat_row"
-                android:layout_width="match_parent"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="74%" />
         </LinearLayout>
