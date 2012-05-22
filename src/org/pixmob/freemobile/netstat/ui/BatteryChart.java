@@ -15,8 +15,6 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
-import java.lang.ref.WeakReference;
-
 import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.R;
@@ -39,7 +37,7 @@ import android.view.View;
  * @author Pixmob
  */
 public class BatteryChart extends View {
-    private WeakReference<Bitmap> cacheRef;
+    private Bitmap cache;
     private int freeMobileColor;
     private int orangeColor;
     private Paint mobileOperatorPaint;
@@ -63,6 +61,12 @@ public class BatteryChart extends View {
     
     public BatteryChart(final Context context, final AttributeSet attrs) {
         super(context, attrs);
+    }
+    
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        invalidateCache();
     }
     
     @Override
@@ -111,7 +115,7 @@ public class BatteryChart extends View {
         final float[] lines = new float[11 * 4];
         int lineIdx = 0;
         lines[lineIdx++] = graphLeft;
-        lines[lineIdx++] = 0;
+        lines[lineIdx++] = graphTop;
         lines[lineIdx++] = graphLeft;
         lines[lineIdx++] = graphBottom;
         lines[lineIdx++] = graphLeft;
@@ -121,7 +125,7 @@ public class BatteryChart extends View {
         
         // Draw Y units.
         final float x0Text = graphLeft - toDip(5);
-        final float yFactor = graphBottom / 100f;
+        final float yFactor = (graphBottom - graphTop) / 100f;
         final int bandSize = 10;
         final float yBand = yFactor * bandSize;
         final float yAscent2 = yTextPaint.ascent() / 2;
@@ -161,8 +165,7 @@ public class BatteryChart extends View {
                 if (x < graphLeft) {
                     continue;
                 }
-                final float y = graphBottom - e.batteryLevel * yFactor
-                        + graphTop;
+                final float y = graphBottom - e.batteryLevel * yFactor;
                 
                 if (i != 0) {
                     batteryPath.lineTo(x, y);
@@ -253,7 +256,7 @@ public class BatteryChart extends View {
         }
         if (mobileOperatorPaint == null) {
             mobileOperatorPaint = new Paint();
-            mobileOperatorPaint.setStrokeWidth(12);
+            mobileOperatorPaint.setStrokeWidth(16);
             
             orangeColor = getResources()
                     .getColor(R.color.orange_network_color1);
@@ -281,19 +284,12 @@ public class BatteryChart extends View {
             textCursorBottom = -textCursorPaint.ascent() + toDip(5);
         }
         
-        // Get the previously drawn image.
-        Bitmap cache = null;
-        if (cacheRef != null) {
-            cache = cacheRef.get();
-        }
-        
         // No image is available in the cache: render a new one.
         if (cache == null) {
             cache = Bitmap.createBitmap(getWidth(), getHeight(),
                 Bitmap.Config.ARGB_8888);
             final Canvas c = new Canvas(cache);
             doDraw(c);
-            cacheRef = new WeakReference<Bitmap>(cache);
         }
         
         canvas.drawBitmap(cache, 0, 0, null);
@@ -314,11 +310,11 @@ public class BatteryChart extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        cacheRef = null;
+        invalidateCache();
         
         graphRight = getWidth();
         graphBottom = getHeight();
-        graphTop = 6;
+        graphTop = 12;
         textCursorLeft = graphRight - toDip(2);
     }
     
@@ -329,6 +325,13 @@ public class BatteryChart extends View {
     
     public void setData(Event[] events) {
         this.events = events;
-        cacheRef = null;
+        invalidateCache();
+    }
+    
+    private void invalidateCache() {
+        if (cache != null) {
+            cache.recycle();
+            cache = null;
+        }
     }
 }
