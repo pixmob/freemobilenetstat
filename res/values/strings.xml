@@ -16,8 +16,6 @@
     <string name="network_type_hspa">3G+ (HSPA)</string>
     <string name="network_type_hspap">3G+ (HSPAP)</string>
     <string name="service_monitor">Service de suivi de la connexion</string>
-    <string name="percent_on_orange_network">Orange : %s</string>
-    <string name="percent_on_free_mobile_network">Free Mobile : %s</string>
     <string name="stat_mobile_network">Réseau actuel</string>
     <string name="stat_mobile_code">MCC+MNC</string>
     <string name="stat_screen">Écran allumé</string>
