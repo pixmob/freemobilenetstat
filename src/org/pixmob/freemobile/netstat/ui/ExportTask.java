@@ -50,6 +50,7 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
     private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm:ss";
     private final Context context;
     private FragmentManager fragmentManager;
+    private boolean aborted;
     
     public ExportTask(final Context context,
             final FragmentManager fragmentManager) {
@@ -63,6 +64,9 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
     
     @Override
     protected Boolean doInBackground(Void... params) {
+        if (aborted) {
+            return false;
+        }
         try {
             export();
             Log.i(TAG, "Export done");
@@ -92,10 +96,10 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
             Toast.makeText(context,
                 context.getString(R.string.external_storage_not_available),
                 Toast.LENGTH_SHORT).show();
-            return;
+            aborted = true;
+        } else {
+            new ExportDialogFragment().show(fragmentManager, DIALOG_TAG);
         }
-        
-        new ExportDialogFragment().show(fragmentManager, DIALOG_TAG);
     }
     
     @Override
