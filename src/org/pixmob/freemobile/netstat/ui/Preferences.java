@@ -29,11 +29,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.pixmob.freemobile.netstat.R;
+import org.pixmob.freemobile.netstat.feature.BackupManagerFeature;
+import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.util.IOUtils;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
@@ -53,7 +56,8 @@ import android.widget.TextView;
  * @author Pixmob
  */
 public class Preferences extends PreferenceActivity implements
-        OnPreferenceClickListener, OnPreferenceChangeListener {
+        OnPreferenceClickListener, OnPreferenceChangeListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String SP_KEY_VERSION = "pref_version";
     private static final String SP_KEY_CHANGELOG = "pref_changelog";
     private static final String SP_KEY_LICENSE = "pref_license";
@@ -103,6 +107,21 @@ public class Preferences extends PreferenceActivity implements
         lp.setSummary(timeIntervals.get(currentInterval));
         lp.setValue(currentInterval);
         lp.setOnPreferenceChangeListener(this);
+        
+        pm.getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(this);
+    }
+    
+    @Override
+    protected void onDestroy() {
+        findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(null);
+        findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(null);
+        findPreference(SP_KEY_TIME_INTERVAL)
+                .setOnPreferenceChangeListener(null);
+        
+        getPreferenceManager().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
+        super.onDestroy();
     }
     
     @Override
@@ -185,5 +204,12 @@ public class Preferences extends PreferenceActivity implements
         } finally {
             IOUtils.close(input);
         }
+    }
+    
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+            String key) {
+        Log.d(TAG, "Application preferences updated: "
+                + "calling BackupManager.dataChanged()");
+        Features.getFeature(BackupManagerFeature.class).dataChanged(this);
     }
 }
