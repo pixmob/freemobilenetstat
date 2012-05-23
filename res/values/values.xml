@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <item name="chart_text_size" type="integer">30</item>
-    <item name="chart_small_text_size" type="integer">18</item>
-
-</resources>

@@ -15,12 +15,15 @@
  */
 package org.pixmob.freemobile.netstat.feature;
 
+import android.annotation.TargetApi;
 import android.content.SharedPreferences.Editor;
+import android.os.Build;
 
 /**
  * Gingerbread {@link SharedPreferencesSaverFeature} implementation.
  * @author Pixmob
  */
+@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 class GingerbreadSharedPreferencesSaverFeature implements
         SharedPreferencesSaverFeature {
     @Override
