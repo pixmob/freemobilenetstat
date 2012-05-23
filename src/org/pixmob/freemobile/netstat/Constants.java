@@ -45,6 +45,27 @@ public final class Constants {
      * updated.
      */
     public static final String SP_KEY_STAT_NOTIF_SOUND = "pref_notif_sound";
+    /**
+     * {@link SharedPreferences} key: set the time interval for displayed data.
+     */
+    public static final String SP_KEY_TIME_INTERVAL = "pref_time_interval";
+    
+    /**
+     * Time interval value: show data since the device boot time.
+     */
+    public static final int INTERVAL_SINCE_BOOT = 0;
+    /**
+     * Time interval value: show data from today.
+     */
+    public static final int INTERVAL_TODAY = 1;
+    /**
+     * Time interval value: show data from one week.
+     */
+    public static final int INTERVAL_ONE_WEEK = 2;
+    /**
+     * Time interval value: show data from one month.
+     */
+    public static final int INTERVAL_ONE_MONTH = 3;
     
     private Constants() {
     }

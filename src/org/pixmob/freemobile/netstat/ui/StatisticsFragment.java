@@ -16,7 +16,15 @@
 package org.pixmob.freemobile.netstat.ui;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
+import static org.pixmob.freemobile.netstat.Constants.INTERVAL_ONE_MONTH;
+import static org.pixmob.freemobile.netstat.Constants.INTERVAL_ONE_WEEK;
+import static org.pixmob.freemobile.netstat.Constants.INTERVAL_TODAY;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
+import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
+
+import java.util.Calendar;
+import java.util.Date;
 
 import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
@@ -28,6 +36,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -38,6 +47,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.telephony.TelephonyManager;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -65,7 +75,6 @@ public class StatisticsFragment extends Fragment implements
     private TextView onOrangeNetwork;
     private TextView statMobileNetwork;
     private TextView statMobileCode;
-    private TextView statStartedSince;
     private TextView statScreenOn;
     private TextView statWifiOn;
     private TextView statOnOrange;
@@ -110,7 +119,6 @@ public class StatisticsFragment extends Fragment implements
                 .findViewById(R.id.on_free_mobile_network);
         statMobileNetwork = (TextView) a.findViewById(R.id.stat_mobile_network);
         statMobileCode = (TextView) a.findViewById(R.id.stat_mobile_code);
-        statStartedSince = (TextView) a.findViewById(R.id.stat_started_since);
         statScreenOn = (TextView) a.findViewById(R.id.stat_screen);
         statWifiOn = (TextView) a.findViewById(R.id.stat_wifi);
         statOnOrange = (TextView) a.findViewById(R.id.stat_on_orange);
@@ -224,7 +232,6 @@ public class StatisticsFragment extends Fragment implements
                 : s.mobileOperator.toName(a));
         statMobileCode.setText(s.mobileOperatorCode == null ? STAT_NO_VALUE
                 : s.mobileOperatorCode);
-        setDurationText(statStartedSince, s.bootTime);
         setDurationText(statScreenOn, s.screenOnTime);
         setDurationText(statWifiOn, s.wifiOnTime);
         setDurationText(statOnOrange, s.orangeTime);
@@ -319,14 +326,37 @@ public class StatisticsFragment extends Fragment implements
         
         @Override
         public Statistics loadInBackground() {
-            final long start = System.currentTimeMillis();
-            if (DEBUG) {
-                Log.d(TAG, "Loading statistics from ContentProvider");
+            final long now = System.currentTimeMillis();
+            
+            final SharedPreferences prefs = getContext().getSharedPreferences(
+                SP_NAME, Context.MODE_PRIVATE);
+            final int interval = prefs.getInt(SP_KEY_TIME_INTERVAL, 0);
+            final long fromTimestamp;
+            if (interval == INTERVAL_ONE_MONTH) {
+                final Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(now);
+                cal.add(Calendar.MONTH, -1);
+                fromTimestamp = cal.getTimeInMillis();
+            } else if (interval == INTERVAL_ONE_WEEK) {
+                final Calendar cal = Calendar.getInstance();
+                cal.setTimeInMillis(now);
+                cal.add(Calendar.DATE, -7);
+                fromTimestamp = cal.getTimeInMillis();
+            } else if (interval == INTERVAL_TODAY) {
+                // Get the date at midnight today.
+                final Time t = new Time();
+                t.set(now);
+                t.hour = 0;
+                t.minute = 0;
+                t.second = 0;
+                fromTimestamp = t.toMillis(false);
+            } else {
+                fromTimestamp = now - SystemClock.elapsedRealtime();
             }
             
-            final long now = System.currentTimeMillis();
-            final long deviceBootTimestamp = now
-                    - SystemClock.elapsedRealtime();
+            Log.i(TAG, "Loading statistics from " + new Date(fromTimestamp)
+                    + " to now");
+            
             final Statistics s = new Statistics();
             
             final TelephonyManager tm = (TelephonyManager) getContext()
@@ -347,7 +377,7 @@ public class StatisticsFragment extends Fragment implements
                             Events.WIFI_CONNECTED, Events.MOBILE_CONNECTED,
                             Events.MOBILE_OPERATOR, Events.BATTERY_LEVEL },
                     Events.TIMESTAMP + ">?",
-                    new String[] { String.valueOf(deviceBootTimestamp) },
+                    new String[] { String.valueOf(fromTimestamp) },
                     Events.TIMESTAMP + " ASC");
                 final int rowCount = c.getCount();
                 s.events = new Event[rowCount];
@@ -394,7 +424,6 @@ public class StatisticsFragment extends Fragment implements
                 s.freeMobileUsePercent = (int) Math.round(s.freeMobileTime
                         / sTime * 100d);
                 s.orangeUsePercent = 100 - s.freeMobileUsePercent;
-                s.bootTime = now - deviceBootTimestamp;
                 s.connectionTime = now - connectionTimestamp;
             } catch (Exception e) {
                 Log.e(TAG, "Failed to load statistics", e);
@@ -410,7 +439,7 @@ public class StatisticsFragment extends Fragment implements
             
             if (DEBUG) {
                 final long end = System.currentTimeMillis();
-                Log.d(TAG, "Statistics loaded in " + (end - start) + " ms");
+                Log.d(TAG, "Statistics loaded in " + (end - now) + " ms");
             }
             
             return s;
@@ -430,7 +459,6 @@ public class StatisticsFragment extends Fragment implements
         public MobileOperator mobileOperator;
         public String mobileOperatorCode;
         public long connectionTime;
-        public long bootTime;
         public long screenOnTime;
         public long wifiOnTime;
         public int battery;

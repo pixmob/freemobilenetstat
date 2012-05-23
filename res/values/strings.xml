@@ -20,7 +20,6 @@
     <string name="percent_on_free_mobile_network">Free Mobile : %s</string>
     <string name="stat_mobile_network">Réseau actuel</string>
     <string name="stat_mobile_code">MCC+MNC</string>
-    <string name="stat_started_since">Démarré depuis</string>
     <string name="stat_screen">Écran allumé</string>
     <string name="stat_wifi">Wi-Fi actif</string>
     <string name="stat_battery">Batterie</string>
@@ -43,6 +42,11 @@
     <string name="pref_changelog">Nouveautés</string>
     <string name="pref_license">Licence</string>
     <string name="pref_notif_sound">Alarme sonore</string>
+    <string name="pref_time_interval">Afficher les données depuis…</string>
+    <string name="interval_since_boot">Démarrage du téléphone</string>
+    <string name="interval_today">Aujourd\'hui</string>
+    <string name="interval_one_week">Une semaine</string>
+    <string name="interval_one_month">Un mois</string>
     <string name="unsupported_sim_error">Carte SIM non supportée</string>
     <string name="unsupported_sim_message">La carte SIM installée dans le téléphone n\'est pas compatible avec cette application.</string>
     <string name="quit_application">Fermer l\'application</string>
