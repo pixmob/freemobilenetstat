@@ -59,6 +59,7 @@ public class BatteryChart extends View {
     private float textCursorLeft;
     private float textCursorBottom;
     private String textCursor;
+    private int textCursorFormat = DateUtils.FORMAT_SHOW_TIME;
     
     public BatteryChart(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -83,7 +84,7 @@ public class BatteryChart extends View {
                             / getXFactor())
                             + t0;
                     textCursor = DateUtils.formatDateTime(getContext(), t,
-                        DateUtils.FORMAT_SHOW_TIME);
+                        textCursorFormat);
                     
                     touchX = x;
                     invalidate();
@@ -131,10 +132,10 @@ public class BatteryChart extends View {
         final float yBand = yFactor * bandSize;
         final float yAscent2 = yTextPaint.ascent() / 2;
         for (int i = bandSize; i <= 100; i += bandSize) {
-            if (bgPaint.getColor() == bgColor1) {
-                bgPaint.setColor(bgColor2);
-            } else {
+            if (bgPaint.getColor() == bgColor2) {
                 bgPaint.setColor(bgColor1);
+            } else {
+                bgPaint.setColor(bgColor2);
             }
             final float y = graphBottom - yFactor * i;
             canvas.drawRect(graphLeft, y, graphRight, y + yBand, bgPaint);
@@ -219,7 +220,7 @@ public class BatteryChart extends View {
         canvas.drawLines(lines, yBarPaint);
         
         if (drawChart) {
-            canvas.clipRect(graphLeft, graphTop, graphRight, graphBottom);
+            canvas.clipRect(graphLeft, 0, graphRight, graphBottom);
             canvas.drawPath(batteryLevelBorderPath, batteryLevelBorderPaint);
         }
     }
@@ -336,7 +337,7 @@ public class BatteryChart extends View {
         
         graphRight = getWidth();
         graphBottom = getHeight();
-        graphTop = 12;
+        graphTop = 38;
         textCursorLeft = graphRight - toDip(2);
     }
     
@@ -348,6 +349,18 @@ public class BatteryChart extends View {
     public void setData(Event[] events) {
         this.events = events;
         invalidateCache();
+        
+        if (events != null && events.length != 0) {
+            final long duration = events[events.length - 1].timestamp
+                    - events[0].timestamp;
+            if (duration >= 86400 * 1000) {
+                // Over a day: show date+time.
+                textCursorFormat = DateUtils.FORMAT_SHOW_DATE;
+            } else {
+                // One day: show time only.
+                textCursorFormat = DateUtils.FORMAT_SHOW_TIME;
+            }
+        }
     }
     
     private void invalidateCache() {

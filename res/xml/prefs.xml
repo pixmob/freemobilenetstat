@@ -16,6 +16,11 @@
             android:showDefault="true"
             android:showSilent="true"
             android:title="@string/pref_notif_sound" />
+
+        <org.pixmob.freemobile.netstat.ui.IntListPreference
+            android:dialogTitle="@string/pref_time_interval"
+            android:key="pref_time_interval"
+            android:title="@string/pref_time_interval" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_about" >
         <Preference
