@@ -13,6 +13,7 @@
     <color name="battery_bg_color2">#383840</color>
     <color name="battery_level_color1">#1D699A</color>
     <color name="battery_level_color2">#17324F</color>
+    <color name="battery_level_border_color">#DDD</color>
     <color name="battery_cursor_color">#DDD</color>
     <color name="battery_text_cursor_color">#FFF</color>
 

@@ -46,6 +46,7 @@ public class BatteryChart extends View {
     private Paint bgPaint;
     private Paint yBarPaint;
     private Paint yTextPaint;
+    private Paint batteryLevelBorderPaint;
     private Paint batteryLevelPaint;
     private Paint cursorPaint;
     private Paint textCursorPaint;
@@ -148,7 +149,10 @@ public class BatteryChart extends View {
             }
         }
         
-        if (events != null && events.length > 1) {
+        final boolean drawChart = events != null && events.length > 1;
+        Path batteryLevelBorderPath = null;
+        
+        if (drawChart) {
             final long t0 = events[0].timestamp;
             final float xFactor = getXFactor();
             
@@ -203,6 +207,8 @@ public class BatteryChart extends View {
                 }
             }
             
+            batteryLevelBorderPath = new Path(batteryPath);
+            
             batteryPath.lineTo(graphRight, lastY);
             batteryPath.lineTo(graphRight, graphBottom);
             batteryPath.lineTo(graphLeft, graphBottom);
@@ -211,6 +217,11 @@ public class BatteryChart extends View {
         
         // Draw axes.
         canvas.drawLines(lines, yBarPaint);
+        
+        if (drawChart) {
+            canvas.clipRect(graphLeft, graphTop, graphRight, graphBottom);
+            canvas.drawPath(batteryLevelBorderPath, batteryLevelBorderPaint);
+        }
     }
     
     @Override
@@ -228,6 +239,16 @@ public class BatteryChart extends View {
                     .getColor(R.color.battery_level_color2);
             batteryLevelPaint.setShader(new LinearGradient(0, 0, 0,
                     getHeight(), c1, c2, Shader.TileMode.CLAMP));
+        }
+        if (batteryLevelBorderPaint == null) {
+            batteryLevelBorderPaint = new Paint();
+            batteryLevelBorderPaint.setAntiAlias(true);
+            batteryLevelBorderPaint.setStyle(Paint.Style.STROKE);
+            batteryLevelBorderPaint.setStrokeWidth(4);
+            batteryLevelBorderPaint.setStrokeCap(Paint.Cap.ROUND);
+            batteryLevelBorderPaint.setStrokeJoin(Paint.Join.ROUND);
+            batteryLevelBorderPaint.setColor(getResources().getColor(
+                R.color.battery_level_border_color));
         }
         if (bgPaint == null) {
             bgColor1 = getResources().getColor(R.color.battery_bg_color1);
@@ -257,6 +278,7 @@ public class BatteryChart extends View {
         if (mobileOperatorPaint == null) {
             mobileOperatorPaint = new Paint();
             mobileOperatorPaint.setStrokeWidth(16);
+            mobileOperatorPaint.setStyle(Paint.Style.STROKE);
             
             orangeColor = getResources()
                     .getColor(R.color.orange_network_color1);
