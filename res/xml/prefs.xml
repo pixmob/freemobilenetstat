@@ -5,9 +5,11 @@
         <CheckBoxPreference
             android:enabled="true"
             android:key="pref_enable_at_boot"
+            android:summary="@string/pref_enable_at_boot_summary"
             android:title="@string/pref_enable_at_boot" />
         <CheckBoxPreference
             android:key="pref_icon_in_gray"
+            android:summary="@string/pref_icon_in_gray_summary"
             android:title="@string/pref_icon_in_gray" />
 
         <RingtonePreference
@@ -15,6 +17,7 @@
             android:ringtoneType="notification"
             android:showDefault="true"
             android:showSilent="true"
+            android:summary="@string/pref_notif_sound_summary"
             android:title="@string/pref_notif_sound" />
 
         <org.pixmob.freemobile.netstat.ui.IntListPreference
