@@ -65,7 +65,7 @@ public class DatabaseCleanup extends BroadcastReceiver {
             final Calendar cal = Calendar.getInstance();
             cal.add(Calendar.MONTH, -1);
             
-            Log.i(TAG, "Deleting events older than " + cal);
+            Log.i(TAG, "Deleting events older than " + cal.getTime());
             
             // Delete oldest events.
             final long timestampLimit = cal.getTimeInMillis();
