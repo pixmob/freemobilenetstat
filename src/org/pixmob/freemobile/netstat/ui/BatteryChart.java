@@ -305,6 +305,7 @@ public class BatteryChart extends View {
             textCursorPaint.setTextAlign(Paint.Align.RIGHT);
             
             textCursorBottom = -textCursorPaint.ascent() + toDip(5);
+            graphTop = textCursorBottom + toDip(4);
         }
         
         // No image is available in the cache: render a new one.
@@ -337,7 +338,6 @@ public class BatteryChart extends View {
         
         graphRight = getWidth();
         graphBottom = getHeight();
-        graphTop = 38;
         textCursorLeft = graphRight - toDip(2);
     }
     
