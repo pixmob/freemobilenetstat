@@ -69,8 +69,8 @@ public class DatabaseCleanup extends BroadcastReceiver {
             
             // Delete oldest events.
             final long timestampLimit = cal.getTimeInMillis();
-            final int deletedEvents = context.getContentResolver().update(
-                Events.CONTENT_URI, null, Events.TIMESTAMP + "<?",
+            final int deletedEvents = context.getContentResolver().delete(
+                Events.CONTENT_URI, Events.TIMESTAMP + "<?",
                 new String[] { String.valueOf(timestampLimit) });
             
             Log.i(TAG, deletedEvents + " events deleted");
