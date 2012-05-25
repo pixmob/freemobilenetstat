@@ -375,8 +375,8 @@ public class StatisticsFragment extends Fragment implements
                     Events.CONTENT_URI,
                     new String[] { Events.TIMESTAMP, Events.SCREEN_ON,
                             Events.WIFI_CONNECTED, Events.MOBILE_CONNECTED,
-                            Events.MOBILE_OPERATOR, Events.BATTERY_LEVEL },
-                    Events.TIMESTAMP + ">?",
+                            Events.MOBILE_OPERATOR, Events.BATTERY_LEVEL,
+                            Events.POWER_ON }, Events.TIMESTAMP + ">?",
                     new String[] { String.valueOf(fromTimestamp) },
                     Events.TIMESTAMP + " ASC");
                 final int rowCount = c.getCount();
@@ -388,6 +388,9 @@ public class StatisticsFragment extends Fragment implements
                     
                     if (i > 0) {
                         final Event e0 = s.events[i - 1];
+                        if (e.powerOn && !e0.powerOn) {
+                            continue;
+                        }
                         final long dt = e.timestamp - e0.timestamp;
                         
                         final MobileOperator op = MobileOperator
