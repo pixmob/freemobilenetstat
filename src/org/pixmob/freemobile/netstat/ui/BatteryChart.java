@@ -182,7 +182,7 @@ public class BatteryChart extends View {
                 final MobileOperator mobOp = MobileOperator
                         .fromString(e.mobileOperator);
                 if (mobOp != null) {
-                    float x2 = graphRight;
+                    float x2 = graphLeft;
                     if (i != 0) {
                         final Event e0 = events[i - 1];
                         if (e.powerOn && !e0.powerOn) {
@@ -191,21 +191,23 @@ public class BatteryChart extends View {
                         
                         final MobileOperator mobOp0 = MobileOperator
                                 .fromString(e0.mobileOperator);
-                        if (MobileOperator.FREE_MOBILE.equals(mobOp0)) {
-                            mobileOperatorPaint.setColor(freeMobileColor);
-                        } else if (MobileOperator.ORANGE.equals(mobOp0)) {
-                            mobileOperatorPaint.setColor(orangeColor);
+                        if (mobOp0 != null) {
+                            if (MobileOperator.FREE_MOBILE.equals(mobOp0)) {
+                                mobileOperatorPaint.setColor(freeMobileColor);
+                            } else if (MobileOperator.ORANGE.equals(mobOp0)) {
+                                mobileOperatorPaint.setColor(orangeColor);
+                            }
+                            
+                            x2 = (e0.timestamp - t0) * xFactor + graphLeft;
+                            if (x2 < graphLeft) {
+                                x2 = graphLeft;
+                            }
+                            if (x2 > graphRight) {
+                                x2 = graphRight;
+                            }
+                            canvas.drawLine(x2, y0Mob, x, y0Mob,
+                                mobileOperatorPaint);
                         }
-                        
-                        x2 = (e0.timestamp - t0) * xFactor + graphLeft;
-                        if (x2 < graphLeft) {
-                            x2 = graphLeft;
-                        }
-                        if (x2 > graphRight) {
-                            x2 = graphRight;
-                        }
-                        canvas.drawLine(x2, y0Mob, x, y0Mob,
-                            mobileOperatorPaint);
                     }
                 }
             }
