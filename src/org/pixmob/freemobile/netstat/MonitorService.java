@@ -82,8 +82,10 @@ public class MonitorService extends Service implements
     private PhoneStateListener phoneMonitor;
     private BroadcastReceiver connectionMonitor;
     private BroadcastReceiver batteryMonitor;
+    private BroadcastReceiver shutdownMonitor;
     private Boolean lastWifiConnected;
     private Boolean lastMobileNetworkConnected;
+    private boolean powerOn = true;
     private String lastMobileOperatorId;
     private String mobileOperatorId;
     private boolean mobileNetworkConnected;
@@ -212,6 +214,20 @@ public class MonitorService extends Service implements
         
         pm = (PowerManager) getSystemService(POWER_SERVICE);
         
+        shutdownMonitor = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                onDeviceShutdown();
+            }
+        };
+        final IntentFilter shutdownIntentFilter = new IntentFilter();
+        shutdownIntentFilter.addAction(Intent.ACTION_SHUTDOWN);
+        // HTC devices use a different Intent action:
+        // http://stackoverflow.com/q/5076410/422906
+        shutdownIntentFilter
+                .addAction("android.intent.action.QUICKBOOT_POWEROFF");
+        registerReceiver(shutdownMonitor, shutdownIntentFilter);
+        
         prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
         prefs.registerOnSharedPreferenceChangeListener(this);
     }
@@ -234,6 +250,7 @@ public class MonitorService extends Service implements
         unregisterReceiver(connectionMonitor);
         cm = null;
         unregisterReceiver(batteryMonitor);
+        unregisterReceiver(shutdownMonitor);
         
         pm = null;
         
@@ -308,6 +325,12 @@ public class MonitorService extends Service implements
         return R.drawable.ic_stat_notify_service;
     }
     
+    private void onDeviceShutdown() {
+        Log.i(TAG, "Device is about to shut down");
+        powerOn = false;
+        updateEventDatabase();
+    }
+    
     /**
      * This method is called when the phone data connectivity is updated.
      */
@@ -357,8 +380,10 @@ public class MonitorService extends Service implements
         e.screenOn = pm.isScreenOn();
         e.batteryLevel = getBatteryLevel();
         e.wifiConnected = Boolean.TRUE.equals(lastWifiConnected);
-        e.mobileConnected = Boolean.TRUE.equals(lastMobileNetworkConnected);
+        e.mobileConnected = powerOn ? Boolean.TRUE
+                .equals(lastMobileNetworkConnected) : false;
         e.mobileOperator = lastMobileOperatorId;
+        e.powerOn = powerOn;
         
         try {
             pendingInsert.put(e);
@@ -409,10 +434,10 @@ public class MonitorService extends Service implements
             // Set a lower priority to prevent UI from lagging.
             Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             
-            final ContentValues cv = new ContentValues(6);
+            final ContentValues cv = new ContentValues(7);
             final ContentResolver cr = context.getContentResolver();
             
-            final ContentValues lastCV = new ContentValues(6);
+            final ContentValues lastCV = new ContentValues(7);
             long lastEventHashCode = 0;
             
             boolean running = true;
@@ -429,7 +454,7 @@ public class MonitorService extends Service implements
                         // inserted.
                         lastCV.putAll(cv);
                         lastCV.remove(Events.TIMESTAMP);
-                        if (lastCV.hashCode() == lastEventHashCode) {
+                        if (e.powerOn && lastCV.hashCode() == lastEventHashCode) {
                             if (DEBUG) {
                                 Log.d(TAG, "Skip event insertion: " + e);
                             }

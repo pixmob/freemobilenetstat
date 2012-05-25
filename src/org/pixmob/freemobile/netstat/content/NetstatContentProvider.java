@@ -217,7 +217,7 @@ public class NetstatContentProvider extends ContentProvider {
      */
     private static class DatabaseHelper extends SQLiteOpenHelper {
         public DatabaseHelper(final Context context) {
-            super(context, "netstat.db", null, 1);
+            super(context, "netstat.db", null, 2);
         }
         
         @Override
@@ -230,7 +230,8 @@ public class NetstatContentProvider extends ContentProvider {
                         + Events.MOBILE_OPERATOR + " TEXT, "
                         + Events.WIFI_CONNECTED + " INTEGER NOT NULL, "
                         + Events.BATTERY_LEVEL + " INTEGER NOT NULL, "
-                        + Events.SCREEN_ON + " INTEGER NOT NULL)";
+                        + Events.SCREEN_ON + " INTEGER NOT NULL, "
+                        + Events.POWER_ON + " INTEGER NOT NULL)";
                 db.execSQL(req);
             }
         }

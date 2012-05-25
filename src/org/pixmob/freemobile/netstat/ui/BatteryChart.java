@@ -191,6 +191,10 @@ public class BatteryChart extends View {
                     float x2 = graphRight;
                     if (i != 0) {
                         final Event e0 = events[i - 1];
+                        if (e.powerOn && !e0.powerOn) {
+                            continue;
+                        }
+                        
                         final MobileOperator mobOp0 = MobileOperator
                                 .fromString(e0.mobileOperator);
                         if (mobOp.equals(mobOp0)) {

@@ -32,6 +32,7 @@ public class Event {
     public boolean mobileConnected;
     public String mobileOperator;
     public int batteryLevel;
+    public boolean powerOn;
     
     /**
      * Read an {@link Event} instance from a database {@link Cursor}. The cursor
@@ -47,6 +48,7 @@ public class Event {
         mobileOperator = c.getString(c
                 .getColumnIndexOrThrow(Events.MOBILE_OPERATOR));
         batteryLevel = c.getInt(c.getColumnIndexOrThrow(Events.BATTERY_LEVEL));
+        powerOn = c.getInt(c.getColumnIndexOrThrow(Events.POWER_ON)) == 1;
     }
     
     /**
@@ -59,6 +61,7 @@ public class Event {
         values.put(Events.MOBILE_CONNECTED, mobileConnected ? 1 : 0);
         values.put(Events.MOBILE_OPERATOR, mobileOperator);
         values.put(Events.BATTERY_LEVEL, batteryLevel);
+        values.put(Events.POWER_ON, powerOn ? 1 : 0);
     }
     
     @Override
@@ -67,6 +70,7 @@ public class Event {
                 + DateFormat.format("dd/MM/yyyy hh:mm:ss", timestamp)
                 + "; screen=" + screenOn + "; wifi=" + wifiConnected
                 + "; mobile=" + mobileConnected + "; operator="
-                + mobileOperator + "; battery=" + batteryLevel + "]";
+                + mobileOperator + "; battery=" + batteryLevel + "; powerOn="
+                + powerOn + "]";
     }
 }
