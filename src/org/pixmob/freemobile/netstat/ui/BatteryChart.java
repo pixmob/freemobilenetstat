@@ -182,12 +182,6 @@ public class BatteryChart extends View {
                 final MobileOperator mobOp = MobileOperator
                         .fromString(e.mobileOperator);
                 if (mobOp != null) {
-                    if (MobileOperator.FREE_MOBILE.equals(mobOp)) {
-                        mobileOperatorPaint.setColor(freeMobileColor);
-                    } else if (MobileOperator.ORANGE.equals(mobOp)) {
-                        mobileOperatorPaint.setColor(orangeColor);
-                    }
-                    
                     float x2 = graphRight;
                     if (i != 0) {
                         final Event e0 = events[i - 1];
@@ -197,17 +191,21 @@ public class BatteryChart extends View {
                         
                         final MobileOperator mobOp0 = MobileOperator
                                 .fromString(e0.mobileOperator);
-                        if (mobOp.equals(mobOp0)) {
-                            x2 = (e0.timestamp - t0) * xFactor + graphLeft;
-                            if (x2 < graphLeft) {
-                                x2 = graphLeft;
-                            }
-                            if (x2 > graphRight) {
-                                x2 = graphRight;
-                            }
-                            canvas.drawLine(x2, y0Mob, x, y0Mob,
-                                mobileOperatorPaint);
+                        if (MobileOperator.FREE_MOBILE.equals(mobOp0)) {
+                            mobileOperatorPaint.setColor(freeMobileColor);
+                        } else if (MobileOperator.ORANGE.equals(mobOp0)) {
+                            mobileOperatorPaint.setColor(orangeColor);
                         }
+                        
+                        x2 = (e0.timestamp - t0) * xFactor + graphLeft;
+                        if (x2 < graphLeft) {
+                            x2 = graphLeft;
+                        }
+                        if (x2 > graphRight) {
+                            x2 = graphRight;
+                        }
+                        canvas.drawLine(x2, y0Mob, x, y0Mob,
+                            mobileOperatorPaint);
                     }
                 }
             }
