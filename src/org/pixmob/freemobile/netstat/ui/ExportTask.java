@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.TimeZone;
 
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
@@ -138,7 +137,6 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
         Log.i(TAG, "Exporting database to " + outputFile.getPath());
         
         final DateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT);
-        dateFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         
         final BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(outputFile), "UTF-8"));
