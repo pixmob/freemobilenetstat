@@ -145,18 +145,19 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
             Events.CONTENT_URI,
             new String[] { Events.TIMESTAMP, Events.MOBILE_OPERATOR,
                     Events.MOBILE_CONNECTED, Events.WIFI_CONNECTED,
-                    Events.BATTERY_LEVEL, Events.SCREEN_ON }, null, null, null);
+                    Events.BATTERY_LEVEL, Events.SCREEN_ON, Events.POWER_ON },
+            null, null, null);
         
         try {
             final int rowCount = c.getCount();
             int currentRow = 0;
             
             final StringBuilder buf = new StringBuilder(1024);
-            buf.append("#Timestamp").append(COL_SEP).append("Mobile Operator")
+            buf.append("Timestamp").append(COL_SEP).append("Mobile Operator")
                     .append(COL_SEP).append("Mobile Connected").append(COL_SEP)
                     .append("Wi-Fi Connected").append(COL_SEP)
                     .append("Screen On").append(COL_SEP).append("Battery")
-                    .append(LINE_SEP);
+                    .append(COL_SEP).append("Power On").append(LINE_SEP);
             out.write(buf.toString());
             
             while (c.moveToNext()) {
@@ -166,13 +167,14 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
                 final int wifiOn = c.getInt(3) == 1 ? 1 : 0;
                 final int bat = c.getInt(4);
                 final int screenOn = c.getInt(5) == 1 ? 1 : 0;
+                final int powerOn = c.getInt(6) == 1 ? 1 : 0;
                 
                 buf.delete(0, buf.length());
                 buf.append(dateFormatter.format(t)).append(COL_SEP)
                         .append(mobOp).append(COL_SEP).append(mobConn)
                         .append(COL_SEP).append(wifiOn).append(COL_SEP)
                         .append(screenOn).append(COL_SEP).append(bat)
-                        .append(LINE_SEP);
+                        .append(COL_SEP).append(powerOn).append(LINE_SEP);
                 out.write(buf.toString());
                 
                 publishProgress(++currentRow, rowCount);
