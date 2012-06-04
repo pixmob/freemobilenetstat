@@ -114,7 +114,7 @@ public class BatteryChart extends View {
         
         // Draw every lines with a single call to Canvas#drawLines, for better
         // performance.
-        final float[] lines = new float[11 * 4];
+        final float[] lines = new float[12 * 4];
         int lineIdx = 0;
         lines[lineIdx++] = graphLeft;
         lines[lineIdx++] = graphTop;
@@ -142,12 +142,11 @@ public class BatteryChart extends View {
             if (i != 100) {
                 canvas.drawText(String.valueOf(i), x0Text, y - yAscent2,
                     yTextPaint);
-                
-                lines[lineIdx++] = graphLeft;
-                lines[lineIdx++] = y;
-                lines[lineIdx++] = graphRight;
-                lines[lineIdx++] = y;
             }
+            lines[lineIdx++] = graphLeft;
+            lines[lineIdx++] = y;
+            lines[lineIdx++] = graphRight;
+            lines[lineIdx++] = y;
         }
         
         final boolean drawChart = events != null && events.length > 1;
