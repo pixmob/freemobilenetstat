@@ -31,6 +31,7 @@ import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.ui.StatisticsFragment.Statistics;
+import org.pixmob.freemobile.netstat.util.DateUtils;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -259,53 +260,7 @@ public class StatisticsFragment extends Fragment implements
      * Return a formatted string for a duration value.
      */
     private CharSequence formatDuration(long duration) {
-        if (duration == 0) {
-            return STAT_NO_VALUE;
-        }
-        final long ds = duration / 1000;
-        if (ds < 60) {
-            return STAT_NO_VALUE;
-        }
-        
-        final StringBuilder buf = new StringBuilder(32);
-        if (ds < 3600) {
-            final long m = ds / 60;
-            buf.append(m).append(getString(R.string.minutes));
-        } else if (ds < 86400) {
-            final long h = ds / 3600;
-            buf.append(h).append(getString(R.string.hours));
-            
-            final long m = (ds - h * 3600) / 60;
-            if (m != 0) {
-                if (m < 10) {
-                    buf.append("0");
-                }
-                buf.append(m);
-            }
-        } else {
-            final long d = ds / 86400;
-            buf.append(d).append(getString(R.string.days));
-            
-            final long h = (ds - d * 86400) / 3600;
-            if (h != 0) {
-                buf.append(" ").append(h).append(getString(R.string.hours));
-            }
-            
-            final long m = (ds - d * 86400 - h * 3600) / 60;
-            if (m != 0) {
-                if (h == 0) {
-                    buf.append(" ");
-                } else if (m < 10) {
-                    buf.append("0");
-                }
-                buf.append(m);
-                if (h == 0) {
-                    buf.append(getString(R.string.minutes));
-                }
-            }
-        }
-        
-        return buf;
+        return DateUtils.formatDuration(duration, getActivity(), STAT_NO_VALUE);
     }
     
     /**
