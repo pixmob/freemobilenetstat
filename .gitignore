@@ -6,4 +6,4 @@ proguard
 *.log
 assets/bugsense.txt
 .directory
-
+Thumbs.db
