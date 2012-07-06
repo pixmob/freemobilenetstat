@@ -15,6 +15,7 @@
  */
 package org.pixmob.freemobile.netstat;
 
+import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 
 import java.util.HashSet;
@@ -29,11 +30,10 @@ import android.util.Log;
  */
 public enum MobileOperator {
     FREE_MOBILE, ORANGE;
-    
-    private static final Set<String> FREE_MOBILE_IDENTIFIERS = new HashSet<String>(
-            2);
+
+    private static final Set<String> FREE_MOBILE_IDENTIFIERS = new HashSet<String>(2);
     private static final Set<String> ORANGE_IDENTIFIERS = new HashSet<String>(3);
-    
+
     static {
         // MCC+MNC identifier list:
         // http://en.wikipedia.org/wiki/Mobile_Network_Code
@@ -43,7 +43,7 @@ public enum MobileOperator {
         ORANGE_IDENTIFIERS.add("20801");
         ORANGE_IDENTIFIERS.add("20802");
     }
-    
+
     /**
      * Get a {@link MobileOperator} instance from a MCC+MNC identifier.
      */
@@ -57,10 +57,12 @@ public enum MobileOperator {
         if (ORANGE_IDENTIFIERS.contains(mccMnc)) {
             return ORANGE;
         }
-        Log.d(TAG, "Unknown MCC+MNC: " + mccMnc);
+        if (DEBUG) {
+            Log.d(TAG, "Unknown MCC+MNC: " + mccMnc);
+        }
         return null;
     }
-    
+
     public String toName(Context context) {
         if (FREE_MOBILE.equals(this)) {
             return context.getString(R.string.network_free_mobile);
