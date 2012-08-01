@@ -27,6 +27,7 @@ import static org.pixmob.freemobile.netstat.Constants.TAG;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
 import org.pixmob.freemobile.netstat.feature.StrictModeFeature;
+import org.pixmob.freemobile.netstat.util.BugSenseUtils;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
@@ -58,5 +59,8 @@ public class Application extends android.app.Application {
             prefsEditor.putBoolean(SP_KEY_UPLOAD_STATS, true);
             Features.getFeature(SharedPreferencesSaverFeature.class).save(prefsEditor);
         }
+
+        // Enable BugSense for reporting errors.
+        BugSenseUtils.setup(this);
     }
 }
