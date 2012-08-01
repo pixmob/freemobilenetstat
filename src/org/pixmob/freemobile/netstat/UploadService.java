@@ -30,10 +30,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.util.DateUtils;
-import org.pixmob.hcl.HttpClient;
-import org.pixmob.hcl.HttpClientException;
-import org.pixmob.hcl.HttpResponse;
-import org.pixmob.hcl.HttpResponseHandler;
+import org.pixmob.httpclient.HttpClient;
+import org.pixmob.httpclient.HttpClientException;
+import org.pixmob.httpclient.HttpResponse;
+import org.pixmob.httpclient.HttpResponseHandler;
 
 import android.app.IntentService;
 import android.content.ContentValues;
@@ -204,7 +204,7 @@ public class UploadService extends IntentService {
             try {
                 client.post(url)
                         .expectStatusCode(HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_NOT_FOUND)
-                        .setPayload(rawJson).setContentType("application/json")
+                        .setContent(rawJson).setContentType("application/json")
                         .setHandler(new HttpResponseHandler() {
                             @Override
                             public void onResponse(HttpResponse response) throws Exception {
@@ -297,7 +297,7 @@ public class UploadService extends IntentService {
         Log.i(TAG, "Registering device");
 
         final HttpClient client = createHttpClient();
-        client.put(url).expectStatusCode(HttpURLConnection.HTTP_CREATED).setPayload(rawJson)
+        client.put(url).expectStatusCode(HttpURLConnection.HTTP_CREATED).setContent(rawJson)
                 .setContentType("application/json").execute();
     }
 
