@@ -15,7 +15,11 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
+import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
+
+import org.pixmob.freemobile.netstat.ConnectivityListener;
 import org.pixmob.freemobile.netstat.MonitorService;
+import org.pixmob.freemobile.netstat.UploadService;
 
 import android.content.Context;
 import android.content.Intent;
@@ -33,26 +37,35 @@ public class Netstat extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
-        
+
         if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null) {
             final StatisticsFragment f = new StatisticsFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .add(android.R.id.content, f).commit();
+            getSupportFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
         }
-        
+
         final Context c = getApplicationContext();
         final Intent i = new Intent(c, MonitorService.class);
         c.startService(i);
+
+        ConnectivityListener.setupAlarm(this);
     }
-    
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (DEBUG) {
+            startService(new Intent(this, UploadService.class));
+        }
+    }
+
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
-        
+
         // Enable "better" gradients:
         // http://stackoverflow.com/a/2932030/422906
         final Window window = getWindow();

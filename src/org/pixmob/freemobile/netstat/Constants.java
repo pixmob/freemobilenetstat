@@ -26,7 +26,7 @@ public final class Constants {
      * Logging tag.
      */
     public static final String TAG = "FreeMobileNetstat";
-    
+
     /**
      * Global {@link SharedPreferences} name.
      */
@@ -49,7 +49,10 @@ public final class Constants {
      * {@link SharedPreferences} key: set the time interval for displayed data.
      */
     public static final String SP_KEY_TIME_INTERVAL = "pref_time_interval";
-    
+    /**
+     * {@link SharedPreferences} key: upload statistics.
+     */
+    public static final String SP_KEY_UPLOAD_STATS = "pref_upload_stats";
     /**
      * Time interval value: show data since the device boot time.
      */
@@ -66,7 +69,7 @@ public final class Constants {
      * Time interval value: show data from one month.
      */
     public static final int INTERVAL_ONE_MONTH = 3;
-    
+
     private Constants() {
     }
 }

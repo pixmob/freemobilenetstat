@@ -33,17 +33,20 @@ import org.pixmob.freemobile.netstat.feature.BackupManagerFeature;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.util.IOUtils;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
@@ -55,84 +58,74 @@ import android.widget.TextView;
  * Application preferences screen.
  * @author Pixmob
  */
-public class Preferences extends PreferenceActivity implements
-        OnPreferenceClickListener, OnPreferenceChangeListener,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+public class Preferences extends PreferenceActivity implements OnPreferenceClickListener,
+        OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String SP_KEY_VERSION = "pref_version";
     private static final String SP_KEY_CHANGELOG = "pref_changelog";
     private static final String SP_KEY_LICENSE = "pref_license";
-    private final SparseArray<CharSequence> timeIntervals = new SparseArray<CharSequence>(
-            4);
-    
+    private final SparseArray<CharSequence> timeIntervals = new SparseArray<CharSequence>(4);
+
     @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         timeIntervals.clear();
-        timeIntervals.append(INTERVAL_SINCE_BOOT,
-            getString(R.string.interval_since_boot));
-        timeIntervals
-                .append(INTERVAL_TODAY, getString(R.string.interval_today));
-        timeIntervals.append(INTERVAL_ONE_WEEK,
-            getString(R.string.interval_one_week));
-        timeIntervals.append(INTERVAL_ONE_MONTH,
-            getString(R.string.interval_one_month));
-        
+        timeIntervals.append(INTERVAL_SINCE_BOOT, getString(R.string.interval_since_boot));
+        timeIntervals.append(INTERVAL_TODAY, getString(R.string.interval_today));
+        timeIntervals.append(INTERVAL_ONE_WEEK, getString(R.string.interval_one_week));
+        timeIntervals.append(INTERVAL_ONE_MONTH, getString(R.string.interval_one_month));
+
         final PreferenceManager pm = getPreferenceManager();
         pm.setSharedPreferencesMode(MODE_PRIVATE);
         pm.setSharedPreferencesName(SP_NAME);
-        
+
         addPreferencesFromResource(R.xml.prefs);
-        
+
         String version = "0";
         try {
             version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (NameNotFoundException e) {
             Log.e(TAG, "Cannot get application version", e);
         }
-        
+
         Preference p = findPreference(SP_KEY_VERSION);
         p.setTitle(String.format(getString(R.string.pref_version), version));
-        
-        findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(this);
-        findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(this);
-        
-        final IntListPreference lp = (IntListPreference) findPreference(SP_KEY_TIME_INTERVAL);
+
+        pm.findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(this);
+        pm.findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(this);
+
+        final IntListPreference lp = (IntListPreference) pm.findPreference(SP_KEY_TIME_INTERVAL);
         lp.setEntries(getValues(timeIntervals));
         lp.setEntryValues(getKeys(timeIntervals));
-        
-        final int currentInterval = pm.getSharedPreferences().getInt(
-            SP_KEY_TIME_INTERVAL, 0);
+
+        final int currentInterval = pm.getSharedPreferences().getInt(SP_KEY_TIME_INTERVAL, 0);
         lp.setSummary(timeIntervals.get(currentInterval));
         lp.setValue(currentInterval);
         lp.setOnPreferenceChangeListener(this);
-        
-        pm.getSharedPreferences()
-                .registerOnSharedPreferenceChangeListener(this);
+
+        pm.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
-    
+
     @Override
     protected void onDestroy() {
         findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(null);
-        findPreference(SP_KEY_TIME_INTERVAL)
-                .setOnPreferenceChangeListener(null);
-        
-        getPreferenceManager().getSharedPreferences()
-                .unregisterOnSharedPreferenceChangeListener(this);
+        findPreference(SP_KEY_TIME_INTERVAL).setOnPreferenceChangeListener(null);
+
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         super.onDestroy();
     }
-    
+
     @Override
     public boolean onPreferenceChange(Preference p, Object value) {
         final IntListPreference lp = (IntListPreference) p;
         final int intValue = Integer.parseInt((String) value);
         lp.setSummary(timeIntervals.get(intValue));
-        
+
         return true;
     }
-    
+
     private static <T> int[] getKeys(SparseArray<T> a) {
         final int s = a.size();
         final int[] keys = new int[s];
@@ -141,7 +134,7 @@ public class Preferences extends PreferenceActivity implements
         }
         return keys;
     }
-    
+
     private static CharSequence[] getValues(SparseArray<CharSequence> a) {
         final int s = a.size();
         final CharSequence[] values = new CharSequence[s];
@@ -150,7 +143,7 @@ public class Preferences extends PreferenceActivity implements
         }
         return values;
     }
-    
+
     @Override
     public boolean onPreferenceClick(Preference p) {
         final String k = p.getKey();
@@ -159,43 +152,38 @@ public class Preferences extends PreferenceActivity implements
         } else if (SP_KEY_LICENSE.equals(k)) {
             showDialog(0);
         }
-        
+
         return true;
     }
-    
+
     private void openBrowser(String url) {
         final Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY
-                | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         startActivity(i);
     }
-    
+
     @Override
     protected Dialog onCreateDialog(int id) {
         final StringBuilder licenseText = new StringBuilder(1024);
         loadAsset("NOTICE.txt", licenseText);
         licenseText.append('\n');
         loadAsset("LICENSE.txt", licenseText);
-        
-        final View licenseContent = LayoutInflater.from(this).inflate(
-            R.layout.license, null);
-        final TextView license = (TextView) licenseContent
-                .findViewById(R.id.license);
+
+        final View licenseContent = LayoutInflater.from(this).inflate(R.layout.license, null);
+        final TextView license = (TextView) licenseContent.findViewById(R.id.license);
         license.setText(licenseText);
-        
-        return new AlertDialog.Builder(this).setTitle(R.string.pref_license)
-                .setView(licenseContent)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setPositiveButton(android.R.string.ok, null).create();
+
+        return new AlertDialog.Builder(this).setTitle(R.string.pref_license).setView(licenseContent)
+                .setIcon(android.R.drawable.ic_dialog_info).setPositiveButton(android.R.string.ok, null)
+                .create();
     }
-    
+
     private void loadAsset(String fileName, StringBuilder buf) {
         InputStream input = null;
         try {
             input = getResources().getAssets().open(fileName);
-            
-            final BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(input));
+
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(input));
             for (String line; (line = reader.readLine()) != null;) {
                 buf.append(line).append('\n');
             }
@@ -205,11 +193,23 @@ public class Preferences extends PreferenceActivity implements
             IOUtils.close(input);
         }
     }
-    
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-            String key) {
-        Log.d(TAG, "Application preferences updated: "
-                + "calling BackupManager.dataChanged()");
+
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Log.d(TAG, "Application preferences updated: " + "calling BackupManager.dataChanged()");
         Features.getFeature(BackupManagerFeature.class).dataChanged(this);
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class PreferencesFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.prefs);
+        }
+
+        public static void install(PreferenceActivity a) {
+            final PreferencesFragment pf = new PreferencesFragment();
+            a.getFragmentManager().beginTransaction().add(android.R.id.content, pf).commit();
+        }
     }
 }

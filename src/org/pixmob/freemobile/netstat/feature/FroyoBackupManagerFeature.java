@@ -15,13 +15,16 @@
  */
 package org.pixmob.freemobile.netstat.feature;
 
+import android.annotation.TargetApi;
 import android.app.backup.BackupManager;
 import android.content.Context;
+import android.os.Build;
 
 /**
  * Froyo {@link BackupManagerFeature} implementation.
  * @author Pixmob
  */
+@TargetApi(Build.VERSION_CODES.FROYO)
 public class FroyoBackupManagerFeature implements BackupManagerFeature {
     @Override
     public void dataChanged(Context context) {

@@ -18,6 +18,7 @@ package org.pixmob.freemobile.netstat.util;
 import org.pixmob.freemobile.netstat.R;
 
 import android.content.Context;
+import android.text.format.DateFormat;
 
 /**
  * Date & time utilities.
@@ -26,12 +27,11 @@ import android.content.Context;
 public final class DateUtils {
     private DateUtils() {
     }
-    
+
     /**
      * Format a duration in milliseconds.
      */
-    public static CharSequence formatDuration(long duration, Context context,
-            CharSequence defaultValue) {
+    public static CharSequence formatDuration(long duration, Context context, CharSequence defaultValue) {
         if (duration <= 0) {
             return defaultValue;
         }
@@ -45,7 +45,7 @@ public final class DateUtils {
         } else if (ds < 86400) {
             final long h = ds / 3600;
             buf.append(h).append(context.getString(R.string.hours));
-            
+
             final long m = (ds - h * 3600) / 60;
             if (m != 0) {
                 if (m < 10) {
@@ -56,13 +56,12 @@ public final class DateUtils {
         } else {
             final long d = ds / 86400;
             buf.append(d).append(context.getString(R.string.days));
-            
+
             final long h = (ds - d * 86400) / 3600;
             if (h != 0) {
-                buf.append(" ").append(h)
-                        .append(context.getString(R.string.hours));
+                buf.append(" ").append(h).append(context.getString(R.string.hours));
             }
-            
+
             final long m = (ds - d * 86400 - h * 3600) / 60;
             if (m != 0) {
                 if (h == 0) {
@@ -76,7 +75,14 @@ public final class DateUtils {
                 }
             }
         }
-        
+
         return buf;
+    }
+
+    /**
+     * Format a date.
+     */
+    public static CharSequence formatDate(long d) {
+        return DateFormat.format("dd/MM/yyyy", d);
     }
 }

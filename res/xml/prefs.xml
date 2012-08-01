@@ -7,7 +7,7 @@
             android:key="pref_enable_at_boot"
             android:summary="@string/pref_enable_at_boot_summary"
             android:title="@string/pref_enable_at_boot" />
-        <CheckBoxPreference
+        <CheckBoxPreference android:title="@string/pref_upload_stats" android:key="pref_upload_stats" android:summary="@string/pref_upload_stats_summary" android:enabled="true"/><CheckBoxPreference
             android:key="pref_icon_in_gray"
             android:summary="@string/pref_icon_in_gray_summary"
             android:title="@string/pref_icon_in_gray" />
@@ -24,6 +24,7 @@
             android:dialogTitle="@string/pref_time_interval"
             android:key="pref_time_interval"
             android:title="@string/pref_time_interval" />
+        
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_about" >
         <Preference

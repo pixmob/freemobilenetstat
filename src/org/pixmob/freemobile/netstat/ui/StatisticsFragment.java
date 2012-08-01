@@ -63,8 +63,7 @@ import android.widget.TextView;
  * Fragment showing statistics using charts.
  * @author Pixmob
  */
-public class StatisticsFragment extends Fragment implements
-        LoaderCallbacks<Statistics> {
+public class StatisticsFragment extends Fragment implements LoaderCallbacks<Statistics> {
     private static final String STAT_NO_VALUE = "-";
     private static ExportTask exportTask;
     private ContentObserver contentMonitor;
@@ -81,43 +80,40 @@ public class StatisticsFragment extends Fragment implements
     private TextView statOnOrange;
     private TextView statOnFreeMobile;
     private TextView statBattery;
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        
+
         if (!isSimSupported(getActivity())) {
-            new UnsupportedSimDialogFragment().show(getFragmentManager(),
-                "error");
+            new UnsupportedSimDialogFragment().show(getFragmentManager(), "error");
         }
-        
+
         if (exportTask != null) {
             exportTask.setFragmentManager(getFragmentManager());
         }
-        
+
         // Monitor database updates: when new data is available, this fragment
         // is updated with the new values.
         contentMonitor = new ContentObserver(new Handler()) {
             @Override
             public void onChange(boolean selfChange) {
                 super.onChange(selfChange);
-                
+
                 Log.i(TAG, "Content updated: refresh statistics");
                 refresh();
             }
         };
-        
+
         // Get widgets.
         final Activity a = getActivity();
         statisticsGroup = a.findViewById(R.id.statistics);
         statisticsGroup.setVisibility(View.INVISIBLE);
         progressBar = (ProgressBar) a.findViewById(R.id.states_progress);
-        mobileNetworkChart = (MobileNetworkChart) a
-                .findViewById(R.id.mobile_network_chart);
+        mobileNetworkChart = (MobileNetworkChart) a.findViewById(R.id.mobile_network_chart);
         batteryChart = (BatteryChart) a.findViewById(R.id.battery_chart);
         onOrangeNetwork = (TextView) a.findViewById(R.id.on_orange_network);
-        onFreeMobileNetwork = (TextView) a
-                .findViewById(R.id.on_free_mobile_network);
+        onFreeMobileNetwork = (TextView) a.findViewById(R.id.on_free_mobile_network);
         statMobileNetwork = (TextView) a.findViewById(R.id.stat_mobile_network);
         statMobileCode = (TextView) a.findViewById(R.id.stat_mobile_code);
         statScreenOn = (TextView) a.findViewById(R.id.stat_screen);
@@ -125,14 +121,16 @@ public class StatisticsFragment extends Fragment implements
         statOnOrange = (TextView) a.findViewById(R.id.stat_on_orange);
         statOnFreeMobile = (TextView) a.findViewById(R.id.stat_on_free_mobile);
         statBattery = (TextView) a.findViewById(R.id.stat_battery);
-        
+
         // The fields are hidden the first time this fragment is displayed,
         // while statistics data are being loaded.
         statisticsGroup.setVisibility(View.INVISIBLE);
-        
+
         setHasOptionsMenu(true);
+
+        getLoaderManager().initLoader(0, null, this);
     }
-    
+
     /**
      * Check if the SIM card is supported.
      */
@@ -141,113 +139,112 @@ public class StatisticsFragment extends Fragment implements
         if (DEBUG) {
             return true;
         }
-        
-        final TelephonyManager tm = (TelephonyManager) context
-                .getSystemService(Context.TELEPHONY_SERVICE);
+
+        final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (TelephonyManager.SIM_STATE_READY != tm.getSimState()) {
             return false;
         }
-        return MobileOperator.FREE_MOBILE.equals(MobileOperator.fromString(tm
-                .getSimOperator()));
+        return MobileOperator.FREE_MOBILE.equals(MobileOperator.fromString(tm.getSimOperator()));
     }
-    
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_statistics, menu);
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_export:
-                onMenuExport();
-                return true;
-            case R.id.menu_preferences:
-                onMenuPreferences();
-                return true;
+        case R.id.menu_export:
+            onMenuExport();
+            return true;
+        case R.id.menu_preferences:
+            onMenuPreferences();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
-    
+
     private void onMenuExport() {
-        exportTask = new ExportTask(getActivity().getApplicationContext(),
-                getFragmentManager());
+        exportTask = new ExportTask(getActivity().getApplicationContext(), getFragmentManager());
         exportTask.execute();
     }
-    
+
     private void onMenuPreferences() {
         startActivity(new Intent(getActivity(), Preferences.class));
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
-        
         // Monitor database updates if the fragment is displayed.
         final ContentResolver cr = getActivity().getContentResolver();
         cr.registerContentObserver(Events.CONTENT_URI, true, contentMonitor);
-        
-        refresh();
     }
-    
+
     @Override
     public void onPause() {
         super.onPause();
         // Stop monitoring database updates.
-        getActivity().getContentResolver().unregisterContentObserver(
-            contentMonitor);
+        getActivity().getContentResolver().unregisterContentObserver(contentMonitor);
     }
-    
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.statistics_fragment, container, false);
     }
-    
+
     public void refresh() {
+        if (getLoaderManager().hasRunningLoaders()) {
+            if (DEBUG) {
+                Log.d(TAG, "Skip statistics refresh: already running");
+            }
+            return;
+        }
+        if (DEBUG) {
+            Log.d(TAG, "Refresh statistics");
+        }
         getLoaderManager().restartLoader(0, null, this);
     }
-    
+
     @Override
     public Loader<Statistics> onCreateLoader(int id, Bundle args) {
         progressBar.setVisibility(View.VISIBLE);
-        
+
         return new StatisticsLoader(getActivity());
     }
-    
+
     @Override
     public void onLoaderReset(Loader<Statistics> loader) {
     }
-    
+
     @Override
     public void onLoadFinished(Loader<Statistics> loader, Statistics s) {
         Log.i(TAG, "Statistics loaded: " + s);
-        
+
         onOrangeNetwork.setText(s.orangeUsePercent + "%");
         onFreeMobileNetwork.setText(s.freeMobileUsePercent + "%");
         mobileNetworkChart.setData(s.orangeUsePercent, s.freeMobileUsePercent);
-        
+
         final Activity a = getActivity();
-        statMobileNetwork.setText(s.mobileOperator == null ? STAT_NO_VALUE
-                : s.mobileOperator.toName(a));
-        statMobileCode.setText(s.mobileOperatorCode == null ? STAT_NO_VALUE
-                : s.mobileOperatorCode);
+        statMobileNetwork.setText(s.mobileOperator == null ? STAT_NO_VALUE : s.mobileOperator.toName(a));
+        statMobileCode.setText(s.mobileOperatorCode == null ? STAT_NO_VALUE : s.mobileOperatorCode);
         setDurationText(statScreenOn, s.screenOnTime);
         setDurationText(statWifiOn, s.wifiOnTime);
         setDurationText(statOnOrange, s.orangeTime);
         setDurationText(statOnFreeMobile, s.freeMobileTime);
-        
-        statBattery.setText(s.battery == 0 ? STAT_NO_VALUE : (String
-                .valueOf(s.battery) + "%"));
-        
+
+        statBattery.setText(s.battery == 0 ? STAT_NO_VALUE : String.valueOf(s.battery) + "%");
+
         batteryChart.setData(s.events);
-        
+
         progressBar.setVisibility(View.INVISIBLE);
         statisticsGroup.setVisibility(View.VISIBLE);
         statisticsGroup.invalidate();
+        batteryChart.invalidate();
     }
-    
+
     private void setDurationText(TextView tv, long duration) {
         if (duration < 1) {
             tv.setText(STAT_NO_VALUE);
@@ -255,14 +252,14 @@ public class StatisticsFragment extends Fragment implements
             tv.setText(formatDuration(duration));
         }
     }
-    
+
     /**
      * Return a formatted string for a duration value.
      */
     private CharSequence formatDuration(long duration) {
         return DateUtils.formatDuration(duration, getActivity(), STAT_NO_VALUE);
     }
-    
+
     /**
      * {@link Loader} implementation for loading events from the database, and
      * computing statistics.
@@ -271,20 +268,31 @@ public class StatisticsFragment extends Fragment implements
     private static class StatisticsLoader extends AsyncTaskLoader<Statistics> {
         public StatisticsLoader(final Context context) {
             super(context);
+
+            if (DEBUG) {
+                Log.d(TAG, "New StatisticsLoader");
+            }
         }
-        
+
         @Override
         protected void onStartLoading() {
             super.onStartLoading();
             forceLoad();
+
+            if (DEBUG) {
+                Log.d(TAG, "StatisticsLoader.onStartLoading()");
+            }
         }
-        
+
         @Override
         public Statistics loadInBackground() {
+            if (DEBUG) {
+                Log.d(TAG, "StatisticsLoader.loadInBackground()");
+            }
+
             final long now = System.currentTimeMillis();
-            
-            final SharedPreferences prefs = getContext().getSharedPreferences(
-                SP_NAME, Context.MODE_PRIVATE);
+
+            final SharedPreferences prefs = getContext().getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
             final int interval = prefs.getInt(SP_KEY_TIME_INTERVAL, 0);
             final long fromTimestamp;
             if (interval == INTERVAL_ONE_MONTH) {
@@ -308,50 +316,45 @@ public class StatisticsFragment extends Fragment implements
             } else {
                 fromTimestamp = now - SystemClock.elapsedRealtime();
             }
-            
-            Log.i(TAG, "Loading statistics from " + new Date(fromTimestamp)
-                    + " to now");
-            
+
+            Log.i(TAG, "Loading statistics from " + new Date(fromTimestamp) + " to now");
+
             final Statistics s = new Statistics();
-            
-            final TelephonyManager tm = (TelephonyManager) getContext()
-                    .getSystemService(Context.TELEPHONY_SERVICE);
+
+            final TelephonyManager tm = (TelephonyManager) getContext().getSystemService(
+                    Context.TELEPHONY_SERVICE);
             s.mobileOperatorCode = tm.getNetworkOperator();
             s.mobileOperator = MobileOperator.fromString(s.mobileOperatorCode);
             if (s.mobileOperator == null) {
                 s.mobileOperatorCode = null;
             }
-            
+
             long connectionTimestamp = 0;
-            
+
             Cursor c = null;
             try {
                 c = getContext().getContentResolver().query(
-                    Events.CONTENT_URI,
-                    new String[] { Events.TIMESTAMP, Events.SCREEN_ON,
-                            Events.WIFI_CONNECTED, Events.MOBILE_CONNECTED,
-                            Events.MOBILE_OPERATOR, Events.BATTERY_LEVEL,
-                            Events.POWER_ON }, Events.TIMESTAMP + ">?",
-                    new String[] { String.valueOf(fromTimestamp) },
-                    Events.TIMESTAMP + " ASC");
+                        Events.CONTENT_URI,
+                        new String[] { Events.TIMESTAMP, Events.SCREEN_ON, Events.WIFI_CONNECTED,
+                                Events.MOBILE_CONNECTED, Events.MOBILE_OPERATOR, Events.BATTERY_LEVEL,
+                                Events.POWER_ON }, Events.TIMESTAMP + ">?",
+                        new String[] { String.valueOf(fromTimestamp) }, Events.TIMESTAMP + " ASC");
                 final int rowCount = c.getCount();
                 s.events = new Event[rowCount];
                 for (int i = 0; c.moveToNext(); ++i) {
                     final Event e = new Event();
                     e.read(c);
                     s.events[i] = e;
-                    
+
                     if (i > 0) {
                         final Event e0 = s.events[i - 1];
                         if (e.powerOn && !e0.powerOn) {
                             continue;
                         }
                         final long dt = e.timestamp - e0.timestamp;
-                        
-                        final MobileOperator op = MobileOperator
-                                .fromString(e.mobileOperator);
-                        final MobileOperator op0 = MobileOperator
-                                .fromString(e0.mobileOperator);
+
+                        final MobileOperator op = MobileOperator.fromString(e.mobileOperator);
+                        final MobileOperator op0 = MobileOperator.fromString(e0.mobileOperator);
                         if (op != null && op.equals(op0)) {
                             if (MobileOperator.ORANGE.equals(op)) {
                                 s.orangeTime += dt;
@@ -373,14 +376,13 @@ public class StatisticsFragment extends Fragment implements
                         }
                     }
                 }
-                
+
                 if (s.events.length > 0) {
                     s.battery = s.events[s.events.length - 1].batteryLevel;
                 }
-                
-                final double sTime = (double) (s.orangeTime + s.freeMobileTime);
-                s.freeMobileUsePercent = (int) Math.round(s.freeMobileTime
-                        / sTime * 100d);
+
+                final double sTime = s.orangeTime + s.freeMobileTime;
+                s.freeMobileUsePercent = (int) Math.round(s.freeMobileTime / sTime * 100d);
                 s.orangeUsePercent = 100 - s.freeMobileUsePercent;
                 s.connectionTime = now - connectionTimestamp;
             } catch (Exception e) {
@@ -394,16 +396,16 @@ public class StatisticsFragment extends Fragment implements
                 } catch (Exception ignore) {
                 }
             }
-            
+
             if (DEBUG) {
                 final long end = System.currentTimeMillis();
                 Log.d(TAG, "Statistics loaded in " + (end - now) + " ms");
             }
-            
+
             return s;
         }
     }
-    
+
     /**
      * Store statistics.
      * @author Pixmob
@@ -420,12 +422,11 @@ public class StatisticsFragment extends Fragment implements
         public long screenOnTime;
         public long wifiOnTime;
         public int battery;
-        
+
         @Override
         public String toString() {
-            return "Statistics[events=" + events.length + "; orange="
-                    + orangeUsePercent + "%; free=" + freeMobileUsePercent
-                    + "%]";
+            return "Statistics[events=" + events.length + "; orange=" + orangeUsePercent + "%; free="
+                    + freeMobileUsePercent + "%]";
         }
     }
 }
