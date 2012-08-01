@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import android.content.Context;
+import android.database.CharArrayBuffer;
 import android.util.Log;
 
 /**
@@ -51,14 +52,32 @@ public enum MobileOperator {
         if (mccMnc == null) {
             return null;
         }
-        if (FREE_MOBILE_IDENTIFIERS.contains(mccMnc)) {
-            return FREE_MOBILE;
-        }
         if (ORANGE_IDENTIFIERS.contains(mccMnc)) {
             return ORANGE;
         }
+        if (FREE_MOBILE_IDENTIFIERS.contains(mccMnc)) {
+            return FREE_MOBILE;
+        }
         if (DEBUG) {
-            Log.d(TAG, "Unknown MCC+MNC: " + mccMnc);
+            Log.v(TAG, "Unknown MCC+MNC: " + mccMnc);
+        }
+        return null;
+    }
+
+    public static MobileOperator fromString(CharArrayBuffer mccMnc) {
+        if (mccMnc == null || mccMnc.sizeCopied != 5 || mccMnc.data[0] != '2' || mccMnc.data[1] != '0'
+                || mccMnc.data[2] != '8') {
+            return null;
+        }
+        if (mccMnc.data[3] == '0' && mccMnc.data[4] == '0' || mccMnc.data[3] == '0' && mccMnc.data[4] == '1'
+                || mccMnc.data[3] == '0' && mccMnc.data[4] == '2') {
+            return ORANGE;
+        }
+        if (mccMnc.data[3] == '1' && mccMnc.data[4] == '4' || mccMnc.data[3] == '1' && mccMnc.data[4] == '5') {
+            return FREE_MOBILE;
+        }
+        if (DEBUG) {
+            Log.v(TAG, "Unknown MCC+MNC: " + new String(mccMnc.data));
         }
         return null;
     }

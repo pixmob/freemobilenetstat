@@ -33,7 +33,7 @@ public class Event {
     public String mobileOperator;
     public int batteryLevel;
     public boolean powerOn;
-    
+
     /**
      * Read an {@link Event} instance from a database {@link Cursor}. The cursor
      * should include every columns defined in {@link Events}.
@@ -41,16 +41,16 @@ public class Event {
     public void read(Cursor c) {
         timestamp = c.getLong(c.getColumnIndexOrThrow(Events.TIMESTAMP));
         screenOn = c.getInt(c.getColumnIndexOrThrow(Events.SCREEN_ON)) == 1;
-        wifiConnected = c
-                .getInt(c.getColumnIndexOrThrow(Events.WIFI_CONNECTED)) == 1;
-        mobileConnected = c.getInt(c
-                .getColumnIndexOrThrow(Events.MOBILE_CONNECTED)) == 1;
-        mobileOperator = c.getString(c
-                .getColumnIndexOrThrow(Events.MOBILE_OPERATOR));
+        wifiConnected = c.getInt(c.getColumnIndexOrThrow(Events.WIFI_CONNECTED)) == 1;
+        mobileConnected = c.getInt(c.getColumnIndexOrThrow(Events.MOBILE_CONNECTED)) == 1;
+        mobileOperator = c.getString(c.getColumnIndexOrThrow(Events.MOBILE_OPERATOR));
+        if (mobileOperator != null) {
+            mobileOperator = mobileOperator.intern();
+        }
         batteryLevel = c.getInt(c.getColumnIndexOrThrow(Events.BATTERY_LEVEL));
         powerOn = c.getInt(c.getColumnIndexOrThrow(Events.POWER_ON)) == 1;
     }
-    
+
     /**
      * Fill a {@link ContentValues} instance with values from this instance.
      */
@@ -63,14 +63,11 @@ public class Event {
         values.put(Events.BATTERY_LEVEL, batteryLevel);
         values.put(Events.POWER_ON, powerOn ? 1 : 0);
     }
-    
+
     @Override
     public String toString() {
-        return "Event[timestamp="
-                + DateFormat.format("dd/MM/yyyy hh:mm:ss", timestamp)
-                + "; screen=" + screenOn + "; wifi=" + wifiConnected
-                + "; mobile=" + mobileConnected + "; operator="
-                + mobileOperator + "; battery=" + batteryLevel + "; powerOn="
-                + powerOn + "]";
+        return "Event[timestamp=" + DateFormat.format("dd/MM/yyyy hh:mm:ss", timestamp) + "; screen="
+                + screenOn + "; wifi=" + wifiConnected + "; mobile=" + mobileConnected + "; operator="
+                + mobileOperator + "; battery=" + batteryLevel + "; powerOn=" + powerOn + "]";
     }
 }

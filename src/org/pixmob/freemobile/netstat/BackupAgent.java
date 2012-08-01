@@ -16,21 +16,23 @@
 package org.pixmob.freemobile.netstat;
 
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
+import android.annotation.TargetApi;
 import android.app.backup.BackupAgentHelper;
 import android.app.backup.SharedPreferencesBackupHelper;
+import android.os.Build;
 
 /**
  * Copy application preferences to a remote "cloud" storage, using the Android
  * backup provider.
  * @author Pixmob
  */
+@TargetApi(Build.VERSION_CODES.FROYO)
 public class BackupAgent extends BackupAgentHelper {
     @Override
     public void onCreate() {
         super.onCreate();
-        
-        final SharedPreferencesBackupHelper prefsHelper = new SharedPreferencesBackupHelper(
-                this, SP_NAME);
+
+        final SharedPreferencesBackupHelper prefsHelper = new SharedPreferencesBackupHelper(this, SP_NAME);
         addHelper("prefs", prefsHelper);
     }
 }

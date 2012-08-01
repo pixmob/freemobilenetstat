@@ -20,6 +20,7 @@ import static org.pixmob.freemobile.netstat.Constants.INTERVAL_SINCE_BOOT;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AT_BOOT;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_ICON_GRAY;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_UPLOAD_STATS;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 
@@ -27,6 +28,7 @@ import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
 import org.pixmob.freemobile.netstat.feature.StrictModeFeature;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -35,26 +37,26 @@ import android.util.Log;
  * @author Pixmob
  */
 public class Application extends android.app.Application {
+    @SuppressLint("CommitPrefEdits")
     @Override
     public void onCreate() {
         super.onCreate();
-        
+
         if (DEBUG) {
             // StrictMode is a developer only feature.
             Log.i(TAG, "Enabling StrictMode settings");
             Features.getFeature(StrictModeFeature.class).enable();
         }
-        
+
         // Set default values for preferences.
-        final SharedPreferences prefs = getSharedPreferences(SP_NAME,
-            MODE_PRIVATE);
+        final SharedPreferences prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
         if (prefs.getAll().isEmpty()) {
             final SharedPreferences.Editor prefsEditor = prefs.edit();
             prefsEditor.putBoolean(SP_KEY_ENABLE_AT_BOOT, true);
             prefsEditor.putBoolean(SP_KEY_STAT_NOTIF_ICON_GRAY, false);
             prefsEditor.putInt(SP_KEY_TIME_INTERVAL, INTERVAL_SINCE_BOOT);
-            Features.getFeature(SharedPreferencesSaverFeature.class).save(
-                prefsEditor);
+            prefsEditor.putBoolean(SP_KEY_UPLOAD_STATS, true);
+            Features.getFeature(SharedPreferencesSaverFeature.class).save(prefsEditor);
         }
     }
 }
