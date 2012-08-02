@@ -189,10 +189,9 @@ public class UploadService extends IntentService {
         }
 
         // Check if the remote server is up.
-        final String baseUrl = "https://freemobilenetstat.appspot.com/" + SERVER_API_VERSION;
         final HttpClient client = createHttpClient();
         try {
-            client.head(baseUrl).execute();
+            client.head(createServerUrl(null)).execute();
         } catch (HttpClientException e) {
             Log.w(TAG, "Remote server is not available: cannot upload statistics", e);
             return;
@@ -214,7 +213,8 @@ public class UploadService extends IntentService {
                 throw new IOException("Failed to prepare statistics upload", e);
             }
 
-            final String url = baseUrl + "/device/" + deviceId + "/daily/" + DateFormat.format("yyyyMMdd", d);
+            final String url = createServerUrl("/device/" + deviceId + "/daily/"
+                    + DateFormat.format("yyyyMMdd", d));
             if (DEBUG) {
                 Log.d(TAG, "Uploading statistics for " + DateUtils.formatDate(d) + " to: " + url);
             }
@@ -232,20 +232,16 @@ public class UploadService extends IntentService {
                                     // Check if the device has just been
                                     // registered.
                                     if (deviceWasRegistered) {
-                                        throw new IOException("Failed to register device " + deviceId);
+                                        throw new IOException("Failed to upload statistics");
                                     } else {
                                         // Got 404: the device does not exist.
                                         // We need to register this device.
-                                        try {
-                                            registerDevice();
+                                        registerDevice(deviceId);
 
-                                            // Restart this service.
-                                            startService(new Intent(getApplicationContext(),
-                                                    UploadService.class).putExtra(EXTRA_DEVICE_REG, true));
-                                            return;
-                                        } catch (HttpClientException e) {
-                                            throw new IOException("Failed to register device " + deviceId, e);
-                                        }
+                                        // Restart this service.
+                                        startService(new Intent(getApplicationContext(), UploadService.class)
+                                                .putExtra(EXTRA_DEVICE_REG, true));
+                                        return;
                                     }
                                 } else if (HttpURLConnection.HTTP_OK == sc) {
                                     // Update upload database.
@@ -312,8 +308,7 @@ public class UploadService extends IntentService {
         return s;
     }
 
-    private void registerDevice() throws IOException, HttpClientException {
-        final String url = "https://freemobilenetstat.appspot.com/device/" + getDeviceId();
+    private void registerDevice(String deviceId) throws IOException {
         final JSONObject json = new JSONObject();
         try {
             json.put("brand", Build.BRAND);
@@ -325,9 +320,26 @@ public class UploadService extends IntentService {
         final byte[] rawJson = json.toString().getBytes("UTF-8");
         Log.i(TAG, "Registering device");
 
+        final String url = createServerUrl("/device/" + deviceId);
         final HttpClient client = createHttpClient();
-        client.put(url).expectStatusCode(HttpURLConnection.HTTP_CREATED).setContent(rawJson)
-                .setContentType("application/json").execute();
+        try {
+            client.put(url).expectStatusCode(HttpURLConnection.HTTP_CREATED).setContent(rawJson)
+                    .setContentType("application/json").execute();
+        } catch (HttpClientException e) {
+            throw new IOException("Failed to register device " + deviceId, e);
+        }
+    }
+
+    private String createServerUrl(String path) {
+        final String safePath;
+        if (path == null) {
+            safePath = "";
+        } else if (path.startsWith("/")) {
+            safePath = path;
+        } else {
+            safePath = "/" + path;
+        }
+        return "http://freemobilenetstat.appspot.com/" + SERVER_API_VERSION + safePath;
     }
 
     private HttpClient createHttpClient() {
