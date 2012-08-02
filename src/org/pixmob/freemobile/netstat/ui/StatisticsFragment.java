@@ -196,6 +196,9 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     }
 
     public void refresh() {
+        if (isDetached()) {
+            return;
+        }
         if (getLoaderManager().hasRunningLoaders()) {
             if (DEBUG) {
                 Log.d(TAG, "Skip statistics refresh: already running");
