@@ -30,11 +30,14 @@ import android.support.v4.app.DialogFragment;
 public class ExportDialogFragment extends DialogFragment {
     public void update(int current, int total) {
         final ProgressDialog dialog = (ProgressDialog) getDialog();
-        dialog.setIndeterminate(false);
-        dialog.setMax(total);
-        dialog.setProgress(current);
+        if (dialog != null) {
+            dialog.setIndeterminate(false);
+            dialog.setMax(total);
+            dialog.setProgress(current);
+        }
     }
-    
+
+    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final ProgressDialog dialog = new ProgressDialog(getActivity());
         dialog.setMessage(getString(R.string.exporting_data));
