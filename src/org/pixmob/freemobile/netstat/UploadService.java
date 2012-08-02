@@ -60,6 +60,8 @@ import android.util.Log;
  * @author Pixmob
  */
 public class UploadService extends IntentService {
+    private static final int SERVER_API_VERSION = 1;
+    private static final String EXTRA_DEVICE_REG = "deviceReg";
     private static final long DAY_IN_MILLISECONDS = 86400 * 1000;
     private static final int SYNC_UPLOADED = 1;
     private static final int SYNC_PENDING = 0;
@@ -110,7 +112,7 @@ public class UploadService extends IntentService {
         try {
             wl.acquire();
             db = dbHelper.getWritableDatabase();
-            run(db);
+            run(intent, db);
         } catch (Exception e) {
             Log.e(TAG, "Failed to upload statistics", e);
         } finally {
@@ -121,7 +123,7 @@ public class UploadService extends IntentService {
         }
     }
 
-    private void run(final SQLiteDatabase db) throws Exception {
+    private void run(Intent intent, final SQLiteDatabase db) throws Exception {
         final long now = dateAtMidnight(System.currentTimeMillis());
 
         Log.i(TAG, "Initializing statistics before uploading");
@@ -177,13 +179,26 @@ public class UploadService extends IntentService {
         }
         db.delete("daily_stat", "stat_timestamp<?", new String[] { String.valueOf(statTimestampStart) });
 
+        // Check if there are any statistics to upload.
+        final int statsLen = stats.size();
+        if (statsLen == 0) {
+            Log.i(TAG, "Nothing to upload");
+            return;
+        }
+
+        // Check if the remote server is up.
+        final String baseUrl = "https://freemobilenetstat.appspot.com/" + SERVER_API_VERSION;
+        final HttpClient client = createHttpClient();
+        try {
+            client.head(baseUrl).execute();
+        } catch (HttpClientException e) {
+            Log.w(TAG, "Remote server is not available: cannot upload statistics", e);
+            return;
+        }
+
         // Upload statistics.
         Log.i(TAG, "Uploading statistics");
-        final HttpClient client = createHttpClient();
-        final String baseUrl = "https://freemobilenetstat.appspot.com/device/" + getDeviceId() + "/daily/";
-
         final JSONObject json = new JSONObject();
-        final int statsLen = stats.size();
         for (int i = 0; i < statsLen; ++i) {
             final long d = stats.keyAt(i);
             final DailyStat s = stats.get(d);
@@ -195,12 +210,14 @@ public class UploadService extends IntentService {
                 throw new IOException("Failed to prepare statistics upload", e);
             }
 
-            final String url = baseUrl + DateFormat.format("yyyyMMdd", d);
+            final String url = baseUrl + "/device/" + getDeviceId() + "/daily/"
+                    + DateFormat.format("yyyyMMdd", d);
             if (DEBUG) {
                 Log.d(TAG, "Uploading statistics for " + DateUtils.formatDate(d) + " to: " + url);
             }
 
             final byte[] rawJson = json.toString().getBytes("UTF-8");
+            final boolean deviceWasRegistered = intent.hasExtra(EXTRA_DEVICE_REG);
             try {
                 client.post(url)
                         .expectStatusCode(HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_NOT_FOUND)
@@ -210,12 +227,23 @@ public class UploadService extends IntentService {
                             public void onResponse(HttpResponse response) throws Exception {
                                 final int sc = response.getStatusCode();
                                 if (HttpURLConnection.HTTP_NOT_FOUND == sc) {
-                                    // Got 404: the device does not exist.
-                                    // We need to register this device.
-                                    registerDevice();
+                                    // Check if the device has just been
+                                    // registered.
+                                    if (deviceWasRegistered) {
+                                        Log.w(TAG, "Failed to upload statistics");
+                                    } else {
+                                        // Got 404: the device does not exist.
+                                        // We need to register this device.
+                                        try {
+                                            registerDevice();
 
-                                    // Restart this service.
-                                    startService(new Intent(UploadService.this, UploadService.class));
+                                            // Restart this service.
+                                            startService(new Intent(UploadService.this, UploadService.class)
+                                                    .putExtra(EXTRA_DEVICE_REG, true));
+                                        } catch (HttpClientException e) {
+                                            Log.w(TAG, "Failed to register device", e);
+                                        }
+                                    }
                                 } else if (HttpURLConnection.HTTP_OK == sc) {
                                     // Update upload database.
                                     cv.clear();
