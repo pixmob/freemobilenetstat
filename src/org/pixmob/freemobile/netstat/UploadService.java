@@ -61,7 +61,7 @@ import android.util.Log;
  */
 public class UploadService extends IntentService {
     private static final int SERVER_API_VERSION = 1;
-    private static final String EXTRA_DEVICE_REG = "deviceReg";
+    private static final String EXTRA_DEVICE_REG = "org.pixmob.freemobile.netstat.deviceReg";
     private static final long DAY_IN_MILLISECONDS = 86400 * 1000;
     private static final int SYNC_UPLOADED = 1;
     private static final int SYNC_PENDING = 0;
@@ -121,6 +121,8 @@ public class UploadService extends IntentService {
             }
             wl.release();
         }
+
+        Log.i(TAG, "Statistics upload done");
     }
 
     private void run(Intent intent, final SQLiteDatabase db) throws Exception {
@@ -199,6 +201,8 @@ public class UploadService extends IntentService {
         // Upload statistics.
         Log.i(TAG, "Uploading statistics");
         final JSONObject json = new JSONObject();
+        final String deviceId = getDeviceId();
+        final boolean deviceWasRegistered = intent.getBooleanExtra(EXTRA_DEVICE_REG, false);
         for (int i = 0; i < statsLen; ++i) {
             final long d = stats.keyAt(i);
             final DailyStat s = stats.get(d);
@@ -210,14 +214,12 @@ public class UploadService extends IntentService {
                 throw new IOException("Failed to prepare statistics upload", e);
             }
 
-            final String url = baseUrl + "/device/" + getDeviceId() + "/daily/"
-                    + DateFormat.format("yyyyMMdd", d);
+            final String url = baseUrl + "/device/" + deviceId + "/daily/" + DateFormat.format("yyyyMMdd", d);
             if (DEBUG) {
                 Log.d(TAG, "Uploading statistics for " + DateUtils.formatDate(d) + " to: " + url);
             }
 
             final byte[] rawJson = json.toString().getBytes("UTF-8");
-            final boolean deviceWasRegistered = intent.hasExtra(EXTRA_DEVICE_REG);
             try {
                 client.post(url)
                         .expectStatusCode(HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_NOT_FOUND)
@@ -230,7 +232,7 @@ public class UploadService extends IntentService {
                                     // Check if the device has just been
                                     // registered.
                                     if (deviceWasRegistered) {
-                                        Log.w(TAG, "Failed to upload statistics");
+                                        throw new IOException("Failed to register device " + deviceId);
                                     } else {
                                         // Got 404: the device does not exist.
                                         // We need to register this device.
@@ -238,10 +240,11 @@ public class UploadService extends IntentService {
                                             registerDevice();
 
                                             // Restart this service.
-                                            startService(new Intent(UploadService.this, UploadService.class)
-                                                    .putExtra(EXTRA_DEVICE_REG, true));
+                                            startService(new Intent(getApplicationContext(),
+                                                    UploadService.class).putExtra(EXTRA_DEVICE_REG, true));
+                                            return;
                                         } catch (HttpClientException e) {
-                                            Log.w(TAG, "Failed to register device", e);
+                                            throw new IOException("Failed to register device " + deviceId, e);
                                         }
                                     }
                                 } else if (HttpURLConnection.HTTP_OK == sc) {
@@ -261,8 +264,6 @@ public class UploadService extends IntentService {
                 throw new IOException("Failed to send request with statistics", e);
             }
         }
-
-        Log.i(TAG, "Statistics upload done");
     }
 
     private DailyStat computeDailyStat(long date) {
