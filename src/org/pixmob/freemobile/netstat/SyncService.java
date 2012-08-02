@@ -59,7 +59,7 @@ import android.util.Log;
  * This background service uploads statistics.
  * @author Pixmob
  */
-public class UploadService extends IntentService {
+public class SyncService extends IntentService {
     private static final int SERVER_API_VERSION = 1;
     private static final String EXTRA_DEVICE_REG = "org.pixmob.freemobile.netstat.deviceReg";
     private static final long DAY_IN_MILLISECONDS = 86400 * 1000;
@@ -71,7 +71,7 @@ public class UploadService extends IntentService {
     private PowerManager pm;
     private SQLiteOpenHelper dbHelper;
 
-    public UploadService() {
+    public SyncService() {
         super("FreeMobileNetstat/Upload");
     }
 
@@ -239,9 +239,8 @@ public class UploadService extends IntentService {
                                         registerDevice(deviceId);
 
                                         // Restart this service.
-                                        startService(new Intent(getApplicationContext(), UploadService.class)
+                                        startService(new Intent(getApplicationContext(), SyncService.class)
                                                 .putExtra(EXTRA_DEVICE_REG, true));
-                                        return;
                                     }
                                 } else if (HttpURLConnection.HTTP_OK == sc) {
                                     // Update upload database.
