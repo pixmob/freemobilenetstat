@@ -45,7 +45,7 @@ public class ConnectivityListener extends BroadcastReceiver {
 
         final AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         final PendingIntent uploadIntent = PendingIntent.getService(context, 0, new Intent(context,
-                UploadService.class), PendingIntent.FLAG_CANCEL_CURRENT);
+                SyncService.class), PendingIntent.FLAG_CANCEL_CURRENT);
 
         if (ni != null && ni.isAvailable() && ni.isConnected()) {
             // The device is connected to Internet: schedule statistics

@@ -18,7 +18,8 @@
     <uses-feature
         android:name="android.hardware.telephony.gsm"
         android:required="true" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".Application"
@@ -36,7 +37,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".UploadService" >
+        <service android:name=".SyncService" >
         </service>
         <service
             android:name=".MonitorService"
@@ -48,7 +49,9 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".ConnectivityListener" android:exported="false" >
+        <receiver
+            android:name=".ConnectivityListener"
+            android:exported="false" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
