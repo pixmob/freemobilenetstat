@@ -15,11 +15,10 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
-import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
-
 import org.pixmob.freemobile.netstat.ConnectivityListener;
-import org.pixmob.freemobile.netstat.SyncService;
+import org.pixmob.freemobile.netstat.MonitorService;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Build;
@@ -45,15 +44,11 @@ public class Netstat extends FragmentActivity {
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
         }
 
-        ConnectivityListener.setupAlarm(this);
-    }
+        final Context c = getApplicationContext();
+        final Intent i = new Intent(c, MonitorService.class);
+        c.startService(i);
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (DEBUG) {
-            startService(new Intent(this, SyncService.class));
-        }
+        ConnectivityListener.setupAlarm(this);
     }
 
     @Override
