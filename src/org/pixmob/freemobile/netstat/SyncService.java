@@ -210,7 +210,9 @@ public class SyncService extends IntentService {
                 json.put("timeOnOrange", s.orange);
                 json.put("timeOnFreeMobile", s.freeMobile);
             } catch (JSONException e) {
-                throw new IOException("Failed to prepare statistics upload", e);
+                final IOException ioe = new IOException("Failed to prepare statistics upload");
+                ioe.initCause(e);
+                throw ioe;
             }
 
             final String url = createServerUrl("/device/" + deviceId + "/daily/"
@@ -256,7 +258,9 @@ public class SyncService extends IntentService {
                             }
                         }).execute();
             } catch (HttpClientException e) {
-                throw new IOException("Failed to send request with statistics", e);
+                final IOException ioe = new IOException("Failed to send request with statistics");
+                ioe.initCause(e);
+                throw ioe;
             }
         }
     }
@@ -313,7 +317,9 @@ public class SyncService extends IntentService {
             json.put("brand", Build.BRAND);
             json.put("model", Build.MODEL);
         } catch (JSONException e) {
-            throw new IOException("Failed to prepare device registration request", e);
+            final IOException ioe = new IOException("Failed to prepare device registration request");
+            ioe.initCause(e);
+            throw ioe;
         }
 
         final byte[] rawJson = json.toString().getBytes("UTF-8");
@@ -325,7 +331,9 @@ public class SyncService extends IntentService {
             client.put(url).expectStatusCode(HttpURLConnection.HTTP_CREATED).setContent(rawJson)
                     .setContentType("application/json").execute();
         } catch (HttpClientException e) {
-            throw new IOException("Failed to register device " + deviceId, e);
+            final IOException ioe = new IOException("Failed to register device " + deviceId);
+            ioe.initCause(e);
+            throw ioe;
         }
     }
 
