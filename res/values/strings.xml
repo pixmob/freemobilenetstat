@@ -41,7 +41,7 @@
     <string name="pref_icon_in_gray">Icône de statut en gris</string>
     <string name="pref_icon_in_gray_summary">Désactiver les couleurs dans la barre de statut</string>
     <string name="pref_about">À propos</string>
-    <string name="pref_version">Version %s</string>
+    <string name="pref_version">Version</string>
     <string name="pref_changelog">Nouveautés</string>
     <string name="pref_license">Licence</string>
     <string name="pref_notif_sound">Alarme sonore</string>
