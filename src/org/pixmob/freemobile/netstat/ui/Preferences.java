@@ -33,20 +33,17 @@ import org.pixmob.freemobile.netstat.feature.BackupManagerFeature;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.util.IOUtils;
 
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
@@ -197,19 +194,5 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d(TAG, "Application preferences updated: " + "calling BackupManager.dataChanged()");
         Features.getFeature(BackupManagerFeature.class).dataChanged(this);
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class PreferencesFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.prefs);
-        }
-
-        public static void install(PreferenceActivity a) {
-            final PreferencesFragment pf = new PreferencesFragment();
-            a.getFragmentManager().beginTransaction().add(android.R.id.content, pf).commit();
-        }
     }
 }
