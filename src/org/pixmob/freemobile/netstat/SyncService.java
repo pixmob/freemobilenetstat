@@ -35,7 +35,9 @@ import org.pixmob.httpclient.HttpClientException;
 import org.pixmob.httpclient.HttpResponse;
 import org.pixmob.httpclient.HttpResponseHandler;
 
+import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -72,7 +74,25 @@ public class SyncService extends IntentService {
     private SQLiteOpenHelper dbHelper;
 
     public SyncService() {
-        super("FreeMobileNetstat/Upload");
+        super("FreeMobileNetstat/Sync");
+    }
+
+    public static void schedule(Context context, boolean enabled) {
+        final AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        final PendingIntent syncIntent = PendingIntent.getService(context, 0, new Intent(context,
+                SyncService.class), PendingIntent.FLAG_CANCEL_CURRENT);
+        if (enabled) {
+            if (DEBUG) {
+                Log.d(TAG, "Scheduling synchronization");
+            }
+            am.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000,
+                    AlarmManager.INTERVAL_HALF_HOUR, syncIntent);
+        } else {
+            if (DEBUG) {
+                Log.d(TAG, "Synchronization schedule canceled");
+            }
+            am.cancel(syncIntent);
+        }
     }
 
     @Override
@@ -96,14 +116,14 @@ public class SyncService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         // Check if statistics upload is enabled.
         if (!prefs.getBoolean(Constants.SP_KEY_UPLOAD_STATS, false)) {
-            Log.d(TAG, "Statistics upload is disabled: skip upload");
+            Log.d(TAG, "Synchronization is disabled: skip sync");
             return;
         }
 
         // Check if an Internet connection is available.
         final NetworkInfo netInfo = cm.getActiveNetworkInfo();
         if (netInfo == null || !netInfo.isAvailable() || !netInfo.isConnected()) {
-            Log.d(TAG, "Network connectivity is not available: skip upload");
+            Log.d(TAG, "Network connectivity is not available: skip sync");
             return;
         }
 

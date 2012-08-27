@@ -15,8 +15,8 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
-import org.pixmob.freemobile.netstat.ConnectivityListener;
 import org.pixmob.freemobile.netstat.MonitorService;
+import org.pixmob.freemobile.netstat.SyncService;
 
 import android.content.Context;
 import android.content.Intent;
@@ -48,7 +48,7 @@ public class Netstat extends FragmentActivity {
         final Intent i = new Intent(c, MonitorService.class);
         c.startService(i);
 
-        ConnectivityListener.setupAlarm(this);
+        SyncService.schedule(this, true);
     }
 
     @Override
