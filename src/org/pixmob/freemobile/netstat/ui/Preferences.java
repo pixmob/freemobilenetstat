@@ -87,8 +87,9 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         }
 
         Preference p = findPreference(SP_KEY_VERSION);
-        p.setTitle(String.format(getString(R.string.pref_version), version));
+        p.setSummary(version);
 
+        pm.findPreference(SP_KEY_VERSION).setOnPreferenceClickListener(this);
         pm.findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(this);
         pm.findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(this);
 
@@ -106,6 +107,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
 
     @Override
     protected void onDestroy() {
+        findPreference(SP_KEY_VERSION).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_TIME_INTERVAL).setOnPreferenceChangeListener(null);
@@ -148,6 +150,14 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             openBrowser(getString(R.string.url_changelog));
         } else if (SP_KEY_LICENSE.equals(k)) {
             showDialog(0);
+        } else if (SP_KEY_VERSION.equals(k)) {
+            final String appName = getPackageName();
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appName)));
+            } catch (android.content.ActivityNotFoundException anfe) {
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://play.google.com/store/apps/details?id=" + appName)));
+            }
         }
 
         return true;
