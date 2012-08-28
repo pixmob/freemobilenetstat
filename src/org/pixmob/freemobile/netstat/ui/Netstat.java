@@ -17,9 +17,14 @@ package org.pixmob.freemobile.netstat.ui;
 
 import org.pixmob.freemobile.netstat.MonitorService;
 import org.pixmob.freemobile.netstat.SyncService;
+import org.pixmob.freemobile.netstat.feature.Features;
+import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +35,7 @@ import android.view.Window;
  * Main application activity.
  * @author Pixmob
  */
+@SuppressLint("CommitPrefEdits")
 public class Netstat extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +55,28 @@ public class Netstat extends FragmentActivity {
         c.startService(i);
 
         SyncService.schedule(this, true);
+
+        final int applicationVersion;
+        try {
+            applicationVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+        } catch (NameNotFoundException e) {
+            // Unlikely to happen.
+            throw new RuntimeException("Failed to get application version", e);
+        }
+
+        final String versionKey = "version";
+        final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        final int lastKnownVersion = prefs.getInt(versionKey, 0);
+        if (lastKnownVersion != applicationVersion) {
+            // Store the current application version.
+            final SharedPreferences.Editor prefsEditor = prefs.edit();
+            prefsEditor.putInt(versionKey, applicationVersion);
+            Features.getFeature(SharedPreferencesSaverFeature.class).save(prefsEditor);
+
+            // The application was updated: let's show changelog.
+            startActivity(new Intent(this, DocumentBrowser.class).putExtra(DocumentBrowser.INTENT_EXTRA_URL,
+                    "CHANGELOG.html"));
+        }
     }
 
     @Override
