@@ -4,13 +4,11 @@
     <item
         android:id="@+id/menu_export"
         android:icon="@drawable/ic_menu_save"
-        android:showAsAction="ifRoom"
         android:title="@string/menu_export">
     </item>
     <item
         android:id="@+id/menu_preferences"
         android:icon="@drawable/ic_menu_preferences"
-        android:showAsAction="ifRoom"
         android:title="@string/menu_preferences">
     </item>
 
