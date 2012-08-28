@@ -152,7 +152,7 @@ public class SyncService extends IntentService {
 
         final LongSparseArray<DailyStat> stats = new LongSparseArray<DailyStat>(15);
         final Set<Long> uploadedStats = new HashSet<Long>(15);
-        final long statTimestampStart = now - 30 * DAY_IN_MILLISECONDS;
+        final long statTimestampStart = now - 7 * DAY_IN_MILLISECONDS;
 
         // Get pending uploads.
         Cursor c = db.query("daily_stat", new String[] { "stat_timestamp", "orange", "free_mobile", "sync" },
