@@ -37,6 +37,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -49,7 +50,9 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     private static final String SP_KEY_VERSION = "pref_version";
     private static final String SP_KEY_CHANGELOG = "pref_changelog";
     private static final String SP_KEY_LICENSE = "pref_license";
+    private static final String SP_KEY_NETWORK_OPERATORS = "pref_network_operators";
     private final SparseArray<CharSequence> timeIntervals = new SparseArray<CharSequence>(4);
+    private Intent networkOperatorSettingsIntent;
 
     @SuppressWarnings("deprecation")
     @Override
@@ -81,6 +84,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         pm.findPreference(SP_KEY_VERSION).setOnPreferenceClickListener(this);
         pm.findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(this);
         pm.findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(this);
+        pm.findPreference(SP_KEY_NETWORK_OPERATORS).setOnPreferenceClickListener(this);
 
         final IntListPreference lp = (IntListPreference) pm.findPreference(SP_KEY_TIME_INTERVAL);
         lp.setEntries(getValues(timeIntervals));
@@ -92,6 +96,12 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         lp.setOnPreferenceChangeListener(this);
 
         pm.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+        // Check if the network operator settings intent is available.
+        networkOperatorSettingsIntent = new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS);
+        final boolean networkOperatorSettingsAvailable = !getPackageManager().queryIntentActivities(
+                networkOperatorSettingsIntent, 0).isEmpty();
+        pm.findPreference(SP_KEY_NETWORK_OPERATORS).setEnabled(networkOperatorSettingsAvailable);
     }
 
     @Override
@@ -99,6 +109,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         findPreference(SP_KEY_VERSION).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(null);
+        findPreference(SP_KEY_NETWORK_OPERATORS).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_TIME_INTERVAL).setOnPreferenceChangeListener(null);
 
         getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
@@ -141,6 +152,8 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         } else if (SP_KEY_LICENSE.equals(k)) {
             startActivity(new Intent(this, DocumentBrowser.class).putExtra(DocumentBrowser.INTENT_EXTRA_URL,
                     "LICENSE.html").putExtra(DocumentBrowser.INTENT_EXTRA_HIDE_BUTTON_BAR, true));
+        } else if (SP_KEY_NETWORK_OPERATORS.equals(k)) {
+            startActivity(networkOperatorSettingsIntent);
         } else if (SP_KEY_VERSION.equals(k)) {
             final String appName = getPackageName();
             try {

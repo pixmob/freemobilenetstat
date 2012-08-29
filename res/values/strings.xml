@@ -48,6 +48,8 @@
     <string name="pref_notif_sound">Alarme sonore</string>
     <string name="pref_notif_sound_summary">Avertir lorsque l\'opérateur réseau change</string>
     <string name="pref_time_interval">Afficher les données depuis…</string>
+    <string name="pref_network_operators">Opérateur de réseau</string>
+    <string name="pref_network_operators_summary">Choisir un opérateur de réseau</string>
     <string name="interval_since_boot">Démarrage du téléphone</string>
     <string name="interval_today">Aujourd\'hui</string>
     <string name="interval_one_week">Une semaine</string>
