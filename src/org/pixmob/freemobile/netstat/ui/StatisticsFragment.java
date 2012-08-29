@@ -134,17 +134,17 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     /**
      * Check if the SIM card is supported.
      */
-    @SuppressWarnings("unused")
     public static boolean isSimSupported(Context context) {
-        if (DEBUG) {
-            return true;
+        if (!DEBUG) {
+            final TelephonyManager tm = (TelephonyManager) context
+                    .getSystemService(Context.TELEPHONY_SERVICE);
+            if (TelephonyManager.SIM_STATE_READY != tm.getSimState()) {
+                return false;
+            }
+            return MobileOperator.FREE_MOBILE.equals(MobileOperator.fromString(tm.getSimOperator()));
         }
 
-        final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        if (TelephonyManager.SIM_STATE_READY != tm.getSimState()) {
-            return false;
-        }
-        return MobileOperator.FREE_MOBILE.equals(MobileOperator.fromString(tm.getSimOperator()));
+        return true;
     }
 
     @Override
