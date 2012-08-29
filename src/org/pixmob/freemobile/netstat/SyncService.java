@@ -58,7 +58,7 @@ import android.text.format.DateFormat;
 import android.util.Log;
 
 /**
- * This background service uploads statistics.
+ * This background service synchronizes data with a remote server.
  * @author Pixmob
  */
 public class SyncService extends IntentService {
@@ -67,8 +67,13 @@ public class SyncService extends IntentService {
     private static final long DAY_IN_MILLISECONDS = 86400 * 1000;
     private static final int SYNC_UPLOADED = 1;
     private static final int SYNC_PENDING = 0;
+    private static final int MAX_SYNC_ERRORS = 4;
+    private static final String INTERNAL_SP_NAME = "sync";
+    private static final String INTERNAL_SP_KEY_SYNC_ERRORS = "syncErrors";
     private static String httpUserAgent;
     private SharedPreferences prefs;
+    private SharedPreferences internalPrefs;
+    private SharedPreferences.Editor internalPrefsEditor;
     private ConnectivityManager cm;
     private PowerManager pm;
     private SQLiteOpenHelper dbHelper;
@@ -82,11 +87,19 @@ public class SyncService extends IntentService {
         final PendingIntent syncIntent = PendingIntent.getService(context, 0, new Intent(context,
                 SyncService.class), PendingIntent.FLAG_CANCEL_CURRENT);
         if (enabled) {
-            if (DEBUG) {
-                Log.d(TAG, "Scheduling synchronization");
+            // Set the sync period.
+            long period = AlarmManager.INTERVAL_HOUR;
+            final int syncErrors = context.getSharedPreferences(INTERNAL_SP_NAME, MODE_PRIVATE).getInt(
+                    INTERNAL_SP_KEY_SYNC_ERRORS, 0);
+            if (syncErrors != 0) {
+                // When there was a sync error, the sync period is longer.
+                period = AlarmManager.INTERVAL_HOUR * Math.min(syncErrors, MAX_SYNC_ERRORS);
             }
-            am.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis() + 1000,
-                    AlarmManager.INTERVAL_HALF_HOUR, syncIntent);
+
+            if (DEBUG) {
+                Log.d(TAG, "Scheduling synchronization: every " + period / 1000 / 60 + " minutes");
+            }
+            am.setInexactRepeating(AlarmManager.RTC, period, period, syncIntent);
         } else {
             if (DEBUG) {
                 Log.d(TAG, "Synchronization schedule canceled");
@@ -99,6 +112,8 @@ public class SyncService extends IntentService {
     public void onCreate() {
         super.onCreate();
         prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
+        internalPrefs = getSharedPreferences(INTERNAL_SP_NAME, MODE_PRIVATE);
+        internalPrefsEditor = internalPrefs.edit();
         cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         pm = (PowerManager) getSystemService(POWER_SERVICE);
         dbHelper = new UploadDatabaseHelper(this);
@@ -133,8 +148,18 @@ public class SyncService extends IntentService {
             wl.acquire();
             db = dbHelper.getWritableDatabase();
             run(intent, db);
+
+            // Sync was successful: reset sync error count.
+            internalPrefsEditor.remove(INTERNAL_SP_KEY_SYNC_ERRORS).commit();
         } catch (Exception e) {
             Log.e(TAG, "Failed to upload statistics", e);
+
+            // Increment sync errors.
+            final int syncErrors = internalPrefs.getInt(INTERNAL_SP_KEY_SYNC_ERRORS, 0);
+            internalPrefsEditor.putInt(INTERNAL_SP_KEY_SYNC_ERRORS, syncErrors + 1).commit();
+
+            // Reschedule this service according to the sync error count.
+            schedule(this, true);
         } finally {
             if (db != null) {
                 db.close();
