@@ -147,11 +147,9 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     public boolean onPreferenceClick(Preference p) {
         final String k = p.getKey();
         if (SP_KEY_CHANGELOG.equals(k)) {
-            startActivity(new Intent(this, DocumentBrowser.class).putExtra(DocumentBrowser.INTENT_EXTRA_URL,
-                    "CHANGELOG.html").putExtra(DocumentBrowser.INTENT_EXTRA_HIDE_BUTTON_BAR, true));
+            openDocument("CHANGELOG.html");
         } else if (SP_KEY_LICENSE.equals(k)) {
-            startActivity(new Intent(this, DocumentBrowser.class).putExtra(DocumentBrowser.INTENT_EXTRA_URL,
-                    "LICENSE.html").putExtra(DocumentBrowser.INTENT_EXTRA_HIDE_BUTTON_BAR, true));
+            openDocument("LICENSE.html");
         } else if (SP_KEY_NETWORK_OPERATORS.equals(k)) {
             startActivity(networkOperatorSettingsIntent);
         } else if (SP_KEY_VERSION.equals(k)) {
@@ -165,6 +163,12 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         }
 
         return true;
+    }
+
+    private void openDocument(String path) {
+        startActivity(new Intent(this, DocumentBrowser.class)
+                .putExtra(DocumentBrowser.INTENT_EXTRA_URL, path).putExtra(
+                        DocumentBrowser.INTENT_EXTRA_HIDE_BUTTON_BAR, true));
     }
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
