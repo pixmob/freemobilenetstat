@@ -27,6 +27,7 @@ import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.feature.BackupManagerFeature;
 import org.pixmob.freemobile.netstat.feature.Features;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -99,9 +100,20 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
 
         // Check if the network operator settings intent is available.
         networkOperatorSettingsIntent = new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS);
-        final boolean networkOperatorSettingsAvailable = !getPackageManager().queryIntentActivities(
-                networkOperatorSettingsIntent, 0).isEmpty();
+        boolean networkOperatorSettingsAvailable = isIntentAvailable(networkOperatorSettingsIntent);
+        if (!networkOperatorSettingsAvailable) {
+            // The previous intent action is not available with some devices:
+            // http://stackoverflow.com/a/6789616/422906
+            networkOperatorSettingsIntent = new Intent(Intent.ACTION_MAIN);
+            networkOperatorSettingsIntent.setComponent(new ComponentName("com.android.phone",
+                    "com.android.phone.NetworkSetting"));
+            networkOperatorSettingsAvailable = isIntentAvailable(networkOperatorSettingsIntent);
+        }
         pm.findPreference(SP_KEY_NETWORK_OPERATORS).setEnabled(networkOperatorSettingsAvailable);
+    }
+
+    private boolean isIntentAvailable(Intent i) {
+        return !getPackageManager().queryIntentActivities(i, 0).isEmpty();
     }
 
     @Override
