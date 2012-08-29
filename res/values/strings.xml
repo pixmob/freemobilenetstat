@@ -44,6 +44,7 @@
     <string name="pref_version">Version</string>
     <string name="pref_changelog">Nouveautés</string>
     <string name="pref_license">Licence</string>
+    <string name="pref_license_summary">Code source disponible sur github.com/pixmob</string>
     <string name="pref_notif_sound">Alarme sonore</string>
     <string name="pref_notif_sound_summary">Avertir lorsque l\'opérateur réseau change</string>
     <string name="pref_time_interval">Afficher les données depuis…</string>
