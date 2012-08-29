@@ -378,7 +378,7 @@ public class SyncService extends IntentService {
                 applicationVersion = pkgInfo.versionName;
             } catch (NameNotFoundException e) {
             }
-            httpUserAgent = "FreeMobileNetstat/" + applicationVersion;
+            httpUserAgent = "FreeMobileNetstat/" + applicationVersion + " Android/" + Build.VERSION.SDK_INT;
         }
 
         final HttpClient client = new HttpClient(this);
