@@ -17,24 +17,29 @@ package org.pixmob.freemobile.netstat.ui;
 
 import org.pixmob.freemobile.netstat.R;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 /**
  * Activity showing an HTML document.
  * @author Pixmob
  */
+@SuppressLint("NewApi")
 public class DocumentBrowser extends Activity {
     /**
      * Intent key for setting a document URL to display.
      */
     public static final String INTENT_EXTRA_URL = "url";
     public static final String INTENT_EXTRA_HIDE_BUTTON_BAR = "hideButtonBar";
-    private WebView browser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +58,23 @@ public class DocumentBrowser extends Activity {
         final boolean buttonBarInvisible = getIntent().getBooleanExtra(INTENT_EXTRA_HIDE_BUTTON_BAR, false);
         findViewById(R.id.button_bar).setVisibility(buttonBarInvisible ? View.GONE : View.VISIBLE);
 
-        browser = (WebView) findViewById(R.id.browser);
-        browser.getSettings().setJavaScriptEnabled(true);
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.doc_progress);
+
+        final WebView browser = (WebView) findViewById(R.id.browser);
+        browser.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                // Open links using the system browser application.
+                final Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(i);
+                return true;
+            }
+        });
         browser.loadUrl(url);
     }
 
