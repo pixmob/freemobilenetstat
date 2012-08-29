@@ -61,6 +61,8 @@ public class DocumentBrowser extends Activity {
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.doc_progress);
 
         final WebView browser = (WebView) findViewById(R.id.browser);
+        // Fix white scrollbar: http://stackoverflow.com/a/2766399/422906
+        browser.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
         browser.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
