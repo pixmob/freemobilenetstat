@@ -24,6 +24,7 @@
             android:dialogTitle="@string/pref_time_interval"
             android:key="pref_time_interval"
             android:title="@string/pref_time_interval" />
+        <Preference android:summary="@string/pref_network_operators_summary" android:title="@string/pref_network_operators" android:key="pref_network_operators"/>
         
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_about" >
