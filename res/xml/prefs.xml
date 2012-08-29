@@ -32,7 +32,7 @@
             android:title="@string/pref_version" />
         <Preference
             android:key="pref_license"
-            android:title="@string/pref_license" />
+            android:title="@string/pref_license" android:summary="@string/pref_license_summary"/>
         <Preference
             android:key="pref_changelog"
             android:title="@string/pref_changelog" />
