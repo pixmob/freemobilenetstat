@@ -54,4 +54,10 @@
         android:layout_height="fill_parent"
         android:layout_above="@id/button_bar" />
 
+    <ProgressBar
+        android:id="@+id/doc_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
 </RelativeLayout>
