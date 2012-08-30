@@ -3,14 +3,12 @@ Free Mobile Netstat
 
 English users: this is an Android application for the french mobile operator Free Mobile. Move along!
 
-Avec Free Mobile Netstat, vous savez à chaque instant sur quelle antenne votre téléphone Android est
-connecté : Orange ou Free Mobile.
+Avec Free Mobile Netstat, vous savez à chaque instant sur quelle antenne votre téléphone Android est connecté : Orange ou Free Mobile.
 
 ![Free Mobile Netstat](http://freemobilenetstat.appspot.com/images/appscreenshot1.png)
 
-Installez l'application sur votre téléphone Android, et contribuez à la collecte de données sur la
-couverture réelle de Free Mobile en France. Les statistiques de couverture sont consultables sur
-[freemobilenetstat.appspot.com](http://freemobilenetstat.appspot.com) et sur [TooSurToo](http://freemobile.toosurtoo.com/outils/netstat/).
+Installez l'application sur votre téléphone Android, et contribuez à la collecte de données sur la couverture réelle de Free Mobile en France.
+Les statistiques de couverture sont consultables sur [freemobilenetstat.appspot.com](http://freemobilenetstat.appspot.com) et sur [TooSurToo](http://freemobile.toosurtoo.com/outils/netstat/).
 
 L'application Free Mobile Netstat est [disponible gratuitement en téléchargement](https://play.google.com/store/apps/details?id=org.pixmob.freemobile.netstat).
 
