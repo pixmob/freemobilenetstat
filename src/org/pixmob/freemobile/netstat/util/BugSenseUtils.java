@@ -42,28 +42,32 @@ public final class BugSenseUtils {
     public static void setup(Context context) {
         String apiKey = null;
 
-        BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new InputStreamReader(context.getAssets().open("bugsense.txt")));
+            BufferedReader reader = null;
+            try {
+                reader = new BufferedReader(new InputStreamReader(context.getAssets().open("bugsense.txt")));
 
-            for (String line; (line = reader.readLine()) != null;) {
-                line = line.trim();
-                if (!line.startsWith("#") && line.length() != 0) {
-                    apiKey = line;
-                    break;
+                for (String line; (line = reader.readLine()) != null;) {
+                    line = line.trim();
+                    if (!line.startsWith("#") && line.length() != 0) {
+                        apiKey = line;
+                        break;
+                    }
                 }
+            } catch (IOException e) {
+                Log.w(TAG, "Failed to load BugSense API key", e);
+            } finally {
+                IOUtils.close(reader);
             }
-        } catch (IOException e) {
-            Log.w(TAG, "Failed to load BugSense API key", e);
-        } finally {
-            IOUtils.close(reader);
-        }
 
-        if (apiKey != null) {
-            Log.i(TAG, "BugSense (error reporting) enabled");
-            BugSenseHandler.setup(context, apiKey);
-        } else {
-            Log.w(TAG, "BugSense (error reporting) is DISABLED");
+            if (apiKey != null) {
+                Log.i(TAG, "BugSense (error reporting) enabled");
+                BugSenseHandler.setup(context, apiKey);
+            } else {
+                Log.w(TAG, "BugSense (error reporting) is DISABLED");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to setup BugSense", e);
         }
     }
 }
