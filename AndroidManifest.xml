@@ -63,6 +63,13 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".NotificationHandler"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="org.pixmob.freemobile.netstat.notif" />
+            </intent-filter>
+        </receiver>
 
         <provider
             android:name=".content.NetstatContentProvider"

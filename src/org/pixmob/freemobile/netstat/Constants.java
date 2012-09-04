@@ -54,6 +54,18 @@ public final class Constants {
      */
     public static final String SP_KEY_UPLOAD_STATS = "pref_upload_stats";
     /**
+     * {@link SharedPreferences} key: set the notification action.
+     */
+    public static final String SP_KEY_NOTIF_ACTION = "pref_notif_action";
+    /**
+     * Notification action: open network operator settings.
+     */
+    public static final String NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS = "network_operator_settings";
+    /**
+     * Notification action: open statistics.
+     */
+    public static final String NOTIF_ACTION_STATISTICS = "statistics";
+    /**
      * Time interval value: show data since the device boot time.
      */
     public static final int INTERVAL_SINCE_BOOT = 0;
@@ -69,6 +81,10 @@ public final class Constants {
      * Time interval value: show data from one month.
      */
     public static final int INTERVAL_ONE_MONTH = 3;
+    /**
+     * Notification intent action.
+     */
+    public static final String ACTION_NOTIFICATION = "org.pixmob.freemobile.netstat.notif";
 
     private Constants() {
     }

@@ -17,7 +17,9 @@ package org.pixmob.freemobile.netstat;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.INTERVAL_SINCE_BOOT;
+import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_STATISTICS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AT_BOOT;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_ICON_GRAY;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_UPLOAD_STATS;
@@ -57,6 +59,7 @@ public class Application extends android.app.Application {
             prefsEditor.putBoolean(SP_KEY_STAT_NOTIF_ICON_GRAY, false);
             prefsEditor.putInt(SP_KEY_TIME_INTERVAL, INTERVAL_SINCE_BOOT);
             prefsEditor.putBoolean(SP_KEY_UPLOAD_STATS, true);
+            prefsEditor.putString(SP_KEY_NOTIF_ACTION, NOTIF_ACTION_STATISTICS);
             Features.getFeature(SharedPreferencesSaverFeature.class).save(prefsEditor);
         }
 

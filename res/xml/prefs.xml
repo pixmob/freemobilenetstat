@@ -7,10 +7,29 @@
             android:key="pref_enable_at_boot"
             android:summary="@string/pref_enable_at_boot_summary"
             android:title="@string/pref_enable_at_boot" />
-        <CheckBoxPreference android:title="@string/pref_upload_stats" android:key="pref_upload_stats" android:summary="@string/pref_upload_stats_summary" android:enabled="true"/><CheckBoxPreference
-            android:key="pref_icon_in_gray"
-            android:summary="@string/pref_icon_in_gray_summary"
-            android:title="@string/pref_icon_in_gray" />
+        <CheckBoxPreference
+            android:enabled="true"
+            android:key="pref_upload_stats"
+            android:summary="@string/pref_upload_stats_summary"
+            android:title="@string/pref_upload_stats" />
+
+        <org.pixmob.freemobile.netstat.ui.IntListPreference
+            android:dialogTitle="@string/pref_time_interval"
+            android:key="pref_time_interval"
+            android:title="@string/pref_time_interval" />
+
+        <Preference
+            android:key="pref_network_operators"
+            android:summary="@string/pref_network_operators_summary"
+            android:title="@string/pref_network_operators" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_notif" >
+        <ListPreference
+            android:dialogTitle="@string/pref_notif_action"
+            android:entries="@array/notif_action_titles"
+            android:entryValues="@array/notif_action_values"
+            android:key="pref_notif_action"
+            android:title="@string/pref_notif_action" />
 
         <RingtonePreference
             android:key="pref_notif_sound"
@@ -20,12 +39,10 @@
             android:summary="@string/pref_notif_sound_summary"
             android:title="@string/pref_notif_sound" />
 
-        <org.pixmob.freemobile.netstat.ui.IntListPreference
-            android:dialogTitle="@string/pref_time_interval"
-            android:key="pref_time_interval"
-            android:title="@string/pref_time_interval" />
-        <Preference android:summary="@string/pref_network_operators_summary" android:title="@string/pref_network_operators" android:key="pref_network_operators"/>
-        
+        <CheckBoxPreference
+            android:key="pref_icon_in_gray"
+            android:summary="@string/pref_icon_in_gray_summary"
+            android:title="@string/pref_icon_in_gray" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_about" >
         <Preference
@@ -33,7 +50,8 @@
             android:title="@string/pref_version" />
         <Preference
             android:key="pref_license"
-            android:title="@string/pref_license" android:summary="@string/pref_license_summary"/>
+            android:summary="@string/pref_license_summary"
+            android:title="@string/pref_license" />
         <Preference
             android:key="pref_changelog"
             android:title="@string/pref_changelog" />

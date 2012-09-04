@@ -19,15 +19,21 @@ import static org.pixmob.freemobile.netstat.Constants.INTERVAL_ONE_MONTH;
 import static org.pixmob.freemobile.netstat.Constants.INTERVAL_ONE_WEEK;
 import static org.pixmob.freemobile.netstat.Constants.INTERVAL_SINCE_BOOT;
 import static org.pixmob.freemobile.netstat.Constants.INTERVAL_TODAY;
+import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS;
+import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_STATISTICS;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.feature.BackupManagerFeature;
 import org.pixmob.freemobile.netstat.feature.Features;
+import org.pixmob.freemobile.netstat.util.IntentFactory;
 
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -38,7 +44,6 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -53,6 +58,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     private static final String SP_KEY_LICENSE = "pref_license";
     private static final String SP_KEY_NETWORK_OPERATORS = "pref_network_operators";
     private final SparseArray<CharSequence> timeIntervals = new SparseArray<CharSequence>(4);
+    private final Map<String, String> notifActions = new HashMap<String, String>(2);
     private Intent networkOperatorSettingsIntent;
 
     @SuppressWarnings("deprecation")
@@ -65,6 +71,11 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         timeIntervals.append(INTERVAL_TODAY, getString(R.string.interval_today));
         timeIntervals.append(INTERVAL_ONE_WEEK, getString(R.string.interval_one_week));
         timeIntervals.append(INTERVAL_ONE_MONTH, getString(R.string.interval_one_month));
+
+        notifActions.clear();
+        notifActions.put(NOTIF_ACTION_STATISTICS, getString(R.string.pref_notif_action_summary_stats));
+        notifActions.put(NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS,
+                getString(R.string.pref_notif_action_summary_netop));
 
         final PreferenceManager pm = getPreferenceManager();
         pm.setSharedPreferencesMode(MODE_PRIVATE);
@@ -96,24 +107,15 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         lp.setValue(currentInterval);
         lp.setOnPreferenceChangeListener(this);
 
+        final String currentNotifAction = pm.getSharedPreferences().getString(SP_KEY_NOTIF_ACTION,
+                NOTIF_ACTION_STATISTICS);
+        p = findPreference(SP_KEY_NOTIF_ACTION);
+        p.setSummary(notifActions.get(currentNotifAction));
+
         pm.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
-        // Check if the network operator settings intent is available.
-        networkOperatorSettingsIntent = new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS);
-        boolean networkOperatorSettingsAvailable = isIntentAvailable(networkOperatorSettingsIntent);
-        if (!networkOperatorSettingsAvailable) {
-            // The previous intent action is not available with some devices:
-            // http://stackoverflow.com/a/6789616/422906
-            networkOperatorSettingsIntent = new Intent(Intent.ACTION_MAIN);
-            networkOperatorSettingsIntent.setComponent(new ComponentName("com.android.phone",
-                    "com.android.phone.NetworkSetting"));
-            networkOperatorSettingsAvailable = isIntentAvailable(networkOperatorSettingsIntent);
-        }
+        final boolean networkOperatorSettingsAvailable = IntentFactory.networkOperatorSettings(this) != null;
         pm.findPreference(SP_KEY_NETWORK_OPERATORS).setEnabled(networkOperatorSettingsAvailable);
-    }
-
-    private boolean isIntentAvailable(Intent i) {
-        return !getPackageManager().queryIntentActivities(i, 0).isEmpty();
     }
 
     @Override
@@ -130,9 +132,12 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
 
     @Override
     public boolean onPreferenceChange(Preference p, Object value) {
-        final IntListPreference lp = (IntListPreference) p;
-        final int intValue = Integer.parseInt((String) value);
-        lp.setSummary(timeIntervals.get(intValue));
+        final String k = p.getKey();
+        if (SP_KEY_TIME_INTERVAL.equals(k)) {
+            final IntListPreference lp = (IntListPreference) p;
+            final int intValue = Integer.parseInt((String) value);
+            lp.setSummary(timeIntervals.get(intValue));
+        }
 
         return true;
     }
@@ -184,6 +189,11 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     }
 
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (SP_KEY_NOTIF_ACTION.equals(key)) {
+            final String notifAction = sharedPreferences.getString(key, null);
+            findPreference(key).setSummary(notifActions.get(notifAction));
+        }
+
         Log.d(TAG, "Application preferences updated: " + "calling BackupManager.dataChanged()");
         Features.getFeature(BackupManagerFeature.class).dataChanged(this);
     }
