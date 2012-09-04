@@ -38,6 +38,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -90,6 +92,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     private int mobileNetworkType;
     private BlockingQueue<Event> pendingInsert;
     private SharedPreferences prefs;
+    private Bitmap freeLargeIcon;
+    private Bitmap orangeLargeIcon;
 
     static {
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_EDGE, R.string.network_type_edge);
@@ -216,6 +220,17 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
         prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
         prefs.registerOnSharedPreferenceChangeListener(this);
+
+        final int largeIconWidth = getResources().getDimensionPixelSize(
+                android.R.dimen.notification_large_icon_width);
+        final int largeIconHeight = getResources().getDimensionPixelSize(
+                android.R.dimen.notification_large_icon_height);
+        freeLargeIcon = Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_notify_service_free_large),
+                largeIconWidth, largeIconHeight, true);
+        orangeLargeIcon = Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_notify_service_orange_large),
+                largeIconWidth, largeIconHeight, true);
     }
 
     @Override
@@ -245,6 +260,15 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
         prefs.unregisterOnSharedPreferenceChangeListener(this);
         prefs = null;
+
+        if (freeLargeIcon != null) {
+            freeLargeIcon.recycle();
+            freeLargeIcon = null;
+        }
+        if (orangeLargeIcon != null) {
+            orangeLargeIcon.recycle();
+            orangeLargeIcon = null;
+        }
     }
 
     @Override
@@ -266,7 +290,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      * Update the status bar notification.
      */
     private void updateNotification(boolean playSound) {
-        final MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
+        MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
         if (mobOp == null || !mobileNetworkConnected) {
             stopForeground(true);
             return;
@@ -279,8 +303,9 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         final String tickerText = String.format(getString(R.string.stat_connected_to_mobile_network),
                 mobOp.toName(this));
         final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext())
-                .setSmallIcon(iconRes).setTicker(tickerText).setContentText(contentText)
-                .setContentTitle(tickerText).setContentIntent(openUIPendingIntent).setWhen(0)
+                .setSmallIcon(iconRes).setLargeIcon(getStatLargeIcon(mobOp)).setTicker(tickerText)
+                .setContentText(contentText).setContentTitle(tickerText)
+                .setContentIntent(openUIPendingIntent).setWhen(0)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
 
         if (playSound) {
@@ -298,8 +323,19 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     private int getStatIcon(MobileOperator op) {
         if (MobileOperator.FREE_MOBILE.equals(op)) {
             return R.drawable.ic_stat_notify_service_free;
+        } else if (MobileOperator.ORANGE.equals(op)) {
+            return R.drawable.ic_stat_notify_service_orange;
         }
-        return R.drawable.ic_stat_notify_service_orange;
+        return android.R.drawable.ic_dialog_alert;
+    }
+
+    private Bitmap getStatLargeIcon(MobileOperator op) {
+        if (MobileOperator.FREE_MOBILE.equals(op)) {
+            return freeLargeIcon;
+        } else if (MobileOperator.ORANGE.equals(op)) {
+            return orangeLargeIcon;
+        }
+        return null;
     }
 
     private void onDeviceShutdown() {
