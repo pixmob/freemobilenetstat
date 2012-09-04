@@ -280,7 +280,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 mobOp.toName(this));
         final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext())
                 .setSmallIcon(iconRes).setTicker(tickerText).setContentText(contentText)
-                .setContentTitle(tickerText).setContentIntent(openUIPendingIntent).setWhen(0);
+                .setContentTitle(tickerText).setContentIntent(openUIPendingIntent).setWhen(0)
+                .setPriority(NotificationCompat.PRIORITY_LOW);
 
         if (playSound) {
             final String rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND, null);
@@ -290,20 +291,15 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             }
         }
 
-        final Notification n = nBuilder.getNotification();
+        final Notification n = nBuilder.build();
         startForeground(R.string.stat_connected_to_mobile_network, n);
     }
 
     private int getStatIcon(MobileOperator op) {
-        if (!prefs.getBoolean(SP_KEY_STAT_NOTIF_ICON_GRAY, false)) {
-            if (MobileOperator.FREE_MOBILE.equals(op)) {
-                return R.drawable.ic_stat_notify_service_free;
-            }
-            if (MobileOperator.ORANGE.equals(op)) {
-                return R.drawable.ic_stat_notify_service_orange;
-            }
+        if (MobileOperator.FREE_MOBILE.equals(op)) {
+            return R.drawable.ic_stat_notify_service_free;
         }
-        return R.drawable.ic_stat_notify_service;
+        return R.drawable.ic_stat_notify_service_orange;
     }
 
     private void onDeviceShutdown() {
