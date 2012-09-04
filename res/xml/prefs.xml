@@ -38,11 +38,6 @@
             android:showSilent="true"
             android:summary="@string/pref_notif_sound_summary"
             android:title="@string/pref_notif_sound" />
-
-        <CheckBoxPreference
-            android:key="pref_icon_in_gray"
-            android:summary="@string/pref_icon_in_gray_summary"
-            android:title="@string/pref_icon_in_gray" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_about" >
         <Preference
