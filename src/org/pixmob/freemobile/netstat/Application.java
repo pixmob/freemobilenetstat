@@ -61,7 +61,9 @@ public class Application extends android.app.Application {
             Features.getFeature(SharedPreferencesSaverFeature.class).save(prefsEditor);
         }
 
-        // Enable BugSense for reporting errors.
-        BugSenseUtils.setup(this);
+        if (!DEBUG) {
+            // Enable BugSense for reporting errors.
+            BugSenseUtils.setup(this);
+        }
     }
 }
