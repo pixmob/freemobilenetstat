@@ -26,6 +26,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.provider.Settings;
 
 /**
@@ -65,6 +66,10 @@ public final class IntentFactory {
      * Get the intent to handle notification action.
      */
     public static Intent notificationAction(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            return statistics(context);
+        }
+
         final SharedPreferences p = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         final String notifAction = p.getString(SP_KEY_NOTIF_ACTION, NOTIF_ACTION_STATISTICS);
         if (NOTIF_ACTION_STATISTICS.equals(notifAction)) {

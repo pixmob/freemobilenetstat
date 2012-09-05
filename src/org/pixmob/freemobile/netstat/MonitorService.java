@@ -26,6 +26,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
+import org.pixmob.freemobile.netstat.util.IntentFactory;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -74,6 +75,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      * This intent will open the main UI.
      */
     private PendingIntent openUIPendingIntent;
+    private PendingIntent networkOperatorSettingsPendingIntent;
     private IntentFilter batteryIntentFilter;
     private PowerManager pm;
     private TelephonyManager tm;
@@ -126,6 +128,11 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // This intent is fired when the application notification is clicked.
         openUIPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_NOTIFICATION),
                 PendingIntent.FLAG_CANCEL_CURRENT);
+
+        // This intent is only available as a Jelly Bean notification action in
+        // order to open network operator settings.
+        networkOperatorSettingsPendingIntent = PendingIntent.getActivity(this, 0,
+                IntentFactory.networkOperatorSettings(this), PendingIntent.FLAG_CANCEL_CURRENT);
 
         // Watch screen light: is the screen on?
         screenMonitor = new BroadcastReceiver() {
@@ -290,7 +297,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      * Update the status bar notification.
      */
     private void updateNotification(boolean playSound) {
-        MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
+        final MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
         if (mobOp == null || !mobileNetworkConnected) {
             stopForeground(true);
             return;
@@ -303,10 +310,16 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         final String tickerText = String.format(getString(R.string.stat_connected_to_mobile_network),
                 mobOp.toName(this));
         final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext())
-                .setSmallIcon(iconRes).setLargeIcon(getStatLargeIcon(mobOp)).setTicker(tickerText)
-                .setContentText(contentText).setContentTitle(tickerText)
-                .setContentIntent(openUIPendingIntent).setWhen(0)
-                .setPriority(NotificationCompat.PRIORITY_LOW);
+                .setSmallIcon(iconRes)
+                .setLargeIcon(getStatLargeIcon(mobOp))
+                .setTicker(tickerText)
+                .setContentText(contentText)
+                .setContentTitle(tickerText)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .addAction(R.drawable.ic_stat_notify_action_network_operator_settings,
+                        getString(R.string.notif_action_network_operator_settings),
+                        networkOperatorSettingsPendingIntent).setContentIntent(openUIPendingIntent)
+                .setWhen(0);
 
         if (playSound) {
             final String rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND, null);
