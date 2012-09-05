@@ -32,17 +32,18 @@ import java.util.Map;
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.feature.BackupManagerFeature;
 import org.pixmob.freemobile.netstat.feature.Features;
-import org.pixmob.freemobile.netstat.util.IntentFactory;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
@@ -56,7 +57,6 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     private static final String SP_KEY_VERSION = "pref_version";
     private static final String SP_KEY_CHANGELOG = "pref_changelog";
     private static final String SP_KEY_LICENSE = "pref_license";
-    private static final String SP_KEY_NETWORK_OPERATORS = "pref_network_operators";
     private final SparseArray<CharSequence> timeIntervals = new SparseArray<CharSequence>(4);
     private final Map<String, String> notifActions = new HashMap<String, String>(2);
     private Intent networkOperatorSettingsIntent;
@@ -96,7 +96,6 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         pm.findPreference(SP_KEY_VERSION).setOnPreferenceClickListener(this);
         pm.findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(this);
         pm.findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(this);
-        pm.findPreference(SP_KEY_NETWORK_OPERATORS).setOnPreferenceClickListener(this);
 
         final IntListPreference lp = (IntListPreference) pm.findPreference(SP_KEY_TIME_INTERVAL);
         lp.setEntries(getValues(timeIntervals));
@@ -114,8 +113,12 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
 
         pm.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
-        final boolean networkOperatorSettingsAvailable = IntentFactory.networkOperatorSettings(this) != null;
-        pm.findPreference(SP_KEY_NETWORK_OPERATORS).setEnabled(networkOperatorSettingsAvailable);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            // Disable notification customization on Jelly Bean, as we are using
+            // notification actions.
+            final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
+            g.removePreference(pm.findPreference(SP_KEY_NOTIF_ACTION));
+        }
     }
 
     @Override
@@ -123,7 +126,6 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         findPreference(SP_KEY_VERSION).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(null);
-        findPreference(SP_KEY_NETWORK_OPERATORS).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_TIME_INTERVAL).setOnPreferenceChangeListener(null);
 
         getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
@@ -167,8 +169,6 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             openDocument("CHANGELOG.html");
         } else if (SP_KEY_LICENSE.equals(k)) {
             openDocument("LICENSE.html");
-        } else if (SP_KEY_NETWORK_OPERATORS.equals(k)) {
-            startActivity(networkOperatorSettingsIntent);
         } else if (SP_KEY_VERSION.equals(k)) {
             final String appName = getPackageName();
             try {

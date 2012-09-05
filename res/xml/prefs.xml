@@ -17,13 +17,8 @@
             android:dialogTitle="@string/pref_time_interval"
             android:key="pref_time_interval"
             android:title="@string/pref_time_interval" />
-
-        <Preference
-            android:key="pref_network_operators"
-            android:summary="@string/pref_network_operators_summary"
-            android:title="@string/pref_network_operators" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/pref_notif" >
+    <PreferenceCategory android:title="@string/pref_notif" android:key="notif_category">
         <ListPreference
             android:dialogTitle="@string/pref_notif_action"
             android:entries="@array/notif_action_titles"

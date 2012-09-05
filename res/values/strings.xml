@@ -46,14 +46,12 @@
     <string name="pref_notif_sound">Alarme sonore</string>
     <string name="pref_notif_sound_summary">Avertir lorsque l\'opérateur de réseau change</string>
     <string name="pref_time_interval">Afficher les données depuis…</string>
-    <string name="pref_network_operators">Opérateur de réseau</string>
-    <string name="pref_network_operators_summary">Choisir un opérateur de réseau</string>
     <string name="pref_notif">Notification</string>
     <string name="pref_notif_action">Action de la notification</string>
     <string name="pref_notif_action_summary_netop">Afficher les opérateurs de réseau</string>
     <string name="pref_notif_action_summary_stats">Afficher les statistiques</string>
     <string name="notif_action_statistics">Statistiques</string>
-    <string name="notif_action_network_operator_settings">Opérateurs de réseau</string>
+    <string name="notif_action_network_operator_settings">Sélectionner un opérateur</string>
     <string name="interval_since_boot">Démarrage du téléphone</string>
     <string name="interval_today">Aujourd\'hui</string>
     <string name="interval_one_week">Une semaine</string>
