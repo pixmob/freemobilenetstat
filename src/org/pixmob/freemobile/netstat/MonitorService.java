@@ -317,7 +317,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 .setContentTitle(tickerText)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .addAction(R.drawable.ic_stat_notify_action_network_operator_settings,
-                        getString(R.string.notif_action_network_operator_settings),
+                        getString(R.string.notif_action_open_network_operator_settings),
                         networkOperatorSettingsPendingIntent).setContentIntent(openUIPendingIntent)
                 .setWhen(0);
 
