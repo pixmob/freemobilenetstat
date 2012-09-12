@@ -57,6 +57,11 @@ public final class Constants {
      */
     public static final String SP_KEY_THEME = "pref_theme";
     /**
+     * {@link SharedPreferences} key: set whether notification actions should be
+     * displayed with Jelly Bean.
+     */
+    public static final String SP_KEY_ENABLE_NOTIF_ACTIONS = "pref_enable_notif_actions";
+    /**
      * Notification action: open network operator settings.
      */
     public static final String NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS = "network_operator_settings";

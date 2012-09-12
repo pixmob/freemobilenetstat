@@ -23,6 +23,7 @@ import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_UPLOAD_STATS;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
@@ -60,6 +61,7 @@ public class Application extends android.app.Application {
         defaultValues.put(SP_KEY_TIME_INTERVAL, INTERVAL_SINCE_BOOT);
         defaultValues.put(SP_KEY_UPLOAD_STATS, true);
         defaultValues.put(SP_KEY_NOTIF_ACTION, NOTIF_ACTION_STATISTICS);
+        defaultValues.put(SP_KEY_ENABLE_NOTIF_ACTIONS, true);
         defaultValues.put(SP_KEY_THEME, THEME_DEFAULT);
 
         // Set default values for preferences.
