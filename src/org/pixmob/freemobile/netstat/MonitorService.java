@@ -17,11 +17,16 @@ package org.pixmob.freemobile.netstat;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.ACTION_NOTIFICATION;
-import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_ICON_GRAY;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
+import static org.pixmob.freemobile.netstat.Constants.THEME_BW;
+import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
+import static org.pixmob.freemobile.netstat.Constants.THEME_PIE;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -62,6 +67,10 @@ import android.util.SparseIntArray;
  * @author Pixmob
  */
 public class MonitorService extends Service implements OnSharedPreferenceChangeListener {
+    /**
+     * Notification themes.
+     */
+    private static final Map<String, Theme> THEMES = new HashMap<String, Theme>(3);
     /**
      * Match network types from {@link TelephonyManager} with the corresponding
      * string.
@@ -106,11 +115,18 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_HSUPA, R.string.network_type_hsupa);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_UMTS, R.string.network_type_umts);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_UNKNOWN, R.string.network_type_unknown);
+
+        THEMES.put(THEME_DEFAULT, new Theme(R.drawable.ic_stat_notify_service_free,
+                R.drawable.ic_stat_notify_service_orange));
+        THEMES.put(THEME_BW, new Theme(R.drawable.ic_stat_notify_service_free_bw,
+                R.drawable.ic_stat_notify_service_orange_bw));
+        THEMES.put(THEME_PIE, new Theme(R.drawable.ic_stat_notify_service_free_pie,
+                R.drawable.ic_stat_notify_service_orange_pie));
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (SP_KEY_STAT_NOTIF_ICON_GRAY.equals(key)) {
+        if (SP_KEY_THEME.equals(key)) {
             updateNotification(false);
         }
     }
@@ -334,10 +350,16 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     }
 
     private int getStatIcon(MobileOperator op) {
+        final String themeKey = prefs.getString(SP_KEY_THEME, THEME_DEFAULT);
+        Theme theme = THEMES.get(themeKey);
+        if (theme == null) {
+            theme = THEMES.get(THEME_DEFAULT);
+        }
+
         if (MobileOperator.FREE_MOBILE.equals(op)) {
-            return R.drawable.ic_stat_notify_service_free;
+            return theme.freeIcon;
         } else if (MobileOperator.ORANGE.equals(op)) {
-            return R.drawable.ic_stat_notify_service_orange;
+            return theme.orangeIcon;
         }
         return android.R.drawable.ic_dialog_alert;
     }
@@ -500,6 +522,20 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             if (DEBUG) {
                 Log.d(TAG, "PendingInsert worker thread is terminated");
             }
+        }
+    }
+
+    /**
+     * Notification theme.
+     * @author Pixmob
+     */
+    private static class Theme {
+        public final int freeIcon;
+        public final int orangeIcon;
+
+        public Theme(final int freeIcon, final int orangeIcon) {
+            this.freeIcon = freeIcon;
+            this.orangeIcon = orangeIcon;
         }
     }
 }

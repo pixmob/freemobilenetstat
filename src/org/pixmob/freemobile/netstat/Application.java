@@ -20,10 +20,15 @@ import static org.pixmob.freemobile.netstat.Constants.INTERVAL_SINCE_BOOT;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_STATISTICS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AT_BOOT;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_UPLOAD_STATS;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
+import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
@@ -50,16 +55,32 @@ public class Application extends android.app.Application {
             Features.getFeature(StrictModeFeature.class).enable();
         }
 
+        final Map<String, Object> defaultValues = new HashMap<String, Object>();
+        defaultValues.put(SP_KEY_ENABLE_AT_BOOT, true);
+        defaultValues.put(SP_KEY_TIME_INTERVAL, INTERVAL_SINCE_BOOT);
+        defaultValues.put(SP_KEY_UPLOAD_STATS, true);
+        defaultValues.put(SP_KEY_NOTIF_ACTION, NOTIF_ACTION_STATISTICS);
+        defaultValues.put(SP_KEY_THEME, THEME_DEFAULT);
+
         // Set default values for preferences.
         final SharedPreferences prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
-        if (prefs.getAll().isEmpty()) {
-            final SharedPreferences.Editor prefsEditor = prefs.edit();
-            prefsEditor.putBoolean(SP_KEY_ENABLE_AT_BOOT, true);
-            prefsEditor.putInt(SP_KEY_TIME_INTERVAL, INTERVAL_SINCE_BOOT);
-            prefsEditor.putBoolean(SP_KEY_UPLOAD_STATS, true);
-            prefsEditor.putString(SP_KEY_NOTIF_ACTION, NOTIF_ACTION_STATISTICS);
-            Features.getFeature(SharedPreferencesSaverFeature.class).save(prefsEditor);
+        final SharedPreferences.Editor prefsEditor = prefs.edit();
+        for (final Map.Entry<String, Object> e : defaultValues.entrySet()) {
+            final String key = e.getKey();
+            final Object value = e.getValue();
+            if (!prefs.contains(key)) {
+                if (value instanceof Boolean) {
+                    prefsEditor.putBoolean(key, (Boolean) value);
+                }
+                if (value instanceof String) {
+                    prefsEditor.putString(key, (String) value);
+                }
+                if (value instanceof Integer) {
+                    prefsEditor.putInt(key, (Integer) value);
+                }
+            }
         }
+        Features.getFeature(SharedPreferencesSaverFeature.class).save(prefsEditor);
 
         if (!DEBUG) {
             // Enable BugSense for reporting errors.

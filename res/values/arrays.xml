@@ -5,10 +5,19 @@
         <item>@string/notif_action_statistics</item>
         <item>@string/notif_action_network_operator_settings</item>
     </string-array>
-
     <string-array name="notif_action_values">
         <item>statistics</item>
         <item>network_operator_settings</item>
+    </string-array>
+    <string-array name="theme_titles">
+        <item>@string/theme_default</item>
+        <item>@string/theme_bw</item>
+        <item>@string/theme_pie</item>
+    </string-array>
+    <string-array name="theme_values">
+        <item>default</item>
+        <item>bw</item>
+        <item>pie</item>
     </string-array>
 
 </resources>

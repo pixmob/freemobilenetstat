@@ -32,11 +32,6 @@ public final class Constants {
      */
     public static final String SP_NAME = "netstat";
     /**
-     * {@link SharedPreferences} key: use a gray icon for the status bar
-     * notification.
-     */
-    public static final String SP_KEY_STAT_NOTIF_ICON_GRAY = "pref_icon_in_gray";
-    /**
      * {@link SharedPreferences} key: start the monitor service at boot.
      */
     public static final String SP_KEY_ENABLE_AT_BOOT = "pref_enable_at_boot";
@@ -57,6 +52,10 @@ public final class Constants {
      * {@link SharedPreferences} key: set the notification action.
      */
     public static final String SP_KEY_NOTIF_ACTION = "pref_notif_action";
+    /**
+     * {@link SharedPreferences} key: set the theme.
+     */
+    public static final String SP_KEY_THEME = "pref_theme";
     /**
      * Notification action: open network operator settings.
      */
@@ -85,6 +84,18 @@ public final class Constants {
      * Notification intent action.
      */
     public static final String ACTION_NOTIFICATION = "org.pixmob.freemobile.netstat.notif";
+    /**
+     * Default theme.
+     */
+    public static final String THEME_DEFAULT = "default";
+    /**
+     * Black & white theme.
+     */
+    public static final String THEME_BW = "bw";
+    /**
+     * Pie theme.
+     */
+    public static final String THEME_PIE = "pie";
 
     private Constants() {
     }
