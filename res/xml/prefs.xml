@@ -18,13 +18,20 @@
             android:key="pref_time_interval"
             android:title="@string/pref_time_interval" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/pref_notif" android:key="notif_category">
+    <PreferenceCategory
+        android:key="notif_category"
+        android:title="@string/pref_notif" >
         <ListPreference
             android:dialogTitle="@string/pref_notif_action"
             android:entries="@array/notif_action_titles"
             android:entryValues="@array/notif_action_values"
             android:key="pref_notif_action"
             android:title="@string/pref_notif_action" />
+
+        <CheckBoxPreference
+            android:key="pref_enable_notif_actions"
+            android:summary="@string/pref_enable_notif_actions_summary"
+            android:title="@string/pref_enable_notif_actions" />
 
         <RingtonePreference
             android:key="pref_notif_sound"
@@ -33,7 +40,13 @@
             android:showSilent="true"
             android:summary="@string/pref_notif_sound_summary"
             android:title="@string/pref_notif_sound" />
-        <ListPreference android:entryValues="@array/theme_values" android:entries="@array/theme_titles" android:dialogTitle="@string/pref_theme" android:key="pref_theme" android:title="@string/pref_theme"/>
+
+        <ListPreference
+            android:dialogTitle="@string/pref_theme"
+            android:entries="@array/theme_titles"
+            android:entryValues="@array/theme_values"
+            android:key="pref_theme"
+            android:title="@string/pref_theme" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_about" >
         <Preference

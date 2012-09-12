@@ -17,6 +17,7 @@ package org.pixmob.freemobile.netstat;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.ACTION_NOTIFICATION;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
@@ -126,7 +127,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (SP_KEY_THEME.equals(key)) {
+        if (SP_KEY_THEME.equals(key) || SP_KEY_ENABLE_NOTIF_ACTIONS.equals(key)) {
             updateNotification(false);
         }
     }
@@ -326,16 +327,15 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         final String tickerText = String.format(getString(R.string.stat_connected_to_mobile_network),
                 mobOp.toName(this));
         final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext())
-                .setSmallIcon(iconRes)
-                .setLargeIcon(getStatLargeIcon(mobOp))
-                .setTicker(tickerText)
-                .setContentText(contentText)
-                .setContentTitle(tickerText)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .addAction(R.drawable.ic_stat_notify_action_network_operator_settings,
-                        getString(R.string.notif_action_open_network_operator_settings),
-                        networkOperatorSettingsPendingIntent).setContentIntent(openUIPendingIntent)
+                .setSmallIcon(iconRes).setLargeIcon(getStatLargeIcon(mobOp)).setTicker(tickerText)
+                .setContentText(contentText).setContentTitle(tickerText)
+                .setPriority(NotificationCompat.PRIORITY_LOW).setContentIntent(openUIPendingIntent)
                 .setWhen(0);
+        if (prefs.getBoolean(SP_KEY_ENABLE_NOTIF_ACTIONS, true)) {
+            nBuilder.addAction(R.drawable.ic_stat_notify_action_network_operator_settings,
+                    getString(R.string.notif_action_open_network_operator_settings),
+                    networkOperatorSettingsPendingIntent);
+        }
 
         if (playSound) {
             final String rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND, null);

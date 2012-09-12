@@ -50,6 +50,8 @@
     <string name="pref_notif_action">Action de la notification</string>
     <string name="pref_notif_action_summary_netop">Afficher les opérateurs de réseau</string>
     <string name="pref_notif_action_summary_stats">Afficher les statistiques</string>
+    <string name="pref_enable_notif_actions">Afficher les actions de notification</string>
+    <string name="pref_enable_notif_actions_summary">Inclure des raccourcis sous la notification</string>
     <string name="pref_theme">Thème</string>
     <string name="theme_default">Par défaut</string>
     <string name="theme_bw">Noir &amp; blanc</string>

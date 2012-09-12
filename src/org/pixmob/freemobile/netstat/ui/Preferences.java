@@ -21,6 +21,7 @@ import static org.pixmob.freemobile.netstat.Constants.INTERVAL_SINCE_BOOT;
 import static org.pixmob.freemobile.netstat.Constants.INTERVAL_TODAY;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_STATISTICS;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
@@ -132,6 +133,12 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             // notification actions.
             final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
             g.removePreference(pm.findPreference(SP_KEY_NOTIF_ACTION));
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            // Disable notification actions display preference before Jelly
+            // Bean.
+            final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
+            g.removePreference(pm.findPreference(SP_KEY_ENABLE_NOTIF_ACTIONS));
         }
     }
 
