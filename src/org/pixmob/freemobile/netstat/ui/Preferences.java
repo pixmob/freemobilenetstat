@@ -22,9 +22,13 @@ import static org.pixmob.freemobile.netstat.Constants.INTERVAL_TODAY;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_STATISTICS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
+import static org.pixmob.freemobile.netstat.Constants.THEME_BW;
+import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
+import static org.pixmob.freemobile.netstat.Constants.THEME_PIE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +63,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     private static final String SP_KEY_LICENSE = "pref_license";
     private final SparseArray<CharSequence> timeIntervals = new SparseArray<CharSequence>(4);
     private final Map<String, String> notifActions = new HashMap<String, String>(2);
-    private Intent networkOperatorSettingsIntent;
+    private final Map<String, Integer> themes = new HashMap<String, Integer>(3);
 
     @SuppressWarnings("deprecation")
     @Override
@@ -71,6 +75,11 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         timeIntervals.append(INTERVAL_TODAY, getString(R.string.interval_today));
         timeIntervals.append(INTERVAL_ONE_WEEK, getString(R.string.interval_one_week));
         timeIntervals.append(INTERVAL_ONE_MONTH, getString(R.string.interval_one_month));
+
+        themes.clear();
+        themes.put(THEME_DEFAULT, R.string.theme_default);
+        themes.put(THEME_BW, R.string.theme_bw);
+        themes.put(THEME_PIE, R.string.theme_pie);
 
         notifActions.clear();
         notifActions.put(NOTIF_ACTION_STATISTICS, getString(R.string.pref_notif_action_summary_stats));
@@ -106,6 +115,11 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         lp.setValue(currentInterval);
         lp.setOnPreferenceChangeListener(this);
 
+        final String currentTheme = pm.getSharedPreferences().getString(SP_KEY_THEME, THEME_DEFAULT);
+        final Preference themePref = pm.findPreference(SP_KEY_THEME);
+        themePref.setSummary(themes.get(currentTheme));
+        themePref.setOnPreferenceChangeListener(this);
+
         final String currentNotifAction = pm.getSharedPreferences().getString(SP_KEY_NOTIF_ACTION,
                 NOTIF_ACTION_STATISTICS);
         p = findPreference(SP_KEY_NOTIF_ACTION);
@@ -127,6 +141,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_TIME_INTERVAL).setOnPreferenceChangeListener(null);
+        findPreference(SP_KEY_THEME).setOnPreferenceChangeListener(null);
 
         getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         super.onDestroy();
@@ -139,6 +154,9 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             final IntListPreference lp = (IntListPreference) p;
             final int intValue = Integer.parseInt((String) value);
             lp.setSummary(timeIntervals.get(intValue));
+        }
+        if (SP_KEY_THEME.equals(k)) {
+            p.setSummary(themes.get(value));
         }
 
         return true;

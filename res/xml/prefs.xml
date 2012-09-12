@@ -33,6 +33,7 @@
             android:showSilent="true"
             android:summary="@string/pref_notif_sound_summary"
             android:title="@string/pref_notif_sound" />
+        <ListPreference android:entryValues="@array/theme_values" android:entries="@array/theme_titles" android:dialogTitle="@string/pref_theme" android:key="pref_theme" android:title="@string/pref_theme"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_about" >
         <Preference

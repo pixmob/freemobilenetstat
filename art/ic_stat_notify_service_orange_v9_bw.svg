@@ -7,42 +7,19 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="25"
-   height="25"
+   width="24"
+   height="38"
    id="svg2997"
    version="1.1"
    inkscape:version="0.48.2 r9819"
-   inkscape:export-filename="C:\dev\perso\pixmob\freemobilenetstat\res\drawable-hdpi\ic_stat_notify_service_orange.png"
+   inkscape:export-filename="C:\dev\perso\pixmob\freemobilenetstat\res\drawable-hdpi-v9\ic_stat_notify_service_orange_bw.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
-   sodipodi:docname="ic_stat_notify_service_orange.svg">
+   sodipodi:docname="ic_stat_notify_service_orange_v9_bw.svg">
   <defs
-     id="defs2999">
-    <linearGradient
-       id="linearGradient2993">
-      <stop
-         style="stop-color:#696969;stop-opacity:1;"
-         offset="0"
-         id="stop2995" />
-      <stop
-         style="stop-color:#0a0a0a;stop-opacity:1;"
-         offset="1"
-         id="stop2997" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient2993"
-       id="linearGradient2999"
-       x1="12.62159"
-       y1="1028.5258"
-       x2="12.62159"
-       y2="1039.6384"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.91568628,0,0,0.91781497,1.0664122,85.448515)" />
-  </defs>
+     id="defs2999" />
   <sodipodi:namedview
      id="base"
      pagecolor="#000000"
@@ -50,9 +27,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="15.686606"
-     inkscape:cx="13.014198"
-     inkscape:cy="1.7044113"
+     inkscape:zoom="7.919596"
+     inkscape:cx="75.585249"
+     inkscape:cy="3.7433149"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -87,28 +64,19 @@
      inkscape:label="Calque 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-1027.3622)">
-    <rect
-       style="fill:url(#linearGradient2999);fill-opacity:1"
-       id="rect2991"
-       width="21.05101"
-       height="21.017199"
-       x="1.9744949"
-       y="1029.3536"
-       rx="1.8313726"
-       ry="1.8356301" />
+     transform="translate(0,-1014.3622)">
     <text
        xml:space="preserve"
-       style="font-size:18.0055275px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#d45500;fill-opacity:1;stroke:none;font-family:Sans"
-       x="5.4959884"
-       y="1046.29"
+       style="font-size:27.08847808999999900px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#8b8b8b;fill-opacity:1;stroke:none;font-family:Sans"
+       x="1.4627904"
+       y="1043.0326"
        id="text3790"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3792"
-         x="5.4959884"
-         y="1046.29"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#d45500;font-family:HelveticaNeue;-inkscape-font-specification:HelveticaNeue">O</tspan></text>
+         x="1.4627904"
+         y="1043.0326"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#8b8b8b;font-family:HelveticaNeue;-inkscape-font-specification:HelveticaNeue;fill-opacity:1">O</tspan></text>
     <path
        style="fill:#999999;fill-opacity:1"
        d=""
