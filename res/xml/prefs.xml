@@ -58,7 +58,7 @@
             android:title="@string/pref_license" />
         <Preference
             android:key="pref_changelog"
-            android:title="@string/pref_changelog" />
+            android:title="@string/pref_changelog" android:summary="@string/pref_changelog_summary"/>
         <Preference android:summary="@string/pref_homesite_summary" android:title="@string/pref_homesite" android:key="pref_homesite"/>
     </PreferenceCategory>
 

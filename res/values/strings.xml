@@ -42,6 +42,7 @@
     <string name="pref_about">À propos</string>
     <string name="pref_version">Version</string>
     <string name="pref_changelog">Nouveautés</string>
+    <string name="pref_changelog_summary">Quoi de neuf dans cette version ?</string>
     <string name="pref_license">Licence</string>
     <string name="pref_license_summary">Code source disponible sur github.com/pixmob</string>
     <string name="pref_homesite">Statistiques nationales</string>
