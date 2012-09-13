@@ -315,26 +315,39 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      */
     private void updateNotification(boolean playSound) {
         final MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
-        if (mobOp == null || !mobileNetworkConnected) {
+        if (!mobileNetworkConnected) {
+            // Not connected to a mobile network: plane mode may be enabled.
             stopForeground(true);
             return;
         }
 
-        final String contentText = String.format(getString(R.string.mobile_network_type),
-                getString(NETWORK_TYPE_STRINGS.get(mobileNetworkType)));
+        final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext());
+        if (mobOp == null) {
+            // Connected to a foreign mobile network.
+            final String tickerText = getString(R.string.stat_connected_to_foreign_mobile_network);
+            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
 
-        final int iconRes = getStatIcon(mobOp);
-        final String tickerText = String.format(getString(R.string.stat_connected_to_mobile_network),
-                mobOp.toName(this));
-        final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext())
-                .setSmallIcon(iconRes).setLargeIcon(getStatLargeIcon(mobOp)).setTicker(tickerText)
-                .setContentText(contentText).setContentTitle(tickerText)
-                .setPriority(NotificationCompat.PRIORITY_LOW).setContentIntent(openUIPendingIntent)
-                .setWhen(0);
-        if (prefs.getBoolean(SP_KEY_ENABLE_NOTIF_ACTIONS, true)) {
-            nBuilder.addAction(R.drawable.ic_stat_notify_action_network_operator_settings,
-                    getString(R.string.notif_action_open_network_operator_settings),
-                    networkOperatorSettingsPendingIntent);
+            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText)
+                    .setSmallIcon(android.R.drawable.stat_sys_warning)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
+        } else {
+            final String tickerText = String.format(getString(R.string.stat_connected_to_mobile_network),
+                    mobOp.toName(this));
+            final String contentText = String.format(getString(R.string.mobile_network_type),
+                    getString(NETWORK_TYPE_STRINGS.get(mobileNetworkType)));
+
+            final int iconRes = getStatIcon(mobOp);
+            nBuilder.setSmallIcon(iconRes).setLargeIcon(getStatLargeIcon(mobOp)).setTicker(tickerText)
+                    .setContentText(contentText).setContentTitle(tickerText)
+                    .setPriority(NotificationCompat.PRIORITY_LOW).setContentIntent(openUIPendingIntent)
+                    .setWhen(0);
+
+            if (prefs.getBoolean(SP_KEY_ENABLE_NOTIF_ACTIONS, true)) {
+                nBuilder.addAction(R.drawable.ic_stat_notify_action_network_operator_settings,
+                        getString(R.string.notif_action_open_network_operator_settings),
+                        networkOperatorSettingsPendingIntent);
+            }
         }
 
         if (playSound) {

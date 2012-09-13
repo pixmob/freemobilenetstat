@@ -2,11 +2,12 @@
 <resources>
 
     <string name="app_name">Free Mobile Netstat</string>
+    <string name="stat_connected_to_foreign_mobile_network">Connecté à un réseau étranger</string>
     <string name="stat_connected_to_mobile_network">Connecté au réseau %s</string>
     <string name="mobile_network_type">Réseau mobile %s</string>
     <string name="network_free_mobile">Free</string>
     <string name="network_orange">Orange</string>
-    <string name="network_unknown">Inconnu</string>
+    <string name="network_unknown">inconnu</string>
     <string name="network_type_unknown">inconnu</string>
     <string name="network_type_gprs">2G (GPRS)</string>
     <string name="network_type_edge">2G (EDGE)</string>
