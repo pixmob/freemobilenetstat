@@ -59,6 +59,7 @@
         <Preference
             android:key="pref_changelog"
             android:title="@string/pref_changelog" />
+        <Preference android:summary="@string/pref_homesite_summary" android:title="@string/pref_homesite" android:key="pref_homesite"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

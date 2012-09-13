@@ -62,6 +62,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     private static final String SP_KEY_VERSION = "pref_version";
     private static final String SP_KEY_CHANGELOG = "pref_changelog";
     private static final String SP_KEY_LICENSE = "pref_license";
+    private static final String SP_KEY_HOMESITE = "pref_homesite";
     private final SparseArray<CharSequence> timeIntervals = new SparseArray<CharSequence>(4);
     private final Map<String, String> notifActions = new HashMap<String, String>(2);
     private final Map<String, Integer> themes = new HashMap<String, Integer>(3);
@@ -106,6 +107,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         pm.findPreference(SP_KEY_VERSION).setOnPreferenceClickListener(this);
         pm.findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(this);
         pm.findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(this);
+        pm.findPreference(SP_KEY_HOMESITE).setOnPreferenceClickListener(this);
 
         final IntListPreference lp = (IntListPreference) pm.findPreference(SP_KEY_TIME_INTERVAL);
         lp.setEntries(getValues(timeIntervals));
@@ -147,6 +149,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         findPreference(SP_KEY_VERSION).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(null);
+        findPreference(SP_KEY_HOMESITE).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_TIME_INTERVAL).setOnPreferenceChangeListener(null);
         findPreference(SP_KEY_THEME).setOnPreferenceChangeListener(null);
 
@@ -202,6 +205,8 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
                 startActivity(new Intent(Intent.ACTION_VIEW,
                         Uri.parse("http://play.google.com/store/apps/details?id=" + appName)));
             }
+        } else if (SP_KEY_HOMESITE.equals(k)) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://freemobilenetstat.appspot.com")));
         }
 
         return true;
