@@ -18,7 +18,7 @@
    inkscape:export-filename="C:\dev\perso\pixmob\freemobilenetstat\res\drawable-hdpi\ic_stat_notify_service_orange.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
-   sodipodi:docname="ic_stat_notify_service_orange.svg">
+   sodipodi:docname="ic_stat_notify_service_orange_bw.svg">
   <defs
      id="defs2999">
     <linearGradient
@@ -37,9 +37,9 @@
        xlink:href="#linearGradient2993"
        id="linearGradient2999"
        x1="12.62159"
-       y1="1028.5258"
+       y1="1032.8983"
        x2="12.62159"
-       y2="1039.6384"
+       y2="1051.0812"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(0.91568628,0,0,0.91781497,1.0664122,85.448515)" />
   </defs>
@@ -50,9 +50,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:zoom="15.686606"
-     inkscape:cx="13.014198"
-     inkscape:cy="1.7044113"
+     inkscape:zoom="22.184211"
+     inkscape:cx="12.833984"
+     inkscape:cy="10.827018"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -99,7 +99,7 @@
        ry="1.8356301" />
     <text
        xml:space="preserve"
-       style="font-size:18.0055275px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#d45500;fill-opacity:1;stroke:none;font-family:Sans"
+       style="font-size:18.00552749999999900px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Sans"
        x="5.4959884"
        y="1046.29"
        id="text3790"
@@ -108,7 +108,7 @@
          id="tspan3792"
          x="5.4959884"
          y="1046.29"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#d45500;font-family:HelveticaNeue;-inkscape-font-specification:HelveticaNeue">O</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:HelveticaNeue;-inkscape-font-specification:HelveticaNeue">O</tspan></text>
     <path
        style="fill:#999999;fill-opacity:1"
        d=""

@@ -92,11 +92,11 @@ public final class Constants {
     /**
      * Default theme.
      */
-    public static final String THEME_DEFAULT = "default";
+    public static final String THEME_COLOR = "color";
     /**
      * Black & white theme.
      */
-    public static final String THEME_BW = "bw";
+    public static final String THEME_DEFAULT = "bw";
     /**
      * Pie theme.
      */

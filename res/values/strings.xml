@@ -57,8 +57,8 @@
     <string name="pref_enable_notif_actions">Afficher les actions de notification</string>
     <string name="pref_enable_notif_actions_summary">Inclure des raccourcis sous la notification</string>
     <string name="pref_theme">Thème</string>
+    <string name="theme_color">Couleur</string>
     <string name="theme_default">Par défaut</string>
-    <string name="theme_bw">Noir &amp; blanc</string>
     <string name="theme_pie">Camembert</string>
     <string name="notif_action_statistics">Statistiques</string>
     <string name="notif_action_network_operator_settings">Opérateur de réseau</string>
