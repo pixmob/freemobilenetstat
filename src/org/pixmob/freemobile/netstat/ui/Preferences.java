@@ -27,7 +27,7 @@ import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
-import static org.pixmob.freemobile.netstat.Constants.THEME_BW;
+import static org.pixmob.freemobile.netstat.Constants.THEME_COLOR;
 import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
 import static org.pixmob.freemobile.netstat.Constants.THEME_PIE;
 
@@ -80,7 +80,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
 
         themes.clear();
         themes.put(THEME_DEFAULT, R.string.theme_default);
-        themes.put(THEME_BW, R.string.theme_bw);
+        themes.put(THEME_COLOR, R.string.theme_color);
         themes.put(THEME_PIE, R.string.theme_pie);
 
         notifActions.clear();
@@ -120,7 +120,11 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
 
         final String currentTheme = pm.getSharedPreferences().getString(SP_KEY_THEME, THEME_DEFAULT);
         final Preference themePref = pm.findPreference(SP_KEY_THEME);
-        themePref.setSummary(themes.get(currentTheme));
+        Integer themePrefSummary = themes.get(currentTheme);
+        if (themePrefSummary == null) {
+            themePrefSummary = themes.get(THEME_DEFAULT);
+        }
+        themePref.setSummary(themePrefSummary);
         themePref.setOnPreferenceChangeListener(this);
 
         final String currentNotifAction = pm.getSharedPreferences().getString(SP_KEY_NOTIF_ACTION,
@@ -166,7 +170,11 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             lp.setSummary(timeIntervals.get(intValue));
         }
         if (SP_KEY_THEME.equals(k)) {
-            p.setSummary(themes.get(value));
+            Integer themePrefSummary = themes.get(value);
+            if (themePrefSummary == null) {
+                themePrefSummary = themes.get(THEME_DEFAULT);
+            }
+            p.setSummary(themePrefSummary);
         }
 
         return true;

@@ -22,7 +22,7 @@ import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
-import static org.pixmob.freemobile.netstat.Constants.THEME_BW;
+import static org.pixmob.freemobile.netstat.Constants.THEME_COLOR;
 import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
 import static org.pixmob.freemobile.netstat.Constants.THEME_PIE;
 
@@ -119,8 +119,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
         THEMES.put(THEME_DEFAULT, new Theme(R.drawable.ic_stat_notify_service_free,
                 R.drawable.ic_stat_notify_service_orange));
-        THEMES.put(THEME_BW, new Theme(R.drawable.ic_stat_notify_service_free_bw,
-                R.drawable.ic_stat_notify_service_orange_bw));
+        THEMES.put(THEME_COLOR, new Theme(R.drawable.ic_stat_notify_service_free_color,
+                R.drawable.ic_stat_notify_service_orange_color));
         THEMES.put(THEME_PIE, new Theme(R.drawable.ic_stat_notify_service_free_pie,
                 R.drawable.ic_stat_notify_service_orange_pie));
     }
