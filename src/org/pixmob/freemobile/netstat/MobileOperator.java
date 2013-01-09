@@ -38,8 +38,8 @@ public enum MobileOperator {
     static {
         // MCC+MNC identifier list:
         // http://en.wikipedia.org/wiki/Mobile_Network_Code
-        FREE_MOBILE_IDENTIFIERS.add("20814");
         FREE_MOBILE_IDENTIFIERS.add("20815");
+        FREE_MOBILE_IDENTIFIERS.add("20816");
         ORANGE_IDENTIFIERS.add("20800");
         ORANGE_IDENTIFIERS.add("20801");
         ORANGE_IDENTIFIERS.add("20802");
