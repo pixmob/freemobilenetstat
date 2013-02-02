@@ -14,4 +14,8 @@
         <item name="android:background">#383840</item>
     </style>
 
+    <style name="dividerVertical"></style>
+
+    <style name="flatButton"></style>
+
 </resources>

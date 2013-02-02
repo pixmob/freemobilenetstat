@@ -4,49 +4,31 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/button_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:divider="?android:attr/dividerHorizontal"
-        android:orientation="vertical"
-        android:showDividers="beginning" >
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true" >
 
-        <LinearLayout
-            style="?android:attr/buttonBarStyle"
+        <View
+            style="@style/dividerVertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:measureWithLargestChild="true"
-            android:orientation="horizontal" >
+            android:layout_height="1dip"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="4dip"
+            android:layout_marginRight="4dip" />
 
-            <LinearLayout
-                android:id="@+id/leftSpacer"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:orientation="horizontal"
-                android:visibility="gone" />
-
-            <Button
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
-                android:maxLines="2"
-                android:onClick="onOK"
-                android:text="@android:string/ok" />
-
-            <LinearLayout
-                android:id="@+id/rightSpacer"
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.5"
-                android:orientation="horizontal"
-                android:visibility="gone" />
-        </LinearLayout>
-    </LinearLayout>
+        <Button
+            style="@style/flatButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:onClick="onOK"
+            android:text="@android:string/ok" />
+    </RelativeLayout>
 
     <WebView
         android:id="@+id/browser"
