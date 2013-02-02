@@ -53,6 +53,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.support.v4.util.LongSparseArray;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -86,6 +87,8 @@ public class SyncService extends IntentService {
         final AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         final PendingIntent syncIntent = PendingIntent.getService(context, 0, new Intent(context,
                 SyncService.class), PendingIntent.FLAG_CANCEL_CURRENT);
+        am.cancel(syncIntent);
+
         if (enabled) {
             // Set the sync period.
             long period = AlarmManager.INTERVAL_HOUR;
@@ -97,14 +100,14 @@ public class SyncService extends IntentService {
             }
 
             if (DEBUG) {
-                Log.d(TAG, "Scheduling synchronization: every " + period / 1000 / 60 + " minutes");
+                Log.d(TAG, "Scheduling synchronization: every " + (period / 1000 / 60) + " minutes");
             }
-            am.setInexactRepeating(AlarmManager.RTC, period, period, syncIntent);
+            final long syncTime = SystemClock.currentThreadTimeMillis() + period;
+            am.setInexactRepeating(AlarmManager.RTC, syncTime, period, syncIntent);
         } else {
             if (DEBUG) {
                 Log.d(TAG, "Synchronization schedule canceled");
             }
-            am.cancel(syncIntent);
         }
     }
 
