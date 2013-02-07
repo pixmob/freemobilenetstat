@@ -22,6 +22,7 @@ import static org.pixmob.httpclient.Constants.HTTP_POST;
 import static org.pixmob.httpclient.Constants.HTTP_PUT;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -68,6 +69,7 @@ public final class HttpRequestBuilder {
     private static TrustManager[] trustManagers;
     private final byte[] buffer = new byte[1024];
     private final HttpClient hc;
+    private final List<HttpRequestHandler> reqHandlers = new ArrayList<HttpRequestHandler>(2);
     private String uri;
     private String method;
     private Set<Integer> expectedStatusCodes = new HashSet<Integer>(2);
@@ -85,7 +87,14 @@ public final class HttpRequestBuilder {
         this.method = method;
     }
 
-    public HttpRequestBuilder expectStatusCode(int... statusCodes) {
+    public HttpRequestBuilder with(HttpRequestHandler handler) {
+        if (handler != null) {
+            reqHandlers.add(handler);
+        }
+        return this;
+    }
+
+    public HttpRequestBuilder expect(int... statusCodes) {
         if (statusCodes != null) {
             for (final int statusCode : statusCodes) {
                 if (statusCode < 1) {
@@ -97,28 +106,26 @@ public final class HttpRequestBuilder {
         return this;
     }
 
-    public HttpRequestBuilder setContentType(String contentType) {
-        this.contentType = contentType;
-        return this;
-    }
-
-    public HttpRequestBuilder setContent(byte[] content) {
+    public HttpRequestBuilder content(byte[] content, String contentType) {
         this.content = content;
-        contentSet = true;
+        this.contentType = contentType;
+        if (content != null) {
+            contentSet = true;
+        }
         return this;
     }
 
-    public HttpRequestBuilder setCookies(Map<String, String> cookies) {
+    public HttpRequestBuilder cookies(Map<String, String> cookies) {
         this.cookies = cookies;
         return this;
     }
 
-    public HttpRequestBuilder setHeaders(Map<String, List<String>> headers) {
+    public HttpRequestBuilder headers(Map<String, List<String>> headers) {
         this.headers = headers;
         return this;
     }
 
-    public HttpRequestBuilder addHeader(String name, String value) {
+    public HttpRequestBuilder header(String name, String value) {
         if (name == null) {
             throw new IllegalArgumentException("Header name cannot be null");
         }
@@ -137,12 +144,12 @@ public final class HttpRequestBuilder {
         return this;
     }
 
-    public HttpRequestBuilder setParameters(Map<String, String> parameters) {
+    public HttpRequestBuilder params(Map<String, String> parameters) {
         this.parameters = parameters;
         return this;
     }
 
-    public HttpRequestBuilder setParameter(String name, String value) {
+    public HttpRequestBuilder param(String name, String value) {
         if (name == null) {
             throw new IllegalArgumentException("Parameter name cannot be null");
         }
@@ -156,7 +163,7 @@ public final class HttpRequestBuilder {
         return this;
     }
 
-    public HttpRequestBuilder setCookie(String name, String value) {
+    public HttpRequestBuilder cookie(String name, String value) {
         if (name == null) {
             throw new IllegalArgumentException("Cookie name cannot be null");
         }
@@ -170,13 +177,18 @@ public final class HttpRequestBuilder {
         return this;
     }
 
-    public HttpRequestBuilder setHandler(HttpResponseHandler handler) {
+    public HttpRequestBuilder to(HttpResponseHandler handler) {
         this.handler = handler;
         return this;
     }
 
-    public HttpRequestBuilder toFile(File file) {
-        setHandler(new WriteToFileHandler(file));
+    public HttpRequestBuilder to(File file) throws IOException {
+        to(new WriteToOutputStreamHandler(new FileOutputStream(file)));
+        return this;
+    }
+
+    public HttpRequestBuilder to(OutputStream output) {
+        to(new WriteToOutputStreamHandler(output));
         return this;
     }
 
@@ -278,6 +290,16 @@ public final class HttpRequestBuilder {
                 }
             }
 
+            for (final HttpRequestHandler connHandler : reqHandlers) {
+                try {
+                    connHandler.onRequest(conn);
+                } catch (HttpClientException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new HttpClientException("Failed to prepare request to " + uri, e);
+                }
+            }
+
             conn.connect();
 
             final int statusCode = conn.getResponseCode();
@@ -317,9 +339,15 @@ public final class HttpRequestBuilder {
             if (handler != null) {
                 try {
                     handler.onResponse(resp);
+                } catch (HttpClientException e) {
+                    throw e;
                 } catch (Exception e) {
                     throw new HttpClientException("Error in response handler", e);
                 }
+            } else {
+                final File temp = File.createTempFile("httpclient-req-", ".cache", hc.getContext().getCacheDir());
+                resp.preload(temp);
+                temp.delete();
             }
             return resp;
         } catch (SocketTimeoutException e) {
@@ -327,6 +355,8 @@ public final class HttpRequestBuilder {
                 try {
                     handler.onTimeout();
                     return null;
+                } catch (HttpClientException e2) {
+                    throw e2;
                 } catch (Exception e2) {
                     throw new HttpClientException("Error in response handler", e2);
                 }
