@@ -272,9 +272,9 @@ public class SyncService extends IntentService {
             final byte[] rawJson = json.toString().getBytes("UTF-8");
             try {
                 client.post(url)
-                        .expectStatusCode(HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_NOT_FOUND)
-                        .setContent(rawJson).setContentType("application/json")
-                        .setHandler(new HttpResponseHandler() {
+                        .content(rawJson, "application/json")
+                        .expect(HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_NOT_FOUND)
+                        .to(new HttpResponseHandler() {
                             @Override
                             public void onResponse(HttpResponse response) throws Exception {
                                 final int sc = response.getStatusCode();
@@ -376,8 +376,8 @@ public class SyncService extends IntentService {
         final String url = createServerUrl("/device/" + deviceId);
         final HttpClient client = createHttpClient();
         try {
-            client.put(url).expectStatusCode(HttpURLConnection.HTTP_CREATED).setContent(rawJson)
-                    .setContentType("application/json").execute();
+            client.put(url).expect(HttpURLConnection.HTTP_CREATED)
+                    .content(rawJson, "application/json").execute();
         } catch (HttpClientException e) {
             final IOException ioe = new IOException("Failed to register device " + deviceId);
             ioe.initCause(e);
