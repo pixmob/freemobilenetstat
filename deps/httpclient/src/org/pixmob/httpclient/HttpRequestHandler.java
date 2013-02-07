@@ -15,20 +15,13 @@
  */
 package org.pixmob.httpclient;
 
+import java.net.HttpURLConnection;
+
 /**
- * This error is thrown when the {@link HttpClient} failed to execute a network
- * operation.
+ * This handler is notified before an Http request is sent.
  * @author Pixmob
  */
-public class HttpClientException extends Exception {
-    private static final long serialVersionUID = 1L;
-
-    HttpClientException(final String message, final Throwable cause) {
-        super(message);
-        initCause(cause);
-    }
-
-    HttpClientException(final String message) {
-        this(message, null);
+public class HttpRequestHandler {
+    public void onRequest(HttpURLConnection conn) throws Exception {
     }
 }
