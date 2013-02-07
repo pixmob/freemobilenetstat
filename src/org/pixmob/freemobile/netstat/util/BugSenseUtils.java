@@ -62,7 +62,7 @@ public final class BugSenseUtils {
 
             if (apiKey != null) {
                 Log.i(TAG, "BugSense (error reporting) enabled");
-                BugSenseHandler.setup(context, apiKey);
+                BugSenseHandler.initAndStartSession(context, apiKey);
             } else {
                 Log.w(TAG, "BugSense (error reporting) is DISABLED");
             }
