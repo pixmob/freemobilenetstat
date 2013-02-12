@@ -18,23 +18,6 @@ package org.pixmob.freemobile.netstat;
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
-import org.pixmob.freemobile.netstat.util.DateUtils;
-import org.pixmob.httpclient.HttpClient;
-import org.pixmob.httpclient.HttpClientException;
-import org.pixmob.httpclient.HttpResponse;
-import org.pixmob.httpclient.HttpResponseHandler;
-
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
@@ -53,16 +36,34 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.PowerManager;
-import android.os.SystemClock;
 import android.support.v4.util.LongSparseArray;
 import android.text.format.DateFormat;
 import android.util.Log;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
+import org.pixmob.freemobile.netstat.util.DateUtils;
+import org.pixmob.httpclient.HttpClient;
+import org.pixmob.httpclient.HttpClientException;
+import org.pixmob.httpclient.HttpResponse;
+import org.pixmob.httpclient.HttpResponseHandler;
+
 /**
  * This background service synchronizes data with a remote server.
+ * 
  * @author Pixmob
  */
 public class SyncService extends IntentService {
+    private static final Random RANDOM = new Random();
     private static final int SERVER_API_VERSION = 1;
     private static final String EXTRA_DEVICE_REG = "org.pixmob.freemobile.netstat.deviceReg";
     private static final long DAY_IN_MILLISECONDS = 86400 * 1000;
@@ -84,26 +85,33 @@ public class SyncService extends IntentService {
     }
 
     public static void schedule(Context context, boolean enabled) {
+        final Context appContext = context.getApplicationContext();
         final AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        final PendingIntent syncIntent = PendingIntent.getService(context, 0, new Intent(context,
-                SyncService.class), PendingIntent.FLAG_CANCEL_CURRENT);
+        final PendingIntent syncIntent =
+            PendingIntent.getService(appContext, 0, new Intent(appContext, SyncService.class),
+                PendingIntent.FLAG_CANCEL_CURRENT);
         am.cancel(syncIntent);
 
         if (enabled) {
             // Set the sync period.
             long period = AlarmManager.INTERVAL_HOUR;
-            final int syncErrors = context.getSharedPreferences(INTERNAL_SP_NAME, MODE_PRIVATE).getInt(
-                    INTERNAL_SP_KEY_SYNC_ERRORS, 0);
+            final int syncErrors =
+                context.getSharedPreferences(INTERNAL_SP_NAME, MODE_PRIVATE)
+                    .getInt(INTERNAL_SP_KEY_SYNC_ERRORS, 0);
             if (syncErrors != 0) {
                 // When there was a sync error, the sync period is longer.
                 period = AlarmManager.INTERVAL_HOUR * Math.min(syncErrors, MAX_SYNC_ERRORS);
             }
 
+            // Add a random time to prevent concurrent requests for the server.
+            final long fuzz = RANDOM.nextInt(1000 * 60 * 30);
+            period += fuzz;
+
             if (DEBUG) {
-                Log.d(TAG, "Scheduling synchronization: every " + (period / 1000 / 60) + " minutes");
+                Log.d(TAG, "Scheduling synchronization: next in " + (period / 1000 / 60) + " minutes");
             }
-            final long syncTime = SystemClock.currentThreadTimeMillis() + period;
-            am.setInexactRepeating(AlarmManager.RTC, syncTime, period, syncIntent);
+            final long syncTime = System.currentTimeMillis() + period;
+            am.set(AlarmManager.RTC_WAKEUP, syncTime, syncIntent);
         } else {
             if (DEBUG) {
                 Log.d(TAG, "Synchronization schedule canceled");
@@ -160,14 +168,14 @@ public class SyncService extends IntentService {
             // Increment sync errors.
             final int syncErrors = internalPrefs.getInt(INTERNAL_SP_KEY_SYNC_ERRORS, 0);
             internalPrefsEditor.putInt(INTERNAL_SP_KEY_SYNC_ERRORS, syncErrors + 1).commit();
-
-            // Reschedule this service according to the sync error count.
-            schedule(this, true);
         } finally {
             if (db != null) {
                 db.close();
             }
             wl.release();
+
+            // Reschedule this service according to the sync error count.
+            schedule(this, true);
         }
 
         Log.i(TAG, "Statistics upload done");
@@ -178,14 +186,15 @@ public class SyncService extends IntentService {
 
         Log.i(TAG, "Initializing statistics before uploading");
 
-        final LongSparseArray<DailyStat> stats = new LongSparseArray<DailyStat>(15);
-        final Set<Long> uploadedStats = new HashSet<Long>(15);
+        final LongSparseArray< DailyStat> stats = new LongSparseArray< DailyStat>(15);
+        final Set< Long> uploadedStats = new HashSet< Long>(15);
         final long statTimestampStart = now - 7 * DAY_IN_MILLISECONDS;
 
         // Get pending uploads.
-        Cursor c = db.query("daily_stat", new String[] { "stat_timestamp", "orange", "free_mobile", "sync" },
-                "stat_timestamp>=? AND stat_timestamp<?", new String[] { String.valueOf(statTimestampStart),
-                        String.valueOf(now) }, null, null, null);
+        Cursor c =
+            db.query("daily_stat", new String[] {"stat_timestamp", "orange", "free_mobile", "sync" },
+                "stat_timestamp>=? AND stat_timestamp<?", new String[] {String.valueOf(statTimestampStart),
+                    String.valueOf(now) }, null, null, null);
         try {
             while (c.moveToNext()) {
                 final long d = c.getLong(0);
@@ -227,7 +236,7 @@ public class SyncService extends IntentService {
         if (DEBUG) {
             Log.d(TAG, "Cleaning up upload database");
         }
-        db.delete("daily_stat", "stat_timestamp<?", new String[] { String.valueOf(statTimestampStart) });
+        db.delete("daily_stat", "stat_timestamp<?", new String[] {String.valueOf(statTimestampStart) });
 
         // Check if there are any statistics to upload.
         final int statsLen = stats.size();
@@ -263,48 +272,45 @@ public class SyncService extends IntentService {
                 throw ioe;
             }
 
-            final String url = createServerUrl("/device/" + deviceId + "/daily/"
-                    + DateFormat.format("yyyyMMdd", d));
+            final String url =
+                createServerUrl("/device/" + deviceId + "/daily/" + DateFormat.format("yyyyMMdd", d));
             if (DEBUG) {
                 Log.d(TAG, "Uploading statistics for " + DateUtils.formatDate(d) + " to: " + url);
             }
 
             final byte[] rawJson = json.toString().getBytes("UTF-8");
             try {
-                client.post(url)
-                        .content(rawJson, "application/json")
-                        .expect(HttpURLConnection.HTTP_OK, HttpURLConnection.HTTP_NOT_FOUND)
-                        .to(new HttpResponseHandler() {
-                            @Override
-                            public void onResponse(HttpResponse response) throws Exception {
-                                final int sc = response.getStatusCode();
-                                if (HttpURLConnection.HTTP_NOT_FOUND == sc) {
-                                    // Check if the device has just been
-                                    // registered.
-                                    if (deviceWasRegistered) {
-                                        throw new IOException("Failed to upload statistics");
-                                    } else {
-                                        // Got 404: the device does not exist.
-                                        // We need to register this device.
-                                        registerDevice(deviceId);
+                client.post(url).content(rawJson, "application/json").expect(HttpURLConnection.HTTP_OK,
+                    HttpURLConnection.HTTP_NOT_FOUND).to(new HttpResponseHandler() {
+                    @Override
+                    public void onResponse(HttpResponse response) throws Exception {
+                        final int sc = response.getStatusCode();
+                        if (HttpURLConnection.HTTP_NOT_FOUND == sc) {
+                            // Check if the device has just been
+                            // registered.
+                            if (deviceWasRegistered) {
+                                throw new IOException("Failed to upload statistics");
+                            } else {
+                                // Got 404: the device does not exist.
+                                // We need to register this device.
+                                registerDevice(deviceId);
 
-                                        // Restart this service.
-                                        startService(new Intent(getApplicationContext(), SyncService.class)
-                                                .putExtra(EXTRA_DEVICE_REG, true));
-                                    }
-                                } else if (HttpURLConnection.HTTP_OK == sc) {
-                                    // Update upload database.
-                                    cv.clear();
-                                    cv.put("sync", SYNC_UPLOADED);
-                                    db.update("daily_stat", cv, "stat_timestamp=?",
-                                            new String[] { String.valueOf(d) });
-
-                                    if (DEBUG) {
-                                        Log.d(TAG, "Upload done for " + DateUtils.formatDate(d));
-                                    }
-                                }
+                                // Restart this service.
+                                startService(new Intent(getApplicationContext(), SyncService.class).putExtra(
+                                    EXTRA_DEVICE_REG, true));
                             }
-                        }).execute();
+                        } else if (HttpURLConnection.HTTP_OK == sc) {
+                            // Update upload database.
+                            cv.clear();
+                            cv.put("sync", SYNC_UPLOADED);
+                            db.update("daily_stat", cv, "stat_timestamp=?", new String[] {String.valueOf(d) });
+
+                            if (DEBUG) {
+                                Log.d(TAG, "Upload done for " + DateUtils.formatDate(d));
+                            }
+                        }
+                    }
+                }).execute();
             } catch (HttpClientException e) {
                 final IOException ioe = new IOException("Failed to send request with statistics");
                 ioe.initCause(e);
@@ -321,10 +327,11 @@ public class SyncService extends IntentService {
             Log.d(TAG, "Computing statistics for " + DateUtils.formatDate(date));
         }
 
-        final Cursor c = getContentResolver().query(Events.CONTENT_URI,
-                new String[] { Events.TIMESTAMP, Events.MOBILE_OPERATOR },
+        final Cursor c =
+            getContentResolver().query(Events.CONTENT_URI,
+                new String[] {Events.TIMESTAMP, Events.MOBILE_OPERATOR },
                 Events.TIMESTAMP + ">=? AND " + Events.TIMESTAMP + "<=?",
-                new String[] { String.valueOf(date), String.valueOf(date + 86400 * 1000) }, Events.TIMESTAMP);
+                new String[] {String.valueOf(date), String.valueOf(date + 86400 * 1000) }, Events.TIMESTAMP);
         try {
             long t0 = 0;
             MobileOperator op0 = null;
@@ -376,8 +383,7 @@ public class SyncService extends IntentService {
         final String url = createServerUrl("/device/" + deviceId);
         final HttpClient client = createHttpClient();
         try {
-            client.put(url).expect(HttpURLConnection.HTTP_CREATED)
-                    .content(rawJson, "application/json").execute();
+            client.put(url).expect(HttpURLConnection.HTTP_CREATED).content(rawJson, "application/json").execute();
         } catch (HttpClientException e) {
             final IOException ioe = new IOException("Failed to register device " + deviceId);
             ioe.initCause(e);
@@ -418,7 +424,7 @@ public class SyncService extends IntentService {
 
     private String getDeviceId() {
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
-        final Cursor c = db.query("device", new String[] { "device_id" }, null, null, null, null, null);
+        final Cursor c = db.query("device", new String[] {"device_id" }, null, null, null, null, null);
         String deviceId = null;
         try {
             if (c.moveToNext()) {
@@ -458,7 +464,8 @@ public class SyncService extends IntentService {
         @Override
         public void onCreate(SQLiteDatabase db) {
             if (!db.isReadOnly()) {
-                String req = "CREATE TABLE daily_stat (stat_timestamp TIMESTAMP PRIMARY KEY, "
+                String req =
+                    "CREATE TABLE daily_stat (stat_timestamp TIMESTAMP PRIMARY KEY, "
                         + "orange INTEGER NOT NULL, free_mobile INTEGER NOT NULL, sync INTEGER NOT NULL)";
                 db.execSQL(req);
 
