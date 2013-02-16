@@ -136,6 +136,20 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     public void onCreate() {
         super.onCreate();
 
+        prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+
+        final int largeIconWidth = getResources().getDimensionPixelSize(
+                android.R.dimen.notification_large_icon_width);
+        final int largeIconHeight = getResources().getDimensionPixelSize(
+                android.R.dimen.notification_large_icon_height);
+        freeLargeIcon = Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_notify_service_free_large),
+                largeIconWidth, largeIconHeight, true);
+        orangeLargeIcon = Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_notify_service_orange_large),
+                largeIconWidth, largeIconHeight, true);
+
         // Initialize and start a worker thread for inserting rows into the
         // application database.
         final Context c = getApplicationContext();
@@ -241,20 +255,6 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // http://stackoverflow.com/q/5076410/422906
         shutdownIntentFilter.addAction("android.intent.action.QUICKBOOT_POWEROFF");
         registerReceiver(shutdownMonitor, shutdownIntentFilter);
-
-        prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
-        prefs.registerOnSharedPreferenceChangeListener(this);
-
-        final int largeIconWidth = getResources().getDimensionPixelSize(
-                android.R.dimen.notification_large_icon_width);
-        final int largeIconHeight = getResources().getDimensionPixelSize(
-                android.R.dimen.notification_large_icon_height);
-        freeLargeIcon = Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_notify_service_free_large),
-                largeIconWidth, largeIconHeight, true);
-        orangeLargeIcon = Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_notify_service_orange_large),
-                largeIconWidth, largeIconHeight, true);
     }
 
     @Override
@@ -414,7 +414,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      * This method is called when the phone service state is updated.
      */
     private boolean onPhoneStateUpdated() {
-        mobileOperatorId = tm.getNetworkOperator();
+        mobileOperatorId = tm != null ? tm.getNetworkOperator() : null;
         if (TextUtils.isEmpty(mobileOperatorId)) {
             mobileOperatorId = null;
         }
