@@ -25,15 +25,6 @@ import static org.pixmob.freemobile.netstat.Constants.TAG;
 import static org.pixmob.freemobile.netstat.Constants.THEME_COLOR;
 import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
 import static org.pixmob.freemobile.netstat.Constants.THEME_PIE;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
-import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
-import org.pixmob.freemobile.netstat.util.IntentFactory;
-
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -51,6 +42,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.Process;
@@ -62,19 +54,27 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseIntArray;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+
+import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
+import org.pixmob.freemobile.netstat.util.IntentFactory;
+
 /**
- * This foreground service is monitoring phone state and battery level. A
- * notification shows which mobile network is the phone is connected to.
+ * This foreground service is monitoring phone state and battery level. A notification shows which mobile network is the
+ * phone is connected to.
+ * 
  * @author Pixmob
  */
 public class MonitorService extends Service implements OnSharedPreferenceChangeListener {
     /**
      * Notification themes.
      */
-    private static final Map<String, Theme> THEMES = new HashMap<String, Theme>(3);
+    private static final Map< String, Theme> THEMES = new HashMap< String, Theme>(3);
     /**
-     * Match network types from {@link TelephonyManager} with the corresponding
-     * string.
+     * Match network types from {@link TelephonyManager} with the corresponding string.
      */
     private static final SparseIntArray NETWORK_TYPE_STRINGS = new SparseIntArray(8);
     /**
@@ -102,7 +102,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     private String mobileOperatorId;
     private boolean mobileNetworkConnected;
     private int mobileNetworkType;
-    private BlockingQueue<Event> pendingInsert;
+    private BlockingQueue< Event> pendingInsert;
     private SharedPreferences prefs;
     private Bitmap freeLargeIcon;
     private Bitmap orangeLargeIcon;
@@ -118,11 +118,11 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_UNKNOWN, R.string.network_type_unknown);
 
         THEMES.put(THEME_DEFAULT, new Theme(R.drawable.ic_stat_notify_service_free,
-                R.drawable.ic_stat_notify_service_orange));
+            R.drawable.ic_stat_notify_service_orange));
         THEMES.put(THEME_COLOR, new Theme(R.drawable.ic_stat_notify_service_free_color,
-                R.drawable.ic_stat_notify_service_orange_color));
+            R.drawable.ic_stat_notify_service_orange_color));
         THEMES.put(THEME_PIE, new Theme(R.drawable.ic_stat_notify_service_free_pie,
-                R.drawable.ic_stat_notify_service_orange_pie));
+            R.drawable.ic_stat_notify_service_orange_pie));
     }
 
     @Override
@@ -139,16 +139,18 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
         prefs.registerOnSharedPreferenceChangeListener(this);
 
-        final int largeIconWidth = getResources().getDimensionPixelSize(
-                android.R.dimen.notification_large_icon_width);
-        final int largeIconHeight = getResources().getDimensionPixelSize(
-                android.R.dimen.notification_large_icon_height);
-        freeLargeIcon = Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_notify_service_free_large),
-                largeIconWidth, largeIconHeight, true);
-        orangeLargeIcon = Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_notify_service_orange_large),
-                largeIconWidth, largeIconHeight, true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            final int largeIconWidth =
+                getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_width);
+            final int largeIconHeight =
+                getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
+            freeLargeIcon =
+                Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.ic_stat_notify_service_free_large), largeIconWidth, largeIconHeight, true);
+            orangeLargeIcon =
+                Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.ic_stat_notify_service_orange_large), largeIconWidth, largeIconHeight, true);
+        }
 
         pm = (PowerManager) getSystemService(POWER_SERVICE);
         tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
@@ -157,17 +159,19 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // Initialize and start a worker thread for inserting rows into the
         // application database.
         final Context c = getApplicationContext();
-        pendingInsert = new ArrayBlockingQueue<Event>(8);
+        pendingInsert = new ArrayBlockingQueue< Event>(8);
         new PendingInsertWorker(c, pendingInsert).start();
 
         // This intent is fired when the application notification is clicked.
-        openUIPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_NOTIFICATION),
-                PendingIntent.FLAG_CANCEL_CURRENT);
+        openUIPendingIntent =
+            PendingIntent
+                .getBroadcast(this, 0, new Intent(ACTION_NOTIFICATION), PendingIntent.FLAG_CANCEL_CURRENT);
 
         // This intent is only available as a Jelly Bean notification action in
         // order to open network operator settings.
-        networkOperatorSettingsPendingIntent = PendingIntent.getActivity(this, 0,
-                IntentFactory.networkOperatorSettings(this), PendingIntent.FLAG_CANCEL_CURRENT);
+        networkOperatorSettingsPendingIntent =
+            PendingIntent.getActivity(this, 0, IntentFactory.networkOperatorSettings(this),
+                PendingIntent.FLAG_CANCEL_CURRENT);
 
         // Watch screen light: is the screen on?
         screenMonitor = new BroadcastReceiver() {
@@ -220,7 +224,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                     }
                 }
 
-                mobileNetworkConnected = serviceState != null && serviceState.getState() == ServiceState.STATE_IN_SERVICE;
+                mobileNetworkConnected =
+                    serviceState != null && serviceState.getState() == ServiceState.STATE_IN_SERVICE;
                 final boolean phoneStateUpdated = onPhoneStateUpdated();
                 if (phoneStateUpdated) {
                     updateEventDatabase();
@@ -228,9 +233,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 updateNotification(phoneStateUpdated);
             }
         };
-
-        tm.listen(phoneMonitor, PhoneStateListener.LISTEN_SERVICE_STATE
-                | PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
+        tm.listen(phoneMonitor, PhoneStateListener.LISTEN_SERVICE_STATE |
+            PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
 
         // Watch battery level.
         batteryMonitor = new BroadcastReceiver() {
@@ -327,26 +331,25 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             final String tickerText = getString(R.string.stat_connected_to_foreign_mobile_network);
             final String contentText = getString(R.string.notif_action_open_network_operator_settings);
 
-            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText)
-                    .setSmallIcon(android.R.drawable.stat_sys_warning)
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
+            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
+                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
         } else {
-            final String tickerText = String.format(getString(R.string.stat_connected_to_mobile_network),
-                    mobOp.toName(this));
-            final String contentText = String.format(getString(R.string.mobile_network_type),
-                    getString(NETWORK_TYPE_STRINGS.get(mobileNetworkType)));
+            final String tickerText =
+                String.format(getString(R.string.stat_connected_to_mobile_network), mobOp.toName(this));
+            final String contentText =
+                String.format(getString(R.string.mobile_network_type), getString(NETWORK_TYPE_STRINGS
+                    .get(mobileNetworkType)));
 
             final int iconRes = getStatIcon(mobOp);
             nBuilder.setSmallIcon(iconRes).setLargeIcon(getStatLargeIcon(mobOp)).setTicker(tickerText)
-                    .setContentText(contentText).setContentTitle(tickerText)
-                    .setPriority(NotificationCompat.PRIORITY_LOW).setContentIntent(openUIPendingIntent)
-                    .setWhen(0);
+                .setContentText(contentText).setContentTitle(tickerText).setPriority(
+                    NotificationCompat.PRIORITY_LOW).setContentIntent(openUIPendingIntent).setWhen(0);
 
             if (prefs.getBoolean(SP_KEY_ENABLE_NOTIF_ACTIONS, true)) {
                 nBuilder.addAction(R.drawable.ic_stat_notify_action_network_operator_settings,
-                        getString(R.string.notif_action_open_network_operator_settings),
-                        networkOperatorSettingsPendingIntent);
+                    getString(R.string.notif_action_open_network_operator_settings),
+                    networkOperatorSettingsPendingIntent);
             }
         }
 
@@ -420,16 +423,15 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         }
 
         // Prevent duplicated inserts.
-        if (lastMobileNetworkConnected != null && lastMobileOperatorId != null
-                && lastMobileNetworkConnected.booleanValue() == mobileNetworkConnected
-                && lastMobileOperatorId.equals(mobileOperatorId)) {
+        if (lastMobileNetworkConnected != null && lastMobileOperatorId != null &&
+            lastMobileNetworkConnected.booleanValue() == mobileNetworkConnected &&
+            lastMobileOperatorId.equals(mobileOperatorId)) {
             return false;
         }
         lastMobileNetworkConnected = mobileNetworkConnected;
         lastMobileOperatorId = mobileOperatorId;
 
-        Log.i(TAG, "Phone state updated: operator=" + mobileOperatorId + "; connected="
-                + mobileNetworkConnected);
+        Log.i(TAG, "Phone state updated: operator=" + mobileOperatorId + "; connected=" + mobileNetworkConnected);
         return true;
     }
 
@@ -466,16 +468,15 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     }
 
     /**
-     * This internal thread is responsible for inserting data into the
-     * application database. This thread will prevent the main loop from being
-     * used for interacting with the database, which could cause
-     * "Application Not Responding" dialogs.
+     * This internal thread is responsible for inserting data into the application database. This thread will prevent
+     * the main loop from being used for interacting with the database, which could cause "Application Not Responding"
+     * dialogs.
      */
     private static class PendingInsertWorker extends Thread {
         private final Context context;
-        private final BlockingQueue<Event> pendingInsert;
+        private final BlockingQueue< Event> pendingInsert;
 
-        public PendingInsertWorker(final Context context, final BlockingQueue<Event> pendingInsert) {
+        public PendingInsertWorker(final Context context, final BlockingQueue< Event> pendingInsert) {
             super("FreeMobileNetstat/PendingInsert");
             setDaemon(true);
             this.context = context;
@@ -540,6 +541,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
     /**
      * Notification theme.
+     * 
      * @author Pixmob
      */
     private static class Theme {
