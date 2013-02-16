@@ -150,6 +150,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_notify_service_orange_large),
                 largeIconWidth, largeIconHeight, true);
 
+        pm = (PowerManager) getSystemService(POWER_SERVICE);
+        tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+
         // Initialize and start a worker thread for inserting rows into the
         // application database.
         final Context c = getApplicationContext();
@@ -179,7 +183,6 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         registerReceiver(screenMonitor, screenIntentFilter);
 
         // Watch Wi-Fi connections.
-        cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         connectionMonitor = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -226,7 +229,6 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             }
         };
 
-        tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         tm.listen(phoneMonitor, PhoneStateListener.LISTEN_SERVICE_STATE
                 | PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
 
@@ -240,8 +242,6 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
         batteryIntentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(batteryMonitor, batteryIntentFilter);
-
-        pm = (PowerManager) getSystemService(POWER_SERVICE);
 
         shutdownMonitor = new BroadcastReceiver() {
             @Override
