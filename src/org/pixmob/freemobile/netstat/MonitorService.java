@@ -190,7 +190,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             public void onServiceStateChanged(ServiceState serviceState) {
                 if (!DEBUG) {
                     // Check if the SIM card is compatible.
-                    if (TelephonyManager.SIM_STATE_READY == tm.getSimState()) {
+                    if (tm != null && TelephonyManager.SIM_STATE_READY == tm.getSimState()) {
                         final String rawMobOp = tm.getSimOperator();
                         final MobileOperator mobOp = MobileOperator.fromString(rawMobOp);
                         if (!MobileOperator.FREE_MOBILE.equals(mobOp)) {
@@ -203,7 +203,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                     }
                 }
 
-                mobileNetworkConnected = serviceState.getState() == ServiceState.STATE_IN_SERVICE;
+                mobileNetworkConnected = serviceState != null && serviceState.getState() == ServiceState.STATE_IN_SERVICE;
                 final boolean phoneStateUpdated = onPhoneStateUpdated();
                 if (phoneStateUpdated) {
                     updateEventDatabase();
