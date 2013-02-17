@@ -277,12 +277,12 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // Stop listening to system events.
         unregisterReceiver(screenMonitor);
         tm.listen(phoneMonitor, PhoneStateListener.LISTEN_NONE);
-        tm = null;
         unregisterReceiver(connectionMonitor);
-        cm = null;
         unregisterReceiver(batteryMonitor);
         unregisterReceiver(shutdownMonitor);
 
+        tm = null;
+        cm = null;
         pm = null;
 
         // Remove the status bar notification.
@@ -443,7 +443,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     private void updateEventDatabase() {
         final Event e = new Event();
         e.timestamp = System.currentTimeMillis();
-        e.screenOn = pm.isScreenOn();
+        e.screenOn = pm != null ? pm.isScreenOn() : false;
         e.batteryLevel = getBatteryLevel();
         e.wifiConnected = Boolean.TRUE.equals(lastWifiConnected);
         e.mobileConnected = powerOn ? Boolean.TRUE.equals(lastMobileNetworkConnected) : false;
