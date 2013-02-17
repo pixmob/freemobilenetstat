@@ -337,9 +337,12 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         } else {
             final String tickerText =
                 String.format(getString(R.string.stat_connected_to_mobile_network), mobOp.toName(this));
+            Integer networkTypeRes = NETWORK_TYPE_STRINGS.get(mobileNetworkType);
+            if(networkTypeRes == null) {
+                networkTypeRes = R.string.network_type_unknown;
+            }
             final String contentText =
-                String.format(getString(R.string.mobile_network_type), getString(NETWORK_TYPE_STRINGS
-                    .get(mobileNetworkType)));
+                String.format(getString(R.string.mobile_network_type), getString(networkTypeRes));
 
             final int iconRes = getStatIcon(mobOp);
             nBuilder.setSmallIcon(iconRes).setLargeIcon(getStatLargeIcon(mobOp)).setTicker(tickerText)
