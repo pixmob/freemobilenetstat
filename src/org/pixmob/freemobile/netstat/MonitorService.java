@@ -115,6 +115,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_HSPAP, R.string.network_type_hspap);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_HSUPA, R.string.network_type_hsupa);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_UMTS, R.string.network_type_umts);
+        NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_LTE, R.string.network_type_lte);
+        NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_CDMA, R.string.network_type_cdma);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_UNKNOWN, R.string.network_type_unknown);
 
         THEMES.put(THEME_DEFAULT, new Theme(R.drawable.ic_stat_notify_service_free,
