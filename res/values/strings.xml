@@ -18,6 +18,7 @@
     <string name="network_type_hspap">3G+ (HSPAP)</string>
     <string name="network_type_cdma">CDMA</string>
     <string name="network_type_lte">4G (LTE)</string>
+    <string name="network_free_femtocell">%s - Femtocell</string>
     <string name="service_monitor">Service de suivi de la connexion</string>
     <string name="stat_mobile_network">Réseau actuel</string>
     <string name="stat_mobile_code">MCC+MNC</string>
@@ -26,6 +27,7 @@
     <string name="stat_battery">Batterie</string>
     <string name="stat_on_orange">Sur Orange</string>
     <string name="stat_on_free_mobile">Sur Free</string>
+    <string name="stat_on_femtocell">Sur Femtocell</string>
     <string name="days">j</string>
     <string name="hours">h</string>
     <string name="minutes">m</string>

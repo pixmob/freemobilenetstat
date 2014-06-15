@@ -25,6 +25,17 @@ import static org.pixmob.freemobile.netstat.Constants.TAG;
 import static org.pixmob.freemobile.netstat.Constants.THEME_COLOR;
 import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
 import static org.pixmob.freemobile.netstat.Constants.THEME_PIE;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+
+import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
+import org.pixmob.freemobile.netstat.util.IntentFactory;
+
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -47,20 +58,19 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.Process;
 import android.support.v4.app.NotificationCompat;
+import android.telephony.CellIdentityGsm;
+import android.telephony.CellIdentityWcdma;
+import android.telephony.CellInfo;
+import android.telephony.CellInfoGsm;
+import android.telephony.CellInfoWcdma;
+import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
+import android.telephony.gsm.GsmCellLocation;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseIntArray;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
-import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
-import org.pixmob.freemobile.netstat.util.IntentFactory;
 
 /**
  * This foreground service is monitoring phone state and battery level. A notification shows which mobile network is the
@@ -81,6 +91,9 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      * Special data used for terminating the PendingInsert worker thread.
      */
     private static final Event STOP_PENDING_CONTENT_MARKER = new Event();
+    
+    private static final String FREE_MOBILE_FEMTOCELL_LAC_CODE = "98";
+    
     /**
      * This intent will open the main UI.
      */
@@ -100,6 +113,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     private boolean powerOn = true;
     private String lastMobileOperatorId;
     private String mobileOperatorId;
+    private boolean isFemtocell;
+    private Boolean lastIsFemtocell;
     private boolean mobileNetworkConnected;
     private int mobileNetworkType;
     private BlockingQueue< Event> pendingInsert;
@@ -107,7 +122,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     private Bitmap freeLargeIcon;
     private Bitmap orangeLargeIcon;
 
-    static {
+	static {
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_EDGE, R.string.network_type_edge);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_GPRS, R.string.network_type_gprs);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_HSDPA, R.string.network_type_hsdpa);
@@ -134,7 +149,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         }
     }
 
-    @Override
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	@Override
     public void onCreate() {
         super.onCreate();
 
@@ -228,6 +244,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
                 mobileNetworkConnected =
                     serviceState != null && serviceState.getState() == ServiceState.STATE_IN_SERVICE;
+                
+                //check for femtocell
                 final boolean phoneStateUpdated = onPhoneStateUpdated();
                 if (phoneStateUpdated) {
                     updateEventDatabase();
@@ -343,9 +361,12 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             if(networkTypeRes == null) {
                 networkTypeRes = R.string.network_type_unknown;
             }
-            final String contentText =
+            String contentText =
                 String.format(getString(R.string.mobile_network_type), getString(networkTypeRes));
 
+            if ((mobOp == MobileOperator.FREE_MOBILE) && (isFemtocell)) 
+            	contentText = getString(R.string.network_free_femtocell, contentText);
+            
             final int iconRes = getStatIcon(mobOp);
             nBuilder.setSmallIcon(iconRes).setLargeIcon(getStatLargeIcon(mobOp)).setTicker(tickerText)
                 .setContentText(contentText).setContentTitle(tickerText).setPriority(
@@ -421,24 +442,83 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     /**
      * This method is called when the phone service state is updated.
      */
-    private boolean onPhoneStateUpdated() {
+	private boolean onPhoneStateUpdated() {
         mobileOperatorId = tm != null ? tm.getNetworkOperator() : null;
         if (TextUtils.isEmpty(mobileOperatorId)) {
             mobileOperatorId = null;
         }
 
+        updateFemtocellStatus();
+        
         // Prevent duplicated inserts.
-        if (lastMobileNetworkConnected != null && lastMobileOperatorId != null &&
-            lastMobileNetworkConnected.booleanValue() == mobileNetworkConnected &&
-            lastMobileOperatorId.equals(mobileOperatorId)) {
+        if (lastMobileNetworkConnected != null && lastMobileOperatorId != null
+        	&& lastIsFemtocell != null
+            && lastMobileNetworkConnected.booleanValue() == mobileNetworkConnected
+            && lastIsFemtocell == isFemtocell 
+            && lastMobileOperatorId.equals(mobileOperatorId)) {
             return false;
         }
         lastMobileNetworkConnected = mobileNetworkConnected;
         lastMobileOperatorId = mobileOperatorId;
-
-        Log.i(TAG, "Phone state updated: operator=" + mobileOperatorId + "; connected=" + mobileNetworkConnected);
+        lastIsFemtocell = isFemtocell;
+        
+        Log.i(TAG, "Phone state updated: operator=" + mobileOperatorId + "; connected=" + mobileNetworkConnected + "; femtocell=" + isFemtocell);
         return true;
     }
+
+	/**
+	 * Check if we are connected on a Free Mobile femtocell
+	 */
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+	private void updateFemtocellStatus() {
+		Integer lac = null;
+        if (tm != null) {
+        	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        	
+        		//get the cell list
+        		List<CellInfo> cellInfos = tm.getAllCellInfo();
+        		for (CellInfo cellInfo : cellInfos) {
+        			
+        			if (cellInfo.isRegistered()) { //we use only registered cells
+	        			if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) 
+	        					&& (cellInfo instanceof CellInfoWcdma)) { //manage the wcdma cell case
+	        				Log.d(TAG, "We got a WCDMA cell");
+	        				CellIdentityWcdma ci = ((CellInfoWcdma) cellInfo).getCellIdentity();
+	        				if (ci != null) { //save the LAC and exit loop
+	        					lac = ci.getLac();
+	        					Log.d(TAG, "We got the LAC - exit loop");
+	        					break;
+	        				}
+	        				
+	        			} else if (cellInfo instanceof CellInfoGsm) { //test the gsm case
+	        				CellIdentityGsm ci = ((CellInfoGsm) cellInfo).getCellIdentity();
+	        				Log.d(TAG, "We got a CDMA cell");
+	        				if (ci != null) { //save the LAC and exit loop
+	        					lac = ci.getLac();
+	        					Log.d(TAG, "We got the LAC - exit loop");
+	        					break;
+	        				}
+	        			}
+	        			
+        			} else
+        				Log.d(TAG, "Unregistered cell - skipping");
+        		}
+        		
+        	} else { //use old API
+        		CellLocation cellLocation = tm.getCellLocation(); //cell location might be null... handle with care
+        		if ((cellLocation != null) && (cellLocation instanceof GsmCellLocation)) {
+        			Log.d(TAG, "We got a old GSM cell with LAC");
+        			lac = ((GsmCellLocation) cellLocation).getLac();
+        		}
+        	}
+        }
+        Log.d(TAG, "LAC value : " + lac);
+        if (lac != null) {
+        	String lacAsString = String.valueOf(lac);
+        	isFemtocell = (lacAsString.length() == 4) && (lacAsString.subSequence(1, 3).equals(FREE_MOBILE_FEMTOCELL_LAC_CODE));
+        }
+        Log.i(TAG, "Femtocell value : " + isFemtocell);
+	}
 
     private void updateEventDatabase() {
         final Event e = new Event();
@@ -449,6 +529,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         e.mobileConnected = powerOn ? Boolean.TRUE.equals(lastMobileNetworkConnected) : false;
         e.mobileOperator = lastMobileOperatorId;
         e.powerOn = powerOn;
+        e.femtocell = lastIsFemtocell;
 
         try {
             pendingInsert.put(e);

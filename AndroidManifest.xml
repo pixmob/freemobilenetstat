@@ -2,12 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.pixmob.freemobile.netstat"
     android:installLocation="internalOnly"
-    android:versionCode="26"
-    android:versionName="26" >
+    android:versionCode="27"
+    android:versionName="27" >
 
     <uses-sdk
         android:minSdkVersion="7"
-        android:targetSdkVersion="17" />
+        android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -20,7 +20,8 @@
         android:required="true" />
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
+ 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+ 
     <application
         android:name=".Application"
         android:allowBackup="true"

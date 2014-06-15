@@ -145,7 +145,7 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
             Events.CONTENT_URI,
             new String[] { Events.TIMESTAMP, Events.MOBILE_OPERATOR,
                     Events.MOBILE_CONNECTED, Events.WIFI_CONNECTED,
-                    Events.BATTERY_LEVEL, Events.SCREEN_ON, Events.POWER_ON },
+                    Events.BATTERY_LEVEL, Events.SCREEN_ON, Events.POWER_ON, Events.FEMTOCELL },
             null, null, null);
         
         try {
@@ -155,6 +155,7 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
             final StringBuilder buf = new StringBuilder(1024);
             buf.append("Timestamp").append(COL_SEP).append("Mobile Operator")
                     .append(COL_SEP).append("Mobile Connected").append(COL_SEP)
+                    .append("Femtocell").append(COL_SEP)
                     .append("Wi-Fi Connected").append(COL_SEP)
                     .append("Screen On").append(COL_SEP).append("Battery")
                     .append(COL_SEP).append("Power On").append(LINE_SEP);
@@ -168,11 +169,14 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
                 final int bat = c.getInt(4);
                 final int screenOn = c.getInt(5) == 1 ? 1 : 0;
                 final int powerOn = c.getInt(6) == 1 ? 1 : 0;
+                final int femtocell = c.getInt(7) == 1 ? 1 : 0;
                 
                 buf.delete(0, buf.length());
                 buf.append(dateFormatter.format(t)).append(COL_SEP)
                         .append(mobOp).append(COL_SEP).append(mobConn)
-                        .append(COL_SEP).append(wifiOn).append(COL_SEP)
+                        .append(COL_SEP)
+                        .append(femtocell).append(COL_SEP)
+                        .append(wifiOn).append(COL_SEP)
                         .append(screenOn).append(COL_SEP).append(bat)
                         .append(COL_SEP).append(powerOn).append(LINE_SEP);
                 out.write(buf.toString());

@@ -231,7 +231,8 @@ public class NetstatContentProvider extends ContentProvider {
                         + Events.WIFI_CONNECTED + " INTEGER NOT NULL, "
                         + Events.BATTERY_LEVEL + " INTEGER NOT NULL, "
                         + Events.SCREEN_ON + " INTEGER NOT NULL, "
-                        + Events.POWER_ON + " INTEGER NOT NULL)";
+                        + Events.POWER_ON + " INTEGER NOT NULL, "
+                        + Events.FEMTOCELL + " INTEGER NOT NULL)";
                 db.execSQL(req);
             }
         }

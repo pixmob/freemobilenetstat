@@ -37,6 +37,7 @@ public class NetstatContract {
         String BATTERY_LEVEL = "battery_level";
         String SCREEN_ON = "screen_on";
         String POWER_ON = "power_on";
+        String FEMTOCELL = "femtocell";
     }
     
     /**
