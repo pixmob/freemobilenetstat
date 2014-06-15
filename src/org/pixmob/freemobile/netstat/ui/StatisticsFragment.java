@@ -79,6 +79,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     private TextView statWifiOn;
     private TextView statOnOrange;
     private TextView statOnFreeMobile;
+    private TextView statOnFemtocell;
     private TextView statBattery;
 
     @Override
@@ -120,6 +121,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         statWifiOn = (TextView) a.findViewById(R.id.stat_wifi);
         statOnOrange = (TextView) a.findViewById(R.id.stat_on_orange);
         statOnFreeMobile = (TextView) a.findViewById(R.id.stat_on_free_mobile);
+        statOnFemtocell = (TextView) a.findViewById(R.id.stat_on_femtocell);
         statBattery = (TextView) a.findViewById(R.id.stat_battery);
 
         // The fields are hidden the first time this fragment is displayed,
@@ -237,6 +239,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         setDurationText(statWifiOn, s.wifiOnTime);
         setDurationText(statOnOrange, s.orangeTime);
         setDurationText(statOnFreeMobile, s.freeMobileTime);
+        setDurationText(statOnFemtocell, s.femtocellTime);
 
         statBattery.setText(s.battery == 0 ? STAT_NO_VALUE : String.valueOf(s.battery) + "%");
 
@@ -340,7 +343,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
                         Events.CONTENT_URI,
                         new String[] { Events.TIMESTAMP, Events.SCREEN_ON, Events.WIFI_CONNECTED,
                                 Events.MOBILE_CONNECTED, Events.MOBILE_OPERATOR, Events.BATTERY_LEVEL,
-                                Events.POWER_ON }, Events.TIMESTAMP + ">?",
+                                Events.POWER_ON, Events.FEMTOCELL }, Events.TIMESTAMP + ">?",
                         new String[] { String.valueOf(fromTimestamp) }, Events.TIMESTAMP + " ASC");
                 final int rowCount = c.getCount();
                 s.events = new Event[rowCount];
@@ -376,6 +379,9 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
                         }
                         if (e.screenOn && e0.screenOn) {
                             s.screenOnTime += dt;
+                        }
+                        if (e.femtocell && e0.femtocell) {
+                            s.femtocellTime += dt;
                         }
                     }
                 }
@@ -424,6 +430,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         public long connectionTime;
         public long screenOnTime;
         public long wifiOnTime;
+        public long femtocellTime;
         public int battery;
 
         @Override

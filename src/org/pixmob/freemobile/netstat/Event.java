@@ -19,7 +19,6 @@ import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.text.format.DateFormat;
 
 /**
  * Network event.
@@ -33,6 +32,7 @@ public class Event {
     public String mobileOperator;
     public int batteryLevel;
     public boolean powerOn;
+    public boolean femtocell;
 
     /**
      * Read an {@link Event} instance from a database {@link Cursor}. The cursor
@@ -49,6 +49,7 @@ public class Event {
         }
         batteryLevel = c.getInt(c.getColumnIndexOrThrow(Events.BATTERY_LEVEL));
         powerOn = c.getInt(c.getColumnIndexOrThrow(Events.POWER_ON)) == 1;
+        femtocell = c.getInt(c.getColumnIndexOrThrow(Events.FEMTOCELL)) == 1;
     }
 
     /**
@@ -62,12 +63,16 @@ public class Event {
         values.put(Events.MOBILE_OPERATOR, mobileOperator);
         values.put(Events.BATTERY_LEVEL, batteryLevel);
         values.put(Events.POWER_ON, powerOn ? 1 : 0);
+        values.put(Events.FEMTOCELL, femtocell ? 1 : 0);
     }
 
-    @Override
-    public String toString() {
-        return "Event[timestamp=" + DateFormat.format("dd/MM/yyyy hh:mm:ss", timestamp) + "; screen="
-                + screenOn + "; wifi=" + wifiConnected + "; mobile=" + mobileConnected + "; operator="
-                + mobileOperator + "; battery=" + batteryLevel + "; powerOn=" + powerOn + "]";
-    }
+	@Override
+	public String toString() {
+		return "Event [timestamp=" + timestamp + ", screenOn=" + screenOn
+				+ ", wifiConnected=" + wifiConnected + ", mobileConnected="
+				+ mobileConnected + ", mobileOperator=" + mobileOperator
+				+ ", batteryLevel=" + batteryLevel + ", powerOn=" + powerOn
+				+ ", femtocell=" + femtocell + "]";
+	}
+    
 }
