@@ -42,7 +42,7 @@ public final class IntentFactory {
      */
     public static Intent networkOperatorSettings(Context context) {
         // Check if the network operator settings intent is available.
-        Intent networkOperatorSettingsIntent = new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS);
+        Intent networkOperatorSettingsIntent = new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS);
         boolean networkOperatorSettingsAvailable = isIntentAvailable(context, networkOperatorSettingsIntent);
         if (!networkOperatorSettingsAvailable) {
             // The previous intent action is not available with some devices:
