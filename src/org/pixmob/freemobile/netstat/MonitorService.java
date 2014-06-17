@@ -477,32 +477,35 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         	
         		//get the cell list
         		List<CellInfo> cellInfos = tm.getAllCellInfo();
-        		for (CellInfo cellInfo : cellInfos) {
-        			
-        			if (cellInfo.isRegistered()) { //we use only registered cells
-	        			if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) 
-	        					&& (cellInfo instanceof CellInfoWcdma)) { //manage the wcdma cell case
-	        				Log.d(TAG, "We got a WCDMA cell");
-	        				CellIdentityWcdma ci = ((CellInfoWcdma) cellInfo).getCellIdentity();
-	        				if (ci != null) { //save the LAC and exit loop
-	        					lac = ci.getLac();
-	        					Log.d(TAG, "We got the LAC - exit loop");
-	        					break;
-	        				}
-	        				
-	        			} else if (cellInfo instanceof CellInfoGsm) { //test the gsm case
-	        				CellIdentityGsm ci = ((CellInfoGsm) cellInfo).getCellIdentity();
-	        				Log.d(TAG, "We got a CDMA cell");
-	        				if (ci != null) { //save the LAC and exit loop
-	        					lac = ci.getLac();
-	        					Log.d(TAG, "We got the LAC - exit loop");
-	        					break;
-	        				}
-	        			}
+        		if (cellInfos != null) {
+	        		for (CellInfo cellInfo : cellInfos) {
 	        			
-        			} else
-        				Log.d(TAG, "Unregistered cell - skipping");
-        		}
+	        			if (cellInfo.isRegistered()) { //we use only registered cells
+		        			if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) 
+		        					&& (cellInfo instanceof CellInfoWcdma)) { //manage the wcdma cell case
+		        				Log.d(TAG, "We got a WCDMA cell");
+		        				CellIdentityWcdma ci = ((CellInfoWcdma) cellInfo).getCellIdentity();
+		        				if (ci != null) { //save the LAC and exit loop
+		        					lac = ci.getLac();
+		        					Log.d(TAG, "We got the LAC - exit loop");
+		        					break;
+		        				}
+		        				
+		        			} else if (cellInfo instanceof CellInfoGsm) { //test the gsm case
+		        				CellIdentityGsm ci = ((CellInfoGsm) cellInfo).getCellIdentity();
+		        				Log.d(TAG, "We got a CDMA cell");
+		        				if (ci != null) { //save the LAC and exit loop
+		        					lac = ci.getLac();
+		        					Log.d(TAG, "We got the LAC - exit loop");
+		        					break;
+		        				}
+		        			}
+		        			
+	        			} else
+	        				Log.d(TAG, "Unregistered cell - skipping");
+	        		}
+        		} else
+    				Log.d(TAG, "No cell infos available");
         		
         	} else { //use old API
         		CellLocation cellLocation = tm.getCellLocation(); //cell location might be null... handle with care
