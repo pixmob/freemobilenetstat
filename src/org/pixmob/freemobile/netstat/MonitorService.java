@@ -120,6 +120,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     private BlockingQueue< Event> pendingInsert;
     private SharedPreferences prefs;
     private Bitmap freeLargeIcon;
+    private Bitmap freeFemtoLargeIcon;
     private Bitmap orangeLargeIcon;
 
 	static {
@@ -135,11 +136,11 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_UNKNOWN, R.string.network_type_unknown);
 
         THEMES.put(THEME_DEFAULT, new Theme(R.drawable.ic_stat_notify_service_free,
-            R.drawable.ic_stat_notify_service_orange));
+            R.drawable.ic_stat_notify_service_free_femto, R.drawable.ic_stat_notify_service_orange));
         THEMES.put(THEME_COLOR, new Theme(R.drawable.ic_stat_notify_service_free_color,
-            R.drawable.ic_stat_notify_service_orange_color));
+            R.drawable.ic_stat_notify_service_free_femto_color, R.drawable.ic_stat_notify_service_orange_color));
         THEMES.put(THEME_PIE, new Theme(R.drawable.ic_stat_notify_service_free_pie,
-            R.drawable.ic_stat_notify_service_orange_pie));
+        		R.drawable.ic_stat_notify_service_free_femto_pie, R.drawable.ic_stat_notify_service_orange_pie));
     }
 
     @Override
@@ -165,6 +166,9 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             freeLargeIcon =
                 Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
                     R.drawable.ic_stat_notify_service_free_large), largeIconWidth, largeIconHeight, true);
+            freeFemtoLargeIcon =
+        		Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                    R.drawable.ic_stat_notify_service_free_femto_large), largeIconWidth, largeIconHeight, true);
             orangeLargeIcon =
                 Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
                     R.drawable.ic_stat_notify_service_orange_large), largeIconWidth, largeIconHeight, true);
@@ -398,7 +402,9 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             theme = THEMES.get(THEME_DEFAULT);
         }
 
-        if (MobileOperator.FREE_MOBILE.equals(op)) {
+        if (MobileOperator.FREE_MOBILE.equals(op) && isFemtocell) {
+            return theme.freeFemtoIcon;
+        } else if (MobileOperator.FREE_MOBILE.equals(op)) {
             return theme.freeIcon;
         } else if (MobileOperator.ORANGE.equals(op)) {
             return theme.orangeIcon;
@@ -407,7 +413,9 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     }
 
     private Bitmap getStatLargeIcon(MobileOperator op) {
-        if (MobileOperator.FREE_MOBILE.equals(op)) {
+        if (MobileOperator.FREE_MOBILE.equals(op) && isFemtocell) {
+            return freeFemtoLargeIcon;
+        } else if (MobileOperator.FREE_MOBILE.equals(op)) {
             return freeLargeIcon;
         } else if (MobileOperator.ORANGE.equals(op)) {
             return orangeLargeIcon;
@@ -507,14 +515,18 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         		} else
     				Log.d(TAG, "No cell infos available");
         		
-        	} else { //use old API
-        		CellLocation cellLocation = tm.getCellLocation(); //cell location might be null... handle with care
-        		if ((cellLocation != null) && (cellLocation instanceof GsmCellLocation)) {
-        			Log.d(TAG, "We got a old GSM cell with LAC");
-        			lac = ((GsmCellLocation) cellLocation).getLac();
-        		}
+        	}
+        	if (lac == null) { //use old API if LAC was not found with the new method (useful for buggy devices such as Samsung Galaxy S5) or if SDK is too old
+	    		CellLocation cellLocation = tm.getCellLocation(); //cell location might be null... handle with care
+	    		if ((cellLocation != null) && (cellLocation instanceof GsmCellLocation)) {
+	    			Log.d(TAG, "We got a old GSM cell with LAC");
+	    			lac = ((GsmCellLocation) cellLocation).getLac();
+	    		}
         	}
         }
+        /*/ Fake femtocell
+        lac = 3981;
+        //*/
         Log.d(TAG, "LAC value : " + lac);
         if (lac != null) {
         	String lacAsString = String.valueOf(lac);
@@ -635,10 +647,12 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      */
     private static class Theme {
         public final int freeIcon;
+        public final int freeFemtoIcon;
         public final int orangeIcon;
 
-        public Theme(final int freeIcon, final int orangeIcon) {
+        public Theme(final int freeIcon, final int freeFemtoIcon, final int orangeIcon) {
             this.freeIcon = freeIcon;
+            this.freeFemtoIcon = freeFemtoIcon;
             this.orangeIcon = orangeIcon;
         }
     }
