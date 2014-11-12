@@ -27,7 +27,7 @@
     <string name="stat_battery">Batterie</string>
     <string name="stat_on_orange">Sur Orange</string>
     <string name="stat_on_free_mobile">Sur Free</string>
-    <string name="stat_on_femtocell">Sur Femtocell</string>
+    <string name="stat_on_femtocell">Dont Femtocell</string>
     <string name="days">j</string>
     <string name="hours">h</string>
     <string name="minutes">m</string>
