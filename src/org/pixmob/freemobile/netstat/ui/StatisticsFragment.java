@@ -28,6 +28,7 @@ import java.util.Date;
 
 import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
+import org.pixmob.freemobile.netstat.NetworkClass;
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.ui.StatisticsFragment.Statistics;
@@ -230,7 +231,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
 
         onOrangeNetwork.setText(s.orangeUsePercent + "%");
         onFreeMobileNetwork.setText(s.freeMobileUsePercent + "%");
-        mobileNetworkChart.setData(s.orangeUsePercent, s.freeMobileUsePercent);
+        mobileNetworkChart.setData(s.orangeUsePercent, s.freeMobileUsePercent, s.orange2GUsePercent, s.freeMobile3GUsePercent);
 
         final Activity a = getActivity();
         statMobileNetwork.setText(s.mobileOperator == null ? STAT_NO_VALUE : s.mobileOperator.toName(a));
@@ -342,8 +343,8 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
                 c = getContext().getContentResolver().query(
                         Events.CONTENT_URI,
                         new String[] { Events.TIMESTAMP, Events.SCREEN_ON, Events.WIFI_CONNECTED,
-                                Events.MOBILE_CONNECTED, Events.MOBILE_NETWORK_TYPE, Events.MOBILE_OPERATOR, Events.BATTERY_LEVEL,
-                                Events.POWER_ON, Events.FEMTOCELL }, Events.TIMESTAMP + ">?",
+                                Events.MOBILE_CONNECTED, Events.MOBILE_NETWORK_TYPE, Events.MOBILE_OPERATOR,
+                                Events.BATTERY_LEVEL, Events.POWER_ON, Events.FEMTOCELL }, Events.TIMESTAMP + ">?",
                         new String[] { String.valueOf(fromTimestamp) }, Events.TIMESTAMP + " ASC");
                 final int rowCount = c.getCount();
                 s.events = new Event[rowCount];
@@ -361,11 +362,22 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
 
                         final MobileOperator op = MobileOperator.fromString(e.mobileOperator);
                         final MobileOperator op0 = MobileOperator.fromString(e0.mobileOperator);
+                    	final NetworkClass nc = NetworkClass.getNetworkClass(e.mobileNetworkType);
                         if (op != null && op.equals(op0)) {
                             if (MobileOperator.ORANGE.equals(op)) {
                                 s.orangeTime += dt;
+                                if (NetworkClass.NC_2G.equals(nc)) {
+                                	s.orange2GTime += dt;
+                                } else if (NetworkClass.NC_3G.equals(nc)) {
+                                	s.orange3GTime += dt;
+                                }
                             } else if (MobileOperator.FREE_MOBILE.equals(op)) {
                                 s.freeMobileTime += dt;
+                                if (NetworkClass.NC_3G.equals(nc)) {
+                                	s.freeMobile3GTime += dt;
+                                } else if (NetworkClass.NC_4G.equals(nc)) {
+                                	s.freeMobile4GTime += dt;
+                                }
                             }
                         }
                         if (e.mobileConnected && !e0.mobileConnected) {
@@ -393,6 +405,10 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
                 final double sTime = s.orangeTime + s.freeMobileTime;
                 s.freeMobileUsePercent = (int) Math.round(s.freeMobileTime / sTime * 100d);
                 s.orangeUsePercent = 100 - s.freeMobileUsePercent;
+                s.freeMobile3GUsePercent = (int) Math.round(s.freeMobile3GTime / sTime * 100d);
+                s.freeMobile4GUsePercent = 100 - s.freeMobile3GUsePercent;
+                s.orange2GUsePercent = (int) Math.round(s.orange2GTime / sTime * 100d);
+                s.orange3GUsePercent = 100 - s.orange2GUsePercent;
                 s.connectionTime = now - connectionTimestamp;
             } catch (Exception e) {
                 Log.e(TAG, "Failed to load statistics", e);
@@ -421,9 +437,17 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
      */
     public static class Statistics {
         public Event[] events = new Event[0];
+        public long orange2GTime;
+        public long orange3GTime;
         public long orangeTime;
+        public long freeMobile3GTime;
+        public long freeMobile4GTime;
         public long freeMobileTime;
+        public int orange2GUsePercent;
+        public int orange3GUsePercent;
         public int orangeUsePercent;
+        public int freeMobile3GUsePercent;
+        public int freeMobile4GUsePercent;
         public int freeMobileUsePercent;
         public MobileOperator mobileOperator;
         public String mobileOperatorCode;
