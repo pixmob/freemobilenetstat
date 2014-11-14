@@ -143,9 +143,9 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
         
         final Cursor c = context.getContentResolver().query(
             Events.CONTENT_URI,
-            new String[] { Events.TIMESTAMP, Events.MOBILE_OPERATOR,
-                    Events.MOBILE_CONNECTED, Events.WIFI_CONNECTED,
-                    Events.BATTERY_LEVEL, Events.SCREEN_ON, Events.POWER_ON, Events.FEMTOCELL },
+            new String[] { Events.TIMESTAMP, Events.MOBILE_OPERATOR, Events.MOBILE_NETWORK_TYPE,
+                    Events.MOBILE_CONNECTED, Events.WIFI_CONNECTED, Events.BATTERY_LEVEL, 
+                    Events.SCREEN_ON, Events.POWER_ON, Events.FEMTOCELL },
             null, null, null);
         
         try {
@@ -153,32 +153,38 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
             int currentRow = 0;
             
             final StringBuilder buf = new StringBuilder(1024);
-            buf.append("Timestamp").append(COL_SEP).append("Mobile Operator")
-                    .append(COL_SEP).append("Mobile Connected").append(COL_SEP)
-                    .append("Femtocell").append(COL_SEP)
-                    .append("Wi-Fi Connected").append(COL_SEP)
-                    .append("Screen On").append(COL_SEP).append("Battery")
-                    .append(COL_SEP).append("Power On").append(LINE_SEP);
+            buf.append("Timestamp").append(COL_SEP)
+            	.append("Mobile Operator").append(COL_SEP)
+            	.append("Mobile Connected").append(COL_SEP)
+            	.append("Mobile Network Type").append(COL_SEP)
+                .append("Femtocell").append(COL_SEP)
+                .append("Wi-Fi Connected").append(COL_SEP)
+                .append("Screen On").append(COL_SEP)
+                .append("Battery").append(COL_SEP)
+                .append("Power On").append(LINE_SEP);
             out.write(buf.toString());
             
             while (c.moveToNext()) {
                 final long t = c.getLong(0);
                 final String mobOp = c.isNull(1) ? "" : c.getString(1);
-                final int mobConn = c.getInt(2) == 1 ? 1 : 0;
-                final int wifiOn = c.getInt(3) == 1 ? 1 : 0;
-                final int bat = c.getInt(4);
-                final int screenOn = c.getInt(5) == 1 ? 1 : 0;
-                final int powerOn = c.getInt(6) == 1 ? 1 : 0;
-                final int femtocell = c.getInt(7) == 1 ? 1 : 0;
+                final int mobNetworkType = c.getInt(2);
+                final int mobConn = c.getInt(3) == 1 ? 1 : 0;
+                final int wifiOn = c.getInt(4) == 1 ? 1 : 0;
+                final int bat = c.getInt(5);
+                final int screenOn = c.getInt(6) == 1 ? 1 : 0;
+                final int powerOn = c.getInt(7) == 1 ? 1 : 0;
+                final int femtocell = c.getInt(8) == 1 ? 1 : 0;
                 
                 buf.delete(0, buf.length());
                 buf.append(dateFormatter.format(t)).append(COL_SEP)
-                        .append(mobOp).append(COL_SEP).append(mobConn)
-                        .append(COL_SEP)
+                        .append(mobOp).append(COL_SEP)
+                        .append(mobNetworkType).append(COL_SEP)
+                        .append(mobConn).append(COL_SEP)
                         .append(femtocell).append(COL_SEP)
                         .append(wifiOn).append(COL_SEP)
-                        .append(screenOn).append(COL_SEP).append(bat)
-                        .append(COL_SEP).append(powerOn).append(LINE_SEP);
+                        .append(screenOn).append(COL_SEP)
+                        .append(bat).append(COL_SEP)
+                        .append(powerOn).append(LINE_SEP);
                 out.write(buf.toString());
                 
                 publishProgress(++currentRow, rowCount);

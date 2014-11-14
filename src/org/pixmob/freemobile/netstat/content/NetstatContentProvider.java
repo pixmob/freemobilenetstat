@@ -228,6 +228,7 @@ public class NetstatContentProvider extends ContentProvider {
                         + Events.TIMESTAMP + " TIMESTAMP NOT NULL, "
                         + Events.MOBILE_CONNECTED + " INTEGER NOT NULL, "
                         + Events.MOBILE_OPERATOR + " TEXT, "
+                        + Events.MOBILE_NETWORK_TYPE + " INTEGER NOT NULL, "
                         + Events.WIFI_CONNECTED + " INTEGER NOT NULL, "
                         + Events.BATTERY_LEVEL + " INTEGER NOT NULL, "
                         + Events.SCREEN_ON + " INTEGER NOT NULL, "

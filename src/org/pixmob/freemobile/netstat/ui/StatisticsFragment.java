@@ -342,7 +342,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
                 c = getContext().getContentResolver().query(
                         Events.CONTENT_URI,
                         new String[] { Events.TIMESTAMP, Events.SCREEN_ON, Events.WIFI_CONNECTED,
-                                Events.MOBILE_CONNECTED, Events.MOBILE_OPERATOR, Events.BATTERY_LEVEL,
+                                Events.MOBILE_CONNECTED, Events.MOBILE_NETWORK_TYPE, Events.MOBILE_OPERATOR, Events.BATTERY_LEVEL,
                                 Events.POWER_ON, Events.FEMTOCELL }, Events.TIMESTAMP + ">?",
                         new String[] { String.valueOf(fromTimestamp) }, Events.TIMESTAMP + " ASC");
                 final int rowCount = c.getCount();
