@@ -269,8 +269,8 @@ public class BatteryChart extends View {
             mobileOperatorPaint.setStrokeWidth(16);
             mobileOperatorPaint.setStyle(Paint.Style.STROKE);
 
-            orangeColor = getResources().getColor(R.color.orange_network_color1);
-            freeMobileColor = getResources().getColor(R.color.free_mobile_network_color1);
+            orangeColor = getResources().getColor(R.color.orange_3G_network_color1);
+            freeMobileColor = getResources().getColor(R.color.free_mobile_3G_network_color1);
         }
         if (cursorPaint == null) {
             cursorPaint = new Paint();
