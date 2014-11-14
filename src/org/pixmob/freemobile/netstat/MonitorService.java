@@ -541,8 +541,9 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         e.screenOn = pm != null ? pm.isScreenOn() : false;
         e.batteryLevel = getBatteryLevel();
         e.wifiConnected = Boolean.TRUE.equals(lastWifiConnected);
-        e.mobileConnected = powerOn ? Boolean.TRUE.equals(lastMobileNetworkConnected) : false;
+        e.mobileConnected = powerOn && Boolean.TRUE.equals(lastMobileNetworkConnected);
         e.mobileOperator = lastMobileOperatorId;
+        e.mobileNetworkType = mobileNetworkType;
         e.powerOn = powerOn;
         e.femtocell = lastIsFemtocell;
 

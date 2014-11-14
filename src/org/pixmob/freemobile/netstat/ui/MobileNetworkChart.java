@@ -133,12 +133,6 @@ public class MobileNetworkChart extends View {
     }
 
     private static int normalizePercent(int p) {
-        if (p < 0) {
-            return 0;
-        }
-        if (p > 100) {
-            return 100;
-        }
-        return p;
+        return Math.min(100, Math.max(0, p));
     }
 }
