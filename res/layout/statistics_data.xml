@@ -163,7 +163,7 @@
                 style="@style/stat_row_even"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="12m" />
+                android:text="25m" />
 
             <TextView
                 android:id="@+id/stat_screen"
