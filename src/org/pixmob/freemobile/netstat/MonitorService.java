@@ -20,23 +20,22 @@ import static org.pixmob.freemobile.netstat.Constants.ACTION_NOTIFICATION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 import static org.pixmob.freemobile.netstat.Constants.THEME_COLOR;
 import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
 import static org.pixmob.freemobile.netstat.Constants.THEME_PIE;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.util.IntentFactory;
-
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -424,7 +423,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     /**
      * Update the status bar notification.
      */
-    private void updateNotification(boolean playSound) {
+    @SuppressLint("InlinedApi")
+	private void updateNotification(boolean playSound) {
         final MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
         /*//
         // Not a good solution as it might prevent the app from running at boot
@@ -436,9 +436,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         }
         //*/
         
-        
-
         final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext());
+        
         if (mobOp == null) {
         	if (isAirplaneModeOn()) { // Airplane mode
 	            final String tickerText = getString(R.string.stat_airplane_mode_on);
@@ -493,8 +492,13 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 nBuilder.setSound(soundUri);
             }
         }
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+        		&& prefs.getBoolean(SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION, true))
+        	nBuilder.setVisibility(Notification.VISIBILITY_SECRET);
 
         final Notification n = nBuilder.build();
+        
         startForeground(R.string.stat_connected_to_mobile_network, n);
     }
     
@@ -583,6 +587,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             && lastMobileNetworkType.intValue() == mobileNetworkType) {
             return false;
         }
+        
         lastMobileNetworkConnected = mobileNetworkConnected;
         lastMobileOperatorId = mobileOperatorId;
         lastIsFemtocell = isFemtocell;

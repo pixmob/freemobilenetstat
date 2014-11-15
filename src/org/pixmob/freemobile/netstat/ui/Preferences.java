@@ -23,6 +23,7 @@ import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_NETWORK_OPERA
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_STATISTICS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
@@ -154,6 +155,10 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         	// Disable auto restart service workaround if not on KitKat nor Jelly Bean
             final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
         	g.removePreference(pm.findPreference(SP_KEY_ENABLE_AUTO_RESTART_SERVICE));
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        	final PreferenceGroup g = (PreferenceGroup) pm.findPreference("pref_enable_lollipop_lockscreen_notification");
+        	g.removePreference(pm.findPreference(SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION));
         }
     }
 
