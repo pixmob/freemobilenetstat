@@ -19,6 +19,7 @@ import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.ACTION_NOTIFICATION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
@@ -26,6 +27,7 @@ import static org.pixmob.freemobile.netstat.Constants.THEME_COLOR;
 import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
 import static org.pixmob.freemobile.netstat.Constants.THEME_PIE;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,9 @@ import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.util.IntentFactory;
 
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -54,9 +59,12 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityWcdma;
@@ -91,8 +99,16 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      * Special data used for terminating the PendingInsert worker thread.
      */
     private static final Event STOP_PENDING_CONTENT_MARKER = new Event();
-    
+    /**
+     * Femtocell's LAC start with this code.
+     */
     private static final String FREE_MOBILE_FEMTOCELL_LAC_CODE = "98";
+    /**
+     * SDK Versions concerned with service auto-kill issue.
+     */
+    public static final int[] SDK_ALLOWED_TO_AUTO_RESTART_SERVICE =
+    	{ Build.VERSION_CODES.JELLY_BEAN, Build.VERSION_CODES.JELLY_BEAN_MR1, 
+    	  Build.VERSION_CODES.JELLY_BEAN_MR2, Build.VERSION_CODES.KITKAT };
     
     /**
      * This intent will open the main UI.
@@ -155,7 +171,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	@Override
     public void onCreate() {
         super.onCreate();
-
+        
         prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
         prefs.registerOnSharedPreferenceChangeListener(this);
 
@@ -291,6 +307,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // http://stackoverflow.com/q/5076410/422906
         shutdownIntentFilter.addAction("android.intent.action.QUICKBOOT_POWEROFF");
         registerReceiver(shutdownMonitor, shutdownIntentFilter);
+        
+        // Kitkat and JellyBean auto-kill service workaround
+        // http://stackoverflow.com/a/20735519/1527491
+        ensureServiceStaysRunning();
     }
 
     @Override
@@ -342,8 +362,62 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         onConnectivityUpdated();
         onPhoneStateUpdated();
         updateNotification(false);
+        
+        if ((intent != null) && (intent.getBooleanExtra("ALARM_RESTART_SERVICE_DIED", false)))
+        {
+        	if (DEBUG)
+        		Log.d(TAG, "onStartCommand after ALARM_RESTART_SERVICE_DIED");
+            if (isRunning())
+            {
+            	if (DEBUG)
+            		Log.d(TAG, "Service already running - return immediately...");
+                ensureServiceStaysRunning();
+            }
+        }
 
         return START_STICKY;
+    }
+    
+    private boolean isRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))
+            if (getClass().getName().equals(service.service.getClassName()))
+                return true;
+        return false;
+    }
+    
+    private void ensureServiceStaysRunning() {
+        // KitKat appears to have (in some cases) forgotten how to honor START_STICKY
+        // and if the service is killed, it doesn't restart.  On an emulator & AOSP device, it restarts...
+        // on my CM device, it does not - WTF?  So, we'll make sure it gets back
+        // up and running in a minimum of 10 minutes.  We reset our timer on a handler every
+        // 2 minutes...but since the handler runs on uptime vs. the alarm which is on realtime,
+        // it is entirely possible that the alarm doesn't get reset.  So - we make it a noop,
+        // but this will still count against the app as a wakelock when it triggers.  Oh well,
+        // it should never cause a device wakeup.  We're also at SDK 19 preferred, so the alarm
+        // mgr set algorithm is better on memory consumption which is good.
+    	// http://stackoverflow.com/a/20735519/1527491
+        if (prefs.getBoolean(SP_KEY_ENABLE_AUTO_RESTART_SERVICE, false) ||
+        		Arrays.asList(SDK_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.SDK_INT))
+        {
+            // A restart intent - this never changes...        
+            final int restartAlarmInterval = 10*60*1000;
+            final int resetAlarmTimer = 1*60*1000;
+            final Intent restartIntent = new Intent(this, this.getClass());
+            restartIntent.putExtra("ALARM_RESTART_SERVICE_DIED", true);
+            final AlarmManager alarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+            Handler restartServiceHandler = new Handler()
+            {
+                @Override
+                public void handleMessage(Message msg) {
+                    // Create a pending intent
+                    PendingIntent pintent = PendingIntent.getService(getApplicationContext(), 0, restartIntent, 0);
+                    alarmMgr.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + restartAlarmInterval, pintent);
+                    sendEmptyMessageDelayed(0, resetAlarmTimer);
+                }            
+            };
+            restartServiceHandler.sendEmptyMessageDelayed(0, 0);  
+        }
     }
 
     /**

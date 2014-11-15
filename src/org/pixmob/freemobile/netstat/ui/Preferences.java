@@ -22,6 +22,7 @@ import static org.pixmob.freemobile.netstat.Constants.INTERVAL_TODAY;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_STATISTICS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
@@ -31,9 +32,11 @@ import static org.pixmob.freemobile.netstat.Constants.THEME_COLOR;
 import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
 import static org.pixmob.freemobile.netstat.Constants.THEME_PIE;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.pixmob.freemobile.netstat.MonitorService;
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.feature.BackupManagerFeature;
 import org.pixmob.freemobile.netstat.feature.Features;
@@ -145,6 +148,12 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             // Bean.
             final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
             g.removePreference(pm.findPreference(SP_KEY_ENABLE_NOTIF_ACTIONS));
+        }
+        if (!Arrays.asList(MonitorService.SDK_ALLOWED_TO_AUTO_RESTART_SERVICE)
+        		.contains(Build.VERSION.SDK_INT)) {
+        	// Disable auto restart service workaround if not on KitKat nor Jelly Bean
+            final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
+        	g.removePreference(pm.findPreference(SP_KEY_ENABLE_AUTO_RESTART_SERVICE));
         }
     }
 
