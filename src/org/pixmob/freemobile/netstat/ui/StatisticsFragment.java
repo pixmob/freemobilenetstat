@@ -82,6 +82,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     private TextView statOnFreeMobile;
     private TextView statOnFemtocell;
     private TextView statBattery;
+    private Statistics lastStatistics;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -213,6 +214,10 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         }
         getLoaderManager().restartLoader(0, null, this);
     }
+    
+    Statistics getLastSatistics() {
+    	return lastStatistics;
+    }
 
     @Override
     public Loader<Statistics> onCreateLoader(int id, Bundle args) {
@@ -250,6 +255,8 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         statisticsGroup.setVisibility(View.VISIBLE);
         statisticsGroup.invalidate();
         batteryChart.invalidate();
+        
+        lastStatistics = s;
     }
 
     private void setDurationText(TextView tv, long duration) {
@@ -405,10 +412,14 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
                 final double sTime = s.orangeTime + s.freeMobileTime;
                 s.freeMobileUsePercent = (int) Math.round(s.freeMobileTime / sTime * 100d);
                 s.orangeUsePercent = 100 - s.freeMobileUsePercent;
-                s.freeMobile3GUsePercent = (int) Math.round(s.freeMobile3GTime / sTime * 100d);
-                s.freeMobile4GUsePercent = 100 - s.freeMobile3GUsePercent;
-                s.orange2GUsePercent = (int) Math.round(s.orange2GTime / sTime * 100d);
-                s.orange3GUsePercent = 100 - s.orange2GUsePercent;
+                s.freeMobile3GUsePercent =
+                		s.freeMobileTime == 0 ? 0 : (int) Math.round(s.freeMobile3GTime / s.freeMobileTime * 100d);
+                s.freeMobile4GUsePercent =
+                		s.freeMobileTime == 0 ? 0 : 100 - s.freeMobile3GUsePercent;
+                s.orange2GUsePercent =
+                		s.orangeTime == 0 ? 0 : (int) Math.round(s.orange2GTime / s.orangeTime * 100d);
+                s.orange3GUsePercent =
+                		s.orangeTime == 0 ? 0 : 100 - s.orange2GUsePercent;
                 s.connectionTime = now - connectionTimestamp;
             } catch (Exception e) {
                 Log.e(TAG, "Failed to load statistics", e);
