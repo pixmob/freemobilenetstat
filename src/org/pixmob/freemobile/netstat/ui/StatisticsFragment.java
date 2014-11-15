@@ -69,7 +69,6 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     private TextView statOnFreeMobile;
     private TextView statOnFemtocell;
     private TextView statBattery;
-    private Statistics lastStatistics;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -209,10 +208,6 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         }
         getLoaderManager().restartLoader(0, null, this);
     }
-    
-    Statistics getLastSatistics() {
-    	return lastStatistics;
-    }
 
     @Override
     public Loader<Statistics> onCreateLoader(int id, Bundle args) {
@@ -249,9 +244,8 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         progressBar.setVisibility(View.INVISIBLE);
         statisticsGroup.setVisibility(View.VISIBLE);
         statisticsGroup.invalidate();
+        mobileNetworkChart.invalidate();
         batteryChart.invalidate();
-        
-        lastStatistics = s;
     }
 
     private void setDurationText(TextView tv, long duration) {
