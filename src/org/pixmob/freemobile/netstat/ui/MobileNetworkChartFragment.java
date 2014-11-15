@@ -113,6 +113,7 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
         progressBar.setVisibility(View.INVISIBLE);
         statisticsWrapperLayout.setVisibility(View.VISIBLE);
         statisticsWrapperLayout.invalidate();
+        mobileNetworkChart.invalidate();
 	}
 
 	@Override
