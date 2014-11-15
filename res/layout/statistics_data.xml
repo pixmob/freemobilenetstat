@@ -59,7 +59,8 @@
             android:id="@+id/mobile_network_chart"
             android:layout_width="@dimen/network_pie_width"
             android:layout_height="@dimen/network_pie_width"
-            android:layout_marginLeft="8dip" />
+            android:layout_marginLeft="8dip"
+            android:onClick="enlargeChart" />
     </LinearLayout>
 
     <LinearLayout

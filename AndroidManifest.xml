@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.pixmob.freemobile.netstat"
     android:installLocation="internalOnly"
-    android:versionCode="28"
-    android:versionName="28" >
+    android:versionCode="27"
+    android:versionName="27" >
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -82,6 +82,12 @@
         <activity
             android:name=".ui.Preferences"
             android:label="@string/menu_preferences" >
+        </activity>
+        
+        <activity
+            android:name=".ui.MobileNetworkChartActivity"
+            android:parentActivityName="org.pixmob.freemobile.netstat.Netstat"
+            android:label="@string/chart" >
         </activity>
 
         <meta-data

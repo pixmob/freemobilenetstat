@@ -19,6 +19,7 @@ import org.pixmob.freemobile.netstat.MonitorService;
 import org.pixmob.freemobile.netstat.SyncService;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
+import org.pixmob.freemobile.netstat.ui.StatisticsFragment.Statistics;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -29,6 +30,7 @@ import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
 import android.view.Window;
 
 /**
@@ -37,6 +39,8 @@ import android.view.Window;
  */
 @SuppressLint("CommitPrefEdits")
 public class Netstat extends FragmentActivity {
+	private final StatisticsFragment f = new StatisticsFragment();
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +50,6 @@ public class Netstat extends FragmentActivity {
         }
 
         if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null) {
-            final StatisticsFragment f = new StatisticsFragment();
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
         }
 
@@ -77,6 +80,20 @@ public class Netstat extends FragmentActivity {
             startActivity(new Intent(this, DocumentBrowser.class).putExtra(DocumentBrowser.INTENT_EXTRA_URL,
                     "CHANGELOG.html"));
         }
+    }
+    
+    public void enlargeChart(View view) {
+    	Intent intent = new Intent(this, MobileNetworkChartActivity.class);
+    	Statistics s = f.getLastSatistics();
+    	if (s != null) {
+	    	intent.putExtra("on_orange_network", s.orangeUsePercent);
+	    	intent.putExtra("on_orange_2G_network", s.orange2GUsePercent);
+	    	intent.putExtra("on_orange_3G_network", s.orange3GUsePercent);
+	    	intent.putExtra("on_free_mobile_network", s.freeMobileUsePercent);
+	    	intent.putExtra("on_free_mobile_3G_network", s.freeMobile3GUsePercent);
+	    	intent.putExtra("on_free_mobile_4G_network", s.freeMobile4GUsePercent);
+	    	startActivity(intent);
+    	}
     }
 
     @Override
