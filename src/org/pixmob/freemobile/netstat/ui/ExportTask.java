@@ -155,8 +155,8 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
             final StringBuilder buf = new StringBuilder(1024);
             buf.append("Timestamp").append(COL_SEP)
             	.append("Mobile Operator").append(COL_SEP)
-            	.append("Mobile Connected").append(COL_SEP)
             	.append("Mobile Network Type").append(COL_SEP)
+            	.append("Mobile Connected").append(COL_SEP)
                 .append("Femtocell").append(COL_SEP)
                 .append("Wi-Fi Connected").append(COL_SEP)
                 .append("Screen On").append(COL_SEP)
