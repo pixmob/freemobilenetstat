@@ -65,6 +65,7 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityWcdma;
@@ -425,21 +426,41 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      */
     private void updateNotification(boolean playSound) {
         final MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
+        /*//
+        // Not a good solution as it might prevent the app from running at boot
+        
         if (!mobileNetworkConnected) {
             // Not connected to a mobile network: plane mode may be enabled.
             stopForeground(true);
             return;
         }
+        //*/
+        
+        
 
         final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext());
         if (mobOp == null) {
-            // Connected to a foreign mobile network.
-            final String tickerText = getString(R.string.stat_connected_to_foreign_mobile_network);
-            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
-
-            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
-                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
+        	if (isAirplaneModeOn()) { // Airplane mode
+	            final String tickerText = getString(R.string.stat_airplane_mode_on);
+	            final String contentText = getString(R.string.notif_monitoring_disabled);
+	            
+	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
+		                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
+        	} else if (mobileOperatorId == null) { // No signal
+	            final String tickerText = getString(R.string.stat_no_signal);
+	            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
+	            
+	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
+		                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW)
+		                .setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
+        	} else {
+	            final String tickerText = getString(R.string.stat_connected_to_foreign_mobile_network);
+	            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
+	
+	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
+	                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW)
+	                .setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
+        	}
         } else {
             final String tickerText =
                 String.format(getString(R.string.stat_connected_to_mobile_network), mobOp.toName(this));
@@ -475,6 +496,19 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
         final Notification n = nBuilder.build();
         startForeground(R.string.stat_connected_to_mobile_network, n);
+    }
+    
+    /**
+     * Gets the state of Airplane Mode.
+     */
+    @SuppressWarnings("deprecation")
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private boolean isAirplaneModeOn() {        
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            return Settings.System.getInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0) != 0;          
+        } else {
+            return Settings.Global.getInt(getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+        }       
     }
 
     private int getStatIcon(MobileOperator op) {
