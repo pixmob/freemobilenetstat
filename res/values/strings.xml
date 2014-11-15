@@ -4,6 +4,8 @@
     <string name="app_name">Free Mobile Netstat</string>
     <string name="stat_connected_to_foreign_mobile_network">Connecté à un réseau étranger</string>
     <string name="stat_connected_to_mobile_network">Connecté au réseau %s</string>
+    <string name="stat_airplane_mode_on">Mode avion détecté</string>
+    <string name="stat_no_signal">Aucun signal</string>
     <string name="mobile_network_type">Réseau mobile %s</string>
     <string name="network_free_mobile">Free</string>
     <string name="network_orange">Orange</string>
@@ -71,6 +73,7 @@
     <string name="notif_action_statistics">Statistiques</string>
     <string name="notif_action_network_operator_settings">Opérateur de réseau</string>
     <string name="notif_action_open_network_operator_settings">Paramètres des opérateurs</string>
+    <string name="notif_monitoring_disabled">Le monitoring a été désactivé.</string>
     <string name="interval_since_boot">Démarrage du téléphone</string>
     <string name="interval_today">Aujourd\'hui</string>
     <string name="interval_one_week">Une semaine</string>
