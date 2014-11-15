@@ -60,7 +60,7 @@
     <string name="pref_enable_auto_restart_service">Relancement automatique du service</string>
     <string name="pref_enable_auto_restart_service_summary">Si la notification ne s\'actualise plus (Bug KitKat).</string>
     <string name="pref_enable_lollipop_lockscreen_notification">Notification sur l\'écran de verrouillage.</string>
-    <string name="pref_enable_lollipop_lockscreen_notification_summary">Active la notification de Lollipop sur l\'écran de verrouillage.</string>
+    <string name="pref_enable_lollipop_lockscreen_notification_summary">Afficher/Masquer la notification sur l\'écran de verrouillage sécurisé.</string>
     <string name="pref_time_interval">Afficher les données depuis…</string>
     <string name="pref_notif">Notification</string>
     <string name="pref_notif_action">Action de la notification</string>
