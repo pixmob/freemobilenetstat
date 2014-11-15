@@ -55,7 +55,7 @@
         
         <CheckBoxPreference
             android:enabled="true"
-            android:key="pref_disable_lollipop_lockscreen_notification"
+            android:key="pref_enable_lollipop_lockscreen_notification"
             android:summary="@string/pref_enable_lollipop_lockscreen_notification_summary"
             android:title="@string/pref_enable_lollipop_lockscreen_notification" />
     </PreferenceCategory>
