@@ -116,6 +116,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     private boolean isFemtocell;
     private Boolean lastIsFemtocell;
     private boolean mobileNetworkConnected;
+    private Integer lastMobileNetworkType;
     private int mobileNetworkType;
     private BlockingQueue< Event> pendingInsert;
     private SharedPreferences prefs;
@@ -226,6 +227,13 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             @Override
             public void onDataConnectionStateChanged(int state, int networkType) {
                 mobileNetworkType = networkType;
+                
+                // Check for a network class change
+                final boolean phoneStateUpdated = onPhoneStateUpdated();
+                if (phoneStateUpdated) {
+                    updateEventDatabase();
+                }
+                
                 updateNotification(false);
             }
 
@@ -460,15 +468,17 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         
         // Prevent duplicated inserts.
         if (lastMobileNetworkConnected != null && lastMobileOperatorId != null
-        	&& lastIsFemtocell != null
+        	&& lastIsFemtocell != null && lastMobileNetworkType != null
             && lastMobileNetworkConnected.booleanValue() == mobileNetworkConnected
-            && lastIsFemtocell == isFemtocell 
-            && lastMobileOperatorId.equals(mobileOperatorId)) {
+            && lastIsFemtocell.booleanValue() == isFemtocell 
+            && lastMobileOperatorId.equals(mobileOperatorId)
+            && lastMobileNetworkType.intValue() == mobileNetworkType) {
             return false;
         }
         lastMobileNetworkConnected = mobileNetworkConnected;
         lastMobileOperatorId = mobileOperatorId;
         lastIsFemtocell = isFemtocell;
+        lastMobileNetworkType = mobileNetworkType;
         
         Log.i(TAG, "Phone state updated: operator=" + mobileOperatorId + "; connected=" + mobileNetworkConnected + "; femtocell=" + isFemtocell);
         return true;
@@ -541,11 +551,13 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         e.screenOn = pm != null ? pm.isScreenOn() : false;
         e.batteryLevel = getBatteryLevel();
         e.wifiConnected = Boolean.TRUE.equals(lastWifiConnected);
-        e.mobileConnected = powerOn ? Boolean.TRUE.equals(lastMobileNetworkConnected) : false;
+        e.mobileConnected = powerOn && Boolean.TRUE.equals(lastMobileNetworkConnected);
         e.mobileOperator = lastMobileOperatorId;
+        e.mobileNetworkType = lastMobileNetworkType != null ?
+        		lastMobileNetworkType.intValue() : TelephonyManager.NETWORK_TYPE_UNKNOWN;
         e.powerOn = powerOn;
-        e.femtocell = lastIsFemtocell;
-
+        e.femtocell  = Boolean.TRUE.equals(lastIsFemtocell);
+        
         try {
             pendingInsert.put(e);
         } catch (InterruptedException ex) {

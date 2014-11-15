@@ -216,8 +216,11 @@ public class NetstatContentProvider extends ContentProvider {
      * @author Pixmob
      */
     private static class DatabaseHelper extends SQLiteOpenHelper {
+    	private final static int DATABASE_VERSION = 3;
+    	
         public DatabaseHelper(final Context context) {
-            super(context, "netstat.db", null, 2);
+        	
+            super(context, "netstat.db", null, DATABASE_VERSION);
         }
         
         @Override
@@ -228,6 +231,7 @@ public class NetstatContentProvider extends ContentProvider {
                         + Events.TIMESTAMP + " TIMESTAMP NOT NULL, "
                         + Events.MOBILE_CONNECTED + " INTEGER NOT NULL, "
                         + Events.MOBILE_OPERATOR + " TEXT, "
+                        + Events.MOBILE_NETWORK_TYPE + " INTEGER NOT NULL, "
                         + Events.WIFI_CONNECTED + " INTEGER NOT NULL, "
                         + Events.BATTERY_LEVEL + " INTEGER NOT NULL, "
                         + Events.SCREEN_ON + " INTEGER NOT NULL, "

@@ -30,6 +30,7 @@ public class Event {
     public boolean wifiConnected;
     public boolean mobileConnected;
     public String mobileOperator;
+    public int mobileNetworkType;
     public int batteryLevel;
     public boolean powerOn;
     public boolean femtocell;
@@ -47,6 +48,7 @@ public class Event {
         if (mobileOperator != null) {
             mobileOperator = mobileOperator.intern();
         }
+        mobileNetworkType = c.getInt(c.getColumnIndexOrThrow(Events.MOBILE_NETWORK_TYPE));
         batteryLevel = c.getInt(c.getColumnIndexOrThrow(Events.BATTERY_LEVEL));
         powerOn = c.getInt(c.getColumnIndexOrThrow(Events.POWER_ON)) == 1;
         femtocell = c.getInt(c.getColumnIndexOrThrow(Events.FEMTOCELL)) == 1;
@@ -61,6 +63,7 @@ public class Event {
         values.put(Events.WIFI_CONNECTED, wifiConnected ? 1 : 0);
         values.put(Events.MOBILE_CONNECTED, mobileConnected ? 1 : 0);
         values.put(Events.MOBILE_OPERATOR, mobileOperator);
+        values.put(Events.MOBILE_NETWORK_TYPE, mobileNetworkType);
         values.put(Events.BATTERY_LEVEL, batteryLevel);
         values.put(Events.POWER_ON, powerOn ? 1 : 0);
         values.put(Events.FEMTOCELL, femtocell ? 1 : 0);
@@ -69,8 +72,8 @@ public class Event {
 	@Override
 	public String toString() {
 		return "Event [timestamp=" + timestamp + ", screenOn=" + screenOn
-				+ ", wifiConnected=" + wifiConnected + ", mobileConnected="
-				+ mobileConnected + ", mobileOperator=" + mobileOperator
+				+ ", wifiConnected=" + wifiConnected + ", mobileConnected="	+ mobileConnected
+				+ ", mobileOperator=" + mobileOperator + ", mobileNetworkType=" + mobileNetworkType
 				+ ", batteryLevel=" + batteryLevel + ", powerOn=" + powerOn
 				+ ", femtocell=" + femtocell + "]";
 	}

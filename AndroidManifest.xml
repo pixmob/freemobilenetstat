@@ -7,7 +7,7 @@
 
     <uses-sdk
         android:minSdkVersion="7"
-        android:targetSdkVersion="19" />
+        android:targetSdkVersion="21" />
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -82,6 +82,17 @@
         <activity
             android:name=".ui.Preferences"
             android:label="@string/menu_preferences" >
+        </activity>
+        
+        <activity
+            android:name=".ui.MobileNetworkChartActivity"
+            android:parentActivityName="org.pixmob.freemobile.netstat.ui.Netstat"
+            android:label="@string/chart">
+            
+            <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="org.pixmob.freemobile.netstat.ui.Netstat" />
+            
         </activity>
 
         <meta-data

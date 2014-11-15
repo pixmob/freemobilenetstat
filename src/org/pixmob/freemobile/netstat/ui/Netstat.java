@@ -29,6 +29,7 @@ import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
 import android.view.Window;
 
 /**
@@ -37,6 +38,8 @@ import android.view.Window;
  */
 @SuppressLint("CommitPrefEdits")
 public class Netstat extends FragmentActivity {
+	private StatisticsFragment statisticsFragment;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,8 +49,11 @@ public class Netstat extends FragmentActivity {
         }
 
         if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null) {
-            final StatisticsFragment f = new StatisticsFragment();
-            getSupportFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
+        	statisticsFragment = new StatisticsFragment();
+            getSupportFragmentManager().beginTransaction().add(android.R.id.content, statisticsFragment).commit();
+        }
+        else {
+        	statisticsFragment = (StatisticsFragment)getSupportFragmentManager().findFragmentById(android.R.id.content);
         }
 
         final Context c = getApplicationContext();
@@ -77,6 +83,11 @@ public class Netstat extends FragmentActivity {
             startActivity(new Intent(this, DocumentBrowser.class).putExtra(DocumentBrowser.INTENT_EXTRA_URL,
                     "CHANGELOG.html"));
         }
+    }
+    
+    public void enlargeChart(View view) {
+    	Intent intent = new Intent(this, MobileNetworkChartActivity.class);
+    	startActivity(intent);
     }
 
     @Override
