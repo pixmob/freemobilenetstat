@@ -16,39 +16,26 @@
 package org.pixmob.freemobile.netstat.ui;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
-import static org.pixmob.freemobile.netstat.Constants.INTERVAL_ONE_MONTH;
-import static org.pixmob.freemobile.netstat.Constants.INTERVAL_ONE_WEEK;
-import static org.pixmob.freemobile.netstat.Constants.INTERVAL_TODAY;
-import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
-import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 
-import java.util.Calendar;
-import java.util.Date;
-
-import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
-import org.pixmob.freemobile.netstat.ui.StatisticsFragment.Statistics;
+import org.pixmob.freemobile.netstat.content.Statistics;
+import org.pixmob.freemobile.netstat.content.StatisticsLoader;
 import org.pixmob.freemobile.netstat.util.DateUtils;
 
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.ContentObserver;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.telephony.TelephonyManager;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -81,6 +68,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     private TextView statOnFreeMobile;
     private TextView statOnFemtocell;
     private TextView statBattery;
+    private Statistics lastStatistics;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -109,7 +97,6 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         // Get widgets.
         final Activity a = getActivity();
         statisticsGroup = a.findViewById(R.id.statistics);
-        statisticsGroup.setVisibility(View.INVISIBLE);
         progressBar = (ProgressBar) a.findViewById(R.id.states_progress);
         mobileNetworkChart = (MobileNetworkChart) a.findViewById(R.id.mobile_network_chart);
         batteryChart = (BatteryChart) a.findViewById(R.id.battery_chart);
@@ -123,7 +110,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         statOnFreeMobile = (TextView) a.findViewById(R.id.stat_on_free_mobile);
         statOnFemtocell = (TextView) a.findViewById(R.id.stat_on_femtocell);
         statBattery = (TextView) a.findViewById(R.id.stat_battery);
-
+        
         // The fields are hidden the first time this fragment is displayed,
         // while statistics data are being loaded.
         statisticsGroup.setVisibility(View.INVISIBLE);
@@ -197,7 +184,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         return inflater.inflate(R.layout.statistics_fragment, container, false);
     }
 
-    public void refresh() {
+    private void refresh() {
         if (isDetached()) {
             return;
         }
@@ -211,6 +198,10 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
             Log.d(TAG, "Refresh statistics");
         }
         getLoaderManager().restartLoader(0, null, this);
+    }
+    
+    Statistics getLastSatistics() {
+    	return lastStatistics;
     }
 
     @Override
@@ -230,7 +221,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
 
         onOrangeNetwork.setText(s.orangeUsePercent + "%");
         onFreeMobileNetwork.setText(s.freeMobileUsePercent + "%");
-        mobileNetworkChart.setData(s.orangeUsePercent, s.freeMobileUsePercent);
+        mobileNetworkChart.setData(s.orangeUsePercent, s.freeMobileUsePercent, s.orange2GUsePercent, s.freeMobile3GUsePercent);
 
         final Activity a = getActivity();
         statMobileNetwork.setText(s.mobileOperator == null ? STAT_NO_VALUE : s.mobileOperator.toName(a));
@@ -249,6 +240,8 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         statisticsGroup.setVisibility(View.VISIBLE);
         statisticsGroup.invalidate();
         batteryChart.invalidate();
+        
+        lastStatistics = s;
     }
 
     private void setDurationText(TextView tv, long duration) {
@@ -266,177 +259,4 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         return DateUtils.formatDuration(duration, getActivity(), STAT_NO_VALUE);
     }
 
-    /**
-     * {@link Loader} implementation for loading events from the database, and
-     * computing statistics.
-     * @author Pixmob
-     */
-    private static class StatisticsLoader extends AsyncTaskLoader<Statistics> {
-        public StatisticsLoader(final Context context) {
-            super(context);
-
-            if (DEBUG) {
-                Log.d(TAG, "New StatisticsLoader");
-            }
-        }
-
-        @Override
-        protected void onStartLoading() {
-            super.onStartLoading();
-            forceLoad();
-
-            if (DEBUG) {
-                Log.d(TAG, "StatisticsLoader.onStartLoading()");
-            }
-        }
-
-        @Override
-        public Statistics loadInBackground() {
-            if (DEBUG) {
-                Log.d(TAG, "StatisticsLoader.loadInBackground()");
-            }
-
-            final long now = System.currentTimeMillis();
-
-            final SharedPreferences prefs = getContext().getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
-            final int interval = prefs.getInt(SP_KEY_TIME_INTERVAL, 0);
-            final long fromTimestamp;
-            if (interval == INTERVAL_ONE_MONTH) {
-                final Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(now);
-                cal.add(Calendar.MONTH, -1);
-                fromTimestamp = cal.getTimeInMillis();
-            } else if (interval == INTERVAL_ONE_WEEK) {
-                final Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(now);
-                cal.add(Calendar.DATE, -7);
-                fromTimestamp = cal.getTimeInMillis();
-            } else if (interval == INTERVAL_TODAY) {
-                // Get the date at midnight today.
-                final Time t = new Time();
-                t.set(now);
-                t.hour = 0;
-                t.minute = 0;
-                t.second = 0;
-                fromTimestamp = t.toMillis(false);
-            } else {
-                fromTimestamp = now - SystemClock.elapsedRealtime();
-            }
-
-            Log.i(TAG, "Loading statistics from " + new Date(fromTimestamp) + " to now");
-
-            final Statistics s = new Statistics();
-
-            final TelephonyManager tm = (TelephonyManager) getContext().getSystemService(
-                    Context.TELEPHONY_SERVICE);
-            s.mobileOperatorCode = tm.getNetworkOperator();
-            s.mobileOperator = MobileOperator.fromString(s.mobileOperatorCode);
-            if (s.mobileOperator == null) {
-                s.mobileOperatorCode = null;
-            }
-
-            long connectionTimestamp = 0;
-
-            Cursor c = null;
-            try {
-                c = getContext().getContentResolver().query(
-                        Events.CONTENT_URI,
-                        new String[] { Events.TIMESTAMP, Events.SCREEN_ON, Events.WIFI_CONNECTED,
-                                Events.MOBILE_CONNECTED, Events.MOBILE_OPERATOR, Events.BATTERY_LEVEL,
-                                Events.POWER_ON, Events.FEMTOCELL }, Events.TIMESTAMP + ">?",
-                        new String[] { String.valueOf(fromTimestamp) }, Events.TIMESTAMP + " ASC");
-                final int rowCount = c.getCount();
-                s.events = new Event[rowCount];
-                for (int i = 0; c.moveToNext(); ++i) {
-                    final Event e = new Event();
-                    e.read(c);
-                    s.events[i] = e;
-
-                    if (i > 0) {
-                        final Event e0 = s.events[i - 1];
-                        if (e.powerOn && !e0.powerOn) {
-                            continue;
-                        }
-                        final long dt = e.timestamp - e0.timestamp;
-
-                        final MobileOperator op = MobileOperator.fromString(e.mobileOperator);
-                        final MobileOperator op0 = MobileOperator.fromString(e0.mobileOperator);
-                        if (op != null && op.equals(op0)) {
-                            if (MobileOperator.ORANGE.equals(op)) {
-                                s.orangeTime += dt;
-                            } else if (MobileOperator.FREE_MOBILE.equals(op)) {
-                                s.freeMobileTime += dt;
-                            }
-                        }
-                        if (e.mobileConnected && !e0.mobileConnected) {
-                            connectionTimestamp = e.timestamp;
-                        }
-                        if (!e.mobileConnected) {
-                            connectionTimestamp = 0;
-                        }
-                        if (e.wifiConnected && e0.wifiConnected) {
-                            s.wifiOnTime += dt;
-                        }
-                        if (e.screenOn && e0.screenOn) {
-                            s.screenOnTime += dt;
-                        }
-                        if (e.femtocell && e0.femtocell) {
-                            s.femtocellTime += dt;
-                        }
-                    }
-                }
-
-                if (s.events.length > 0) {
-                    s.battery = s.events[s.events.length - 1].batteryLevel;
-                }
-
-                final double sTime = s.orangeTime + s.freeMobileTime;
-                s.freeMobileUsePercent = (int) Math.round(s.freeMobileTime / sTime * 100d);
-                s.orangeUsePercent = 100 - s.freeMobileUsePercent;
-                s.connectionTime = now - connectionTimestamp;
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to load statistics", e);
-                s.events = new Event[0];
-            } finally {
-                try {
-                    if (c != null) {
-                        c.close();
-                    }
-                } catch (Exception ignore) {
-                }
-            }
-
-            if (DEBUG) {
-                final long end = System.currentTimeMillis();
-                Log.d(TAG, "Statistics loaded in " + (end - now) + " ms");
-            }
-
-            return s;
-        }
-    }
-
-    /**
-     * Store statistics.
-     * @author Pixmob
-     */
-    public static class Statistics {
-        public Event[] events = new Event[0];
-        public long orangeTime;
-        public long freeMobileTime;
-        public int orangeUsePercent;
-        public int freeMobileUsePercent;
-        public MobileOperator mobileOperator;
-        public String mobileOperatorCode;
-        public long connectionTime;
-        public long screenOnTime;
-        public long wifiOnTime;
-        public long femtocellTime;
-        public int battery;
-
-        @Override
-        public String toString() {
-            return "Statistics[events=" + events.length + "; orange=" + orangeUsePercent + "%; free="
-                    + freeMobileUsePercent + "%]";
-        }
-    }
 }
