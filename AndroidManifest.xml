@@ -86,8 +86,13 @@
         
         <activity
             android:name=".ui.MobileNetworkChartActivity"
-            android:parentActivityName="org.pixmob.freemobile.netstat.Netstat"
-            android:label="@string/chart" >
+            android:parentActivityName="org.pixmob.freemobile.netstat.ui.Netstat"
+            android:label="@string/chart">
+            
+            <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="org.pixmob.freemobile.netstat.ui.Netstat" />
+            
         </activity>
 
         <meta-data
