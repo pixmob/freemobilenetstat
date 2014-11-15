@@ -56,6 +56,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -125,7 +126,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         statOnFreeMobile = (TextView) a.findViewById(R.id.stat_on_free_mobile);
         statOnFemtocell = (TextView) a.findViewById(R.id.stat_on_femtocell);
         statBattery = (TextView) a.findViewById(R.id.stat_battery);
-
+        
         // The fields are hidden the first time this fragment is displayed,
         // while statistics data are being loaded.
         statisticsGroup.setVisibility(View.INVISIBLE);
@@ -422,11 +423,6 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
                 s.orange2GUsePercent = 100 - s.orange3GUsePercent;
                 s.connectionTime = now - connectionTimestamp;
                 
-                Log.d("Statistics", "Final sTime=" + sTime + ";freeMobileTime=" + s.freeMobileTime + ";orangeTime" + s.orangeTime
-                		+ ";freeMobileUsePercent=" + s.freeMobileUsePercent + ";freeMobile3GTime" + s.freeMobile3GTime
-                		+ ";orangeUsePercent=" + s.orangeUsePercent + ";freeMobile3GUsePercent=" + s.freeMobile3GUsePercent
-                		+ ";freeMobile4GUsePercent=" + s.freeMobile4GUsePercent + ";orange2GUsePercent=" + s.orange2GUsePercent
-                		+ ";orange3GUsePercent=" + s.orange3GUsePercent + ";connectionTime=" + s.connectionTime);
             } catch (Exception e) {
                 Log.e(TAG, "Failed to load statistics", e);
                 s.events = new Event[0];

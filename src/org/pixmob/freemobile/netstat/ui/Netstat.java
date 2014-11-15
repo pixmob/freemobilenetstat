@@ -30,6 +30,7 @@ import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
@@ -39,7 +40,7 @@ import android.view.Window;
  */
 @SuppressLint("CommitPrefEdits")
 public class Netstat extends FragmentActivity {
-	private final StatisticsFragment f = new StatisticsFragment();
+	private StatisticsFragment statisticsFragment;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,7 +51,11 @@ public class Netstat extends FragmentActivity {
         }
 
         if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null) {
-            getSupportFragmentManager().beginTransaction().add(android.R.id.content, f).commit();
+        	statisticsFragment = new StatisticsFragment();
+            getSupportFragmentManager().beginTransaction().add(android.R.id.content, statisticsFragment).commit();
+        }
+        else {
+        	statisticsFragment = (StatisticsFragment)getSupportFragmentManager().findFragmentById(android.R.id.content);
         }
 
         final Context c = getApplicationContext();
@@ -84,7 +89,7 @@ public class Netstat extends FragmentActivity {
     
     public void enlargeChart(View view) {
     	Intent intent = new Intent(this, MobileNetworkChartActivity.class);
-    	Statistics s = f.getLastSatistics();
+    	Statistics s = statisticsFragment.getLastSatistics();
     	if (s != null) {
 	    	intent.putExtra("on_orange_network", s.orangeUsePercent);
 	    	intent.putExtra("on_orange_2G_network", s.orange2GUsePercent);
