@@ -52,9 +52,7 @@ public class Netstat extends FragmentActivity {
         	statisticsFragment = new StatisticsFragment();
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, statisticsFragment).commit();
         }
-        else {
-        	statisticsFragment = (StatisticsFragment)getSupportFragmentManager().findFragmentById(android.R.id.content);
-        }
+        else statisticsFragment = (StatisticsFragment)getSupportFragmentManager().findFragmentById(android.R.id.content);
 
         final Context c = getApplicationContext();
         final Intent i = new Intent(c, MonitorService.class);
