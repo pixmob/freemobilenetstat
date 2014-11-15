@@ -7,7 +7,8 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="center" >
+        android:gravity="center"
+        android:onClick="enlargeChart" >
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -60,7 +61,7 @@
             android:layout_width="@dimen/network_pie_width"
             android:layout_height="@dimen/network_pie_width"
             android:layout_marginLeft="8dip"
-            android:onClick="enlargeChart" />
+            />
     </LinearLayout>
 
     <LinearLayout
