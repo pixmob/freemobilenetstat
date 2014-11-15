@@ -52,6 +52,12 @@
             android:key="pref_enable_auto_restart_service"
             android:summary="@string/pref_enable_auto_restart_service_summary"
             android:title="@string/pref_enable_auto_restart_service" />
+        
+        <CheckBoxPreference
+            android:enabled="true"
+            android:key="pref_disable_lollipop_lockscreen_notification"
+            android:summary="@string/pref_enable_lollipop_lockscreen_notification_summary"
+            android:title="@string/pref_enable_lollipop_lockscreen_notification" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_about" >
         <Preference
