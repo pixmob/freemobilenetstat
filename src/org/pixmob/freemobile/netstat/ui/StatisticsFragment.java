@@ -409,18 +409,24 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
                     s.battery = s.events[s.events.length - 1].batteryLevel;
                 }
 
-                final double sTime = s.orangeTime + s.freeMobileTime;
+                final double sTime = s.orangeTime + s.freeMobileTime;                
                 s.freeMobileUsePercent = (int) Math.round(s.freeMobileTime / sTime * 100d);
-                s.orangeUsePercent = 100 - s.freeMobileUsePercent;
-                s.freeMobile3GUsePercent =
-                		s.freeMobileUsePercent == 0 ? 0 : (int) Math.round(s.freeMobile3GTime / s.freeMobileTime * 100d);
+                s.orangeUsePercent = (int) Math.round(s.orangeTime / sTime * 100d);
                 s.freeMobile4GUsePercent =
-                		s.freeMobileUsePercent == 0 ? 0 : 100 - s.freeMobile3GUsePercent;
-                s.orange2GUsePercent =
-                		s.orangeUsePercent == 0 ? 0 : (int) Math.round(s.orange2GTime / s.orangeTime * 100d);
+                		s.freeMobileUsePercent == 0 || s.freeMobileTime == 0 ?
+                				0 : (int) Math.round((double)s.freeMobile4GTime / s.freeMobileTime * 100);
+                s.freeMobile3GUsePercent = 100 - s.freeMobile4GUsePercent;
                 s.orange3GUsePercent =
-                		s.orangeUsePercent == 0 ? 0 : 100 - s.orange2GUsePercent;
+                		s.orangeUsePercent == 0 || s.orangeTime == 0 ?
+                				0 : (int) Math.round((double)s.orange3GTime / s.orangeTime * 100);
+                s.orange2GUsePercent = 100 - s.orange3GUsePercent;
                 s.connectionTime = now - connectionTimestamp;
+                
+                Log.d("Statistics", "Final sTime=" + sTime + ";freeMobileTime=" + s.freeMobileTime + ";orangeTime" + s.orangeTime
+                		+ ";freeMobileUsePercent=" + s.freeMobileUsePercent + ";freeMobile3GTime" + s.freeMobile3GTime
+                		+ ";orangeUsePercent=" + s.orangeUsePercent + ";freeMobile3GUsePercent=" + s.freeMobile3GUsePercent
+                		+ ";freeMobile4GUsePercent=" + s.freeMobile4GUsePercent + ";orange2GUsePercent=" + s.orange2GUsePercent
+                		+ ";orange3GUsePercent=" + s.orange3GUsePercent + ";connectionTime=" + s.connectionTime);
             } catch (Exception e) {
                 Log.e(TAG, "Failed to load statistics", e);
                 s.events = new Event[0];
