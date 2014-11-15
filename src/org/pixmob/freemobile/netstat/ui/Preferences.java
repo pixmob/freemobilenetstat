@@ -157,7 +157,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         	g.removePreference(pm.findPreference(SP_KEY_ENABLE_AUTO_RESTART_SERVICE));
         }
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-        	final PreferenceGroup g = (PreferenceGroup) pm.findPreference("pref_enable_lollipop_lockscreen_notification");
+        	final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
         	g.removePreference(pm.findPreference(SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION));
         }
     }

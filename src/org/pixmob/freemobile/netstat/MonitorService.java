@@ -484,6 +484,13 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                     networkOperatorSettingsPendingIntent);
             }
         }
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+        		&& Boolean.FALSE.equals(prefs.getBoolean(SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION, true))) {
+        	if (DEBUG)
+        		Log.d(TAG, "Lollipop : notification will not be displayed on lockscreen.");
+        	nBuilder.setVisibility(Notification.VISIBILITY_SECRET);
+        }
 
         if (playSound) {
             final String rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND, null);
@@ -492,10 +499,6 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 nBuilder.setSound(soundUri);
             }
         }
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-        		&& prefs.getBoolean(SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION, true))
-        	nBuilder.setVisibility(Notification.VISIBILITY_SECRET);
 
         final Notification n = nBuilder.build();
         
