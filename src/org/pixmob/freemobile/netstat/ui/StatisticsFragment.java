@@ -413,13 +413,13 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
                 s.freeMobileUsePercent = (int) Math.round(s.freeMobileTime / sTime * 100d);
                 s.orangeUsePercent = 100 - s.freeMobileUsePercent;
                 s.freeMobile3GUsePercent =
-                		s.freeMobileTime == 0 ? 0 : (int) Math.round(s.freeMobile3GTime / s.freeMobileTime * 100d);
+                		s.freeMobileUsePercent == 0 ? 0 : (int) Math.round(s.freeMobile3GTime / s.freeMobileTime * 100d);
                 s.freeMobile4GUsePercent =
-                		s.freeMobileTime == 0 ? 0 : 100 - s.freeMobile3GUsePercent;
+                		s.freeMobileUsePercent == 0 ? 0 : 100 - s.freeMobile3GUsePercent;
                 s.orange2GUsePercent =
-                		s.orangeTime == 0 ? 0 : (int) Math.round(s.orange2GTime / s.orangeTime * 100d);
+                		s.orangeUsePercent == 0 ? 0 : (int) Math.round(s.orange2GTime / s.orangeTime * 100d);
                 s.orange3GUsePercent =
-                		s.orangeTime == 0 ? 0 : 100 - s.orange2GUsePercent;
+                		s.orangeUsePercent == 0 ? 0 : 100 - s.orange2GUsePercent;
                 s.connectionTime = now - connectionTimestamp;
             } catch (Exception e) {
                 Log.e(TAG, "Failed to load statistics", e);

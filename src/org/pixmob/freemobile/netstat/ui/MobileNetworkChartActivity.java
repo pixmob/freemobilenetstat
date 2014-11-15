@@ -49,9 +49,9 @@ public class MobileNetworkChartActivity extends Activity{
 	    final int onFreeMobile4GNetwork = intent.getIntExtra("on_free_mobile_4G_network", 100 - onFreeMobile3GNetwork);
 
 	    mobileNetworkChart.setData(onOrangeNetwork, onFreeMobileNetwork, onOrange2GNetwork, onFreeMobile3GNetwork);
-	    onOrange2GnetworkTextView.setText(onOrange2GNetwork + "%");
-	    onOrange3GnetworkTextView.setText(onOrange3GNetwork + "%");
-	    onFreeMobile3GnetworkTextView.setText(onFreeMobile3GNetwork + "%");
-	    onFreeMobile4GnetworkTextView.setText(onFreeMobile4GNetwork + "%");
+	    onOrange2GnetworkTextView.setText(onOrange2GNetwork * onOrangeNetwork / 100 + "%");
+	    onOrange3GnetworkTextView.setText(onOrange3GNetwork * onOrangeNetwork / 100 + "%");
+	    onFreeMobile3GnetworkTextView.setText(onFreeMobile3GNetwork * onFreeMobileNetwork / 100 + "%");
+	    onFreeMobile4GnetworkTextView.setText(onFreeMobile4GNetwork * onFreeMobileNetwork / 100 + "%");
 	}
 }
