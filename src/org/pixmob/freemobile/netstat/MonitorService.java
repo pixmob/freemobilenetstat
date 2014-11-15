@@ -553,7 +553,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         e.wifiConnected = Boolean.TRUE.equals(lastWifiConnected);
         e.mobileConnected = powerOn && Boolean.TRUE.equals(lastMobileNetworkConnected);
         e.mobileOperator = lastMobileOperatorId;
-        e.mobileNetworkType = lastMobileNetworkType != null ? lastMobileNetworkType.intValue() : 0;
+        e.mobileNetworkType = lastMobileNetworkType != null ?
+        		lastMobileNetworkType.intValue() : TelephonyManager.NETWORK_TYPE_UNKNOWN;
         e.powerOn = powerOn;
         e.femtocell  = Boolean.TRUE.equals(lastIsFemtocell);
         
