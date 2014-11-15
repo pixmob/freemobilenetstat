@@ -15,43 +15,33 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
-import org.pixmob.freemobile.netstat.R;
-
-import android.app.Activity;
-import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.support.v4.app.FragmentActivity;
+import android.view.Window;
 
 /**
- * Application chart screen.
+ * Application chart activity (enlarged Chart).
  * @author gilbsgilbs
  */
-public class MobileNetworkChartActivity extends Activity{
+public class MobileNetworkChartActivity extends FragmentActivity {
+	
+	MobileNetworkChartFragment mobileNetworkChartActivity;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.mobile_network_chart_activity);
 	    
-	    final MobileNetworkChart mobileNetworkChart = (MobileNetworkChart) findViewById(R.id.mobile_network_chart);
-	    final TextView onOrange2GnetworkTextView = (TextView) findViewById(R.id.on_orange_2G_network);
-	    final TextView onOrange3GnetworkTextView = (TextView) findViewById(R.id.on_orange_3G_network);
-	    final TextView onFreeMobile3GnetworkTextView = (TextView) findViewById(R.id.on_free_mobile_3G_network);
-	    final TextView onFreeMobile4GnetworkTextView = (TextView) findViewById(R.id.on_free_mobile_4G_network);
-
-	    Intent intent = getIntent();
+	    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
 	    
-	    final int onOrangeNetwork = intent.getIntExtra("on_orange_network", 0);
-	    final int onFreeMobileNetwork = intent.getIntExtra("on_free_mobile_network", 100 - onOrangeNetwork);
-	    final int onOrange2GNetwork = intent.getIntExtra("on_orange_2G_network", 0);
-	    final int onOrange3GNetwork = intent.getIntExtra("on_orange_3G_network", 100 - onOrange2GNetwork);
-	    final int onFreeMobile3GNetwork = intent.getIntExtra("on_free_mobile_3G_network", 0);
-	    final int onFreeMobile4GNetwork = intent.getIntExtra("on_free_mobile_4G_network", 100 - onFreeMobile3GNetwork);
-
-	    mobileNetworkChart.setData(onOrangeNetwork, onFreeMobileNetwork, onOrange2GNetwork, onFreeMobile3GNetwork);
-	    onOrange2GnetworkTextView.setText(onOrange2GNetwork * onOrangeNetwork / 100 + "%");
-	    onOrange3GnetworkTextView.setText(onOrange3GNetwork * onOrangeNetwork / 100 + "%");
-	    onFreeMobile3GnetworkTextView.setText(onFreeMobile3GNetwork * onFreeMobileNetwork / 100 + "%");
-	    onFreeMobile4GnetworkTextView.setText(onFreeMobile4GNetwork * onFreeMobileNetwork / 100 + "%");
+	    if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null) {
+	    	mobileNetworkChartActivity = new MobileNetworkChartFragment();
+            getSupportFragmentManager().beginTransaction().add(android.R.id.content, mobileNetworkChartActivity).commit();
+        }
+        else {
+        	mobileNetworkChartActivity = (MobileNetworkChartFragment)getSupportFragmentManager().findFragmentById(android.R.id.content);
+        }
 	}
 }

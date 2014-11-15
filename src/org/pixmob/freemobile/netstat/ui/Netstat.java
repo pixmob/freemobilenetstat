@@ -19,7 +19,6 @@ import org.pixmob.freemobile.netstat.MonitorService;
 import org.pixmob.freemobile.netstat.SyncService;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
-import org.pixmob.freemobile.netstat.ui.StatisticsFragment.Statistics;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -30,7 +29,6 @@ import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
@@ -89,16 +87,7 @@ public class Netstat extends FragmentActivity {
     
     public void enlargeChart(View view) {
     	Intent intent = new Intent(this, MobileNetworkChartActivity.class);
-    	Statistics s = statisticsFragment.getLastSatistics();
-    	if (s != null) {
-	    	intent.putExtra("on_orange_network", s.orangeUsePercent);
-	    	intent.putExtra("on_orange_2G_network", s.orange2GUsePercent);
-	    	intent.putExtra("on_orange_3G_network", s.orange3GUsePercent);
-	    	intent.putExtra("on_free_mobile_network", s.freeMobileUsePercent);
-	    	intent.putExtra("on_free_mobile_3G_network", s.freeMobile3GUsePercent);
-	    	intent.putExtra("on_free_mobile_4G_network", s.freeMobile4GUsePercent);
-	    	startActivity(intent);
-    	}
+    	startActivity(intent);
     }
 
     @Override

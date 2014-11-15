@@ -1,36 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
-  android:orientation="vertical" 
-  android:layout_width="fill_parent" 
-  android:layout_height="fill_parent"> 
-
-
-  <!-- Chart Wrapper --> 
-  <LinearLayout
-    android:orientation="horizontal" 
-    android:layout_weight="1" 
-    android:layout_width="fill_parent" 
-    android:layout_height="fill_parent"
-    android:baselineAligned="false"> 
-    
-     <!--  Chart layout -->
-      
-        <org.pixmob.freemobile.netstat.ui.MobileNetworkChart
-            android:id="@+id/mobile_network_chart"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_margin="30dip" />
-
-  </LinearLayout> 
-
-  <!-- Bottom stats -->
-  <LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" 
     android:layout_weight="0" 
     android:layout_width="fill_parent" 
     android:layout_height="wrap_content"
     android:layout_margin="3dip"
-    android:gravity="center"> 
+    android:gravity="center" >
     
       <!-- Left (Orange) -->
       <LinearLayout
@@ -136,8 +111,6 @@
 			                android:textAppearance="?android:attr/textAppearanceLarge"
 			                android:textColor="@color/free_mobile_4G_network_color1" />
             	</LinearLayout>
-        </LinearLayout>
       
   </LinearLayout> 
-
-</LinearLayout> 
+ </LinearLayout> 
