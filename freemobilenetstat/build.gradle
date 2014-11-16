@@ -1,0 +1,27 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.1"
+
+    defaultConfig {
+        applicationId "org.pixmob.freemobile.netstat"
+        minSdkVersion 7
+        targetSdkVersion 21
+        versionCode 28
+        versionName "2.0.0-beta1"
+    }
+
+    buildTypes {
+        release {
+            runProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
+        }
+    }
+}
+
+dependencies {
+    compile project(':httpclient')
+    compile 'com.android.support:support-v4:21.0.0'
+    compile files('libs/bugsense3.2.2.jar')
+}
