@@ -148,10 +148,14 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_GPRS, R.string.network_type_gprs);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_HSDPA, R.string.network_type_hsdpa);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_HSPA, R.string.network_type_hspa);
-        NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_HSPAP, R.string.network_type_hspap);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB_MR2) {
+            NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_HSPAP, R.string.network_type_hspap);
+        }
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_HSUPA, R.string.network_type_hsupa);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_UMTS, R.string.network_type_umts);
-        NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_LTE, R.string.network_type_lte);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+            NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_LTE, R.string.network_type_lte);
+        }
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_CDMA, R.string.network_type_cdma);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_UNKNOWN, R.string.network_type_unknown);
 

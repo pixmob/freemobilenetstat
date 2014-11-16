@@ -16,6 +16,7 @@
 
 package org.pixmob.httpclient;
 
+import android.annotation.SuppressLint;
 import android.util.Base64OutputStream;
 
 import java.io.UnsupportedEncodingException;
@@ -496,6 +497,7 @@ class Base64 {
      *            controls certain features of the encoded output. Passing
      *            {@code DEFAULT} results in output that adheres to RFC 2045.
      */
+    @SuppressLint("Assert")
     public static byte[] encode(byte[] input, int offset, int len, int flags) {
         Encoder encoder = new Encoder(flags, null);
 
@@ -528,7 +530,9 @@ class Base64 {
         encoder.output = new byte[output_len];
         encoder.process(input, offset, len, true);
 
-        assert encoder.op == output_len;
+        if (BuildConfig.DEBUG) {
+            assert encoder.op == output_len;
+        }
 
         return encoder.output;
     }
@@ -713,8 +717,10 @@ class Base64 {
                     output[op++] = '\n';
                 }
 
-                assert tailLen == 0;
-                assert p == len;
+                if (BuildConfig.DEBUG) {
+                    assert tailLen == 0;
+                    assert p == len;
+                }
             } else {
                 // Save the leftovers in tail to be consumed on the next
                 // call to encodeInternal.

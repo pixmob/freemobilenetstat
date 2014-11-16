@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/chart_wrapper_layout"
@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dip"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -38,13 +38,12 @@
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:gravity="center|right"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/on_orange_network"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="87%"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/orange_3G_network_color1" />
 
@@ -52,7 +51,6 @@
                 android:id="@+id/on_free_mobile_network"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="13%"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/free_mobile_3G_network_color1" />
         </LinearLayout>
@@ -69,13 +67,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dip"
         android:baselineAligned="false"
-        android:orientation="horizontal" >
+        android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 style="@style/stat_row_even"
@@ -106,7 +104,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/stat_on_femtocell" />
-            
+
             <TextView
                 style="@style/stat_row"
                 android:layout_width="fill_parent"
@@ -130,63 +128,55 @@
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/stat_mobile_network"
                 style="@style/stat_row_even"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="Orange" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/stat_mobile_code"
                 style="@style/stat_row"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="20810" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/stat_on_orange"
                 style="@style/stat_row_even"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="8h 14m" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/stat_on_free_mobile"
                 style="@style/stat_row"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="12m" />
-			
-			<TextView
+                android:layout_height="wrap_content" />
+
+            <TextView
                 android:id="@+id/stat_on_femtocell"
                 style="@style/stat_row_even"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="25m" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/stat_screen"
                 style="@style/stat_row"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="1h 27m" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/stat_wifi"
                 style="@style/stat_row_even"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="27m" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/stat_battery"
                 style="@style/stat_row"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="74%" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
 
