@@ -245,10 +245,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 mobileNetworkType = networkType;
                 
                 // Check for a network class change
-                final boolean phoneStateUpdated = onPhoneStateUpdated();
-                if (phoneStateUpdated) {
+                if (onPhoneStateUpdated() >= 0)
                     updateEventDatabase();
-                }
                 
                 updateNotification(false);
             }
@@ -274,11 +272,11 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                     serviceState != null && serviceState.getState() == ServiceState.STATE_IN_SERVICE;
                 
                 //check for femtocell
-                final boolean phoneStateUpdated = onPhoneStateUpdated();
-                if (phoneStateUpdated) {
+                final int phoneStateUpdated = onPhoneStateUpdated();
+                if (phoneStateUpdated >= 0)
                     updateEventDatabase();
-                }
-                updateNotification(phoneStateUpdated);
+                
+                updateNotification(phoneStateUpdated == 1);
             }
         };
         tm.listen(phoneMonitor, PhoneStateListener.LISTEN_SERVICE_STATE |
@@ -445,7 +443,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	            
 	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
 		                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
-        	} else if (mobileOperatorId == null) { // No signal
+        	} else if (mobileNetworkConnected) { // No signal
 	            final String tickerText = getString(R.string.stat_no_signal);
 	            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
 	            
@@ -572,8 +570,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
     /**
      * This method is called when the phone service state is updated.
+     * @return -1 : no update ; 0 : minor update ; 1 : major update
+     * It is a major update if mobile operator changes or phone connects a network.
      */
-	private boolean onPhoneStateUpdated() {
+	private int onPhoneStateUpdated() {		
         mobileOperatorId = tm != null ? tm.getNetworkOperator() : null;
         if (TextUtils.isEmpty(mobileOperatorId)) {
             mobileOperatorId = null;
@@ -588,8 +588,14 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             && lastIsFemtocell.booleanValue() == isFemtocell 
             && lastMobileOperatorId.equals(mobileOperatorId)
             && lastMobileNetworkType.intValue() == mobileNetworkType) {
-            return false;
+            return -1;
         }
+        
+		int ret = 0;
+        
+        if (lastMobileNetworkConnected != null && lastMobileNetworkConnected.booleanValue() != mobileNetworkConnected
+        		|| lastMobileOperatorId != null && !lastMobileOperatorId.equals(mobileOperatorId))
+        	ret = 1;
         
         lastMobileNetworkConnected = mobileNetworkConnected;
         lastMobileOperatorId = mobileOperatorId;
@@ -597,7 +603,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         lastMobileNetworkType = mobileNetworkType;
         
         Log.i(TAG, "Phone state updated: operator=" + mobileOperatorId + "; connected=" + mobileNetworkConnected + "; femtocell=" + isFemtocell);
-        return true;
+        return ret;
     }
 
 	/**
