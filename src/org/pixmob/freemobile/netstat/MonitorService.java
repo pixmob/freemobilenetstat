@@ -443,7 +443,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	            
 	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
 		                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
-        	} else if (mobileNetworkConnected) { // No signal
+        	} else if (mobileOperatorId == null) { // No signal
 	            final String tickerText = getString(R.string.stat_no_signal);
 	            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
 	            
