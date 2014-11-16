@@ -15,7 +15,7 @@ android {
     buildTypes {
         release {
             runProguard true
-            proguardFiles getDefaultProguardFile('proguard-android.txt')
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), "proguard-rules.txt"
         }
     }
 }
@@ -23,7 +23,6 @@ android {
 dependencies {
     compile project(':httpclient')
     compile 'com.android.support:support-v4:21.0.0'
-    //compile files('libs/bugsense3.2.2.jar')
     compile 'ch.acra:acra:4.5.0'
     compile 'com.intellij:annotations:+@jar'
 }
