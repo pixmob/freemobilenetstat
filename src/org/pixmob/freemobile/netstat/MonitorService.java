@@ -106,8 +106,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     /**
      * SDK Versions concerned with service auto-kill issue.
      */
-    public static final int[] SDK_ALLOWED_TO_AUTO_RESTART_SERVICE =
-    	{ Build.VERSION_CODES.JELLY_BEAN, Build.VERSION_CODES.JELLY_BEAN_MR1, 
+    public static final Integer[] SDK_ALLOWED_TO_AUTO_RESTART_SERVICE =
+    	new Integer[] { Build.VERSION_CODES.JELLY_BEAN, Build.VERSION_CODES.JELLY_BEAN_MR1, 
     	  Build.VERSION_CODES.JELLY_BEAN_MR2, Build.VERSION_CODES.KITKAT };
     
     /**
