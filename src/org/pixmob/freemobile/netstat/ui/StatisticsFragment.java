@@ -19,6 +19,7 @@ import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 
 import org.pixmob.freemobile.netstat.MobileOperator;
+import org.pixmob.freemobile.netstat.MonitorService;
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.content.Statistics;
@@ -68,7 +69,6 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     private TextView statOnFreeMobile;
     private TextView statOnFemtocell;
     private TextView statBattery;
-    private Statistics lastStatistics;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -145,17 +145,20 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case R.id.menu_export:
-            onMenuExport();
-            return true;
-        case R.id.menu_preferences:
-            onMenuPreferences();
-            return true;
+	        case R.id.menu_export:
+	            onMenuExport();
+	            return true;
+	        case R.id.menu_preferences:
+	            onMenuPreferences();
+	            return true;
+	        case R.id.menu_quit:
+	        	onMenuQuit();
+	        	return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void onMenuExport() {
+	private void onMenuExport() {
         exportTask = new ExportTask(getActivity().getApplicationContext(), getFragmentManager());
         exportTask.execute();
     }
@@ -163,6 +166,12 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     private void onMenuPreferences() {
         startActivity(new Intent(getActivity(), Preferences.class));
     }
+
+    private void onMenuQuit() {
+    	getActivity().stopService(new Intent(getActivity().getApplicationContext(), MonitorService.class));
+    	getActivity().finish();
+    	System.exit(0);
+	}
 
     @Override
     public void onResume() {
@@ -198,10 +207,6 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
             Log.d(TAG, "Refresh statistics");
         }
         getLoaderManager().restartLoader(0, null, this);
-    }
-    
-    Statistics getLastSatistics() {
-    	return lastStatistics;
     }
 
     @Override
@@ -239,9 +244,8 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         progressBar.setVisibility(View.INVISIBLE);
         statisticsGroup.setVisibility(View.VISIBLE);
         statisticsGroup.invalidate();
+        mobileNetworkChart.invalidate();
         batteryChart.invalidate();
-        
-        lastStatistics = s;
     }
 
     private void setDurationText(TextView tv, long duration) {
