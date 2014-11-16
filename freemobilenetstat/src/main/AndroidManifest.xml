@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="org.pixmob.freemobile.netstat" >
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -80,7 +81,8 @@
         <activity
             android:name=".ui.MobileNetworkChartActivity"
             android:parentActivityName="org.pixmob.freemobile.netstat.ui.Netstat"
-            android:label="@string/chart">
+            android:label="@string/chart"
+            tools:ignore="UnusedAttribute">
             
             <meta-data
             android:name="android.support.PARENT_ACTIVITY"
