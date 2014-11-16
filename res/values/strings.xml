@@ -4,6 +4,8 @@
     <string name="app_name">Free Mobile Netstat</string>
     <string name="stat_connected_to_foreign_mobile_network">Connecté à un réseau étranger</string>
     <string name="stat_connected_to_mobile_network">Connecté au réseau %s</string>
+    <string name="stat_airplane_mode_on">Mode avion détecté</string>
+    <string name="stat_no_signal">Aucun signal</string>
     <string name="mobile_network_type">Réseau mobile %s</string>
     <string name="network_free_mobile">Free</string>
     <string name="network_orange">Orange</string>
@@ -38,6 +40,7 @@
     <string name="export_error">Impossible d\'exporter les données</string>
     <string name="menu_export">Exporter</string>
     <string name="menu_preferences">Préférences</string>
+    <string name="menu_quit">Quitter</string>
     <string name="chart">Camembert</string>
     <string name="pref_background_service">Surveillance du réseau</string>
     <string name="pref_enable_at_boot">Activer au démarrage</string>
@@ -49,11 +52,15 @@
     <string name="pref_changelog">Nouveautés</string>
     <string name="pref_changelog_summary">Quoi de neuf dans cette version ?</string>
     <string name="pref_license">Licence</string>
-    <string name="pref_license_summary">Code source disponible sur github.com/pixmob</string>
+    <string name="pref_license_summary">Code source disponible sur github.com/vdavy/freemobilenetstat</string>
     <string name="pref_homesite">Statistiques nationales</string>
     <string name="pref_homesite_summary">Ouvrir la page freemobilenetstat.appspot.com</string>
     <string name="pref_notif_sound">Alarme sonore</string>
     <string name="pref_notif_sound_summary">Avertir lorsque l\'opérateur de réseau change</string>
+    <string name="pref_enable_auto_restart_service">Relancement automatique du service</string>
+    <string name="pref_enable_auto_restart_service_summary">Si la notification ne s\'actualise plus (Bug KitKat).</string>
+    <string name="pref_enable_lollipop_lockscreen_notification">Notification sur l\'écran de verrouillage.</string>
+    <string name="pref_enable_lollipop_lockscreen_notification_summary">Afficher/Masquer la notification sur l\'écran de verrouillage sécurisé.</string>
     <string name="pref_time_interval">Afficher les données depuis…</string>
     <string name="pref_notif">Notification</string>
     <string name="pref_notif_action">Action de la notification</string>
@@ -68,6 +75,7 @@
     <string name="notif_action_statistics">Statistiques</string>
     <string name="notif_action_network_operator_settings">Opérateur de réseau</string>
     <string name="notif_action_open_network_operator_settings">Paramètres des opérateurs</string>
+    <string name="notif_monitoring_disabled">Le monitoring a été désactivé.</string>
     <string name="interval_since_boot">Démarrage du téléphone</string>
     <string name="interval_today">Aujourd\'hui</string>
     <string name="interval_one_week">Une semaine</string>

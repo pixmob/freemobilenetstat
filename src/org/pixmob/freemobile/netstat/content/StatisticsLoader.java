@@ -51,7 +51,7 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
     }
 
     @Override
-    public org.pixmob.freemobile.netstat.content.Statistics loadInBackground() {
+    public Statistics loadInBackground() {
         if (DEBUG) {
             Log.d(TAG, "StatisticsLoader.loadInBackground()");
         }

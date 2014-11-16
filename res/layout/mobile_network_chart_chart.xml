@@ -6,8 +6,6 @@
     android:baselineAligned="false"
     android:orientation="horizontal" >
     
-     <!--  Chart layout -->
-      
         <org.pixmob.freemobile.netstat.ui.MobileNetworkChart
             android:id="@+id/mobile_network_chart"
             android:layout_width="fill_parent"

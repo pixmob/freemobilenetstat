@@ -11,5 +11,9 @@
         android:icon="@drawable/ic_menu_preferences"
         android:title="@string/menu_preferences">
     </item>
+    <item
+        android:id="@+id/menu_quit"
+        android:title="@string/menu_quit">
+    </item>
 
 </menu>

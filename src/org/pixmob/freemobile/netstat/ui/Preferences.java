@@ -22,6 +22,9 @@ import static org.pixmob.freemobile.netstat.Constants.INTERVAL_TODAY;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_STATISTICS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
@@ -31,9 +34,11 @@ import static org.pixmob.freemobile.netstat.Constants.THEME_COLOR;
 import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
 import static org.pixmob.freemobile.netstat.Constants.THEME_PIE;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.pixmob.freemobile.netstat.MonitorService;
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.feature.BackupManagerFeature;
 import org.pixmob.freemobile.netstat.feature.Features;
@@ -108,6 +113,8 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         pm.findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(this);
         pm.findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(this);
         pm.findPreference(SP_KEY_HOMESITE).setOnPreferenceClickListener(this);
+        
+        pm.findPreference(SP_KEY_STAT_NOTIF_SOUND).setOnPreferenceChangeListener(this); // RingtonePreference does not trigger otherwise
 
         final IntListPreference lp = (IntListPreference) pm.findPreference(SP_KEY_TIME_INTERVAL);
         lp.setEntries(getValues(timeIntervals));
@@ -146,6 +153,16 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
             g.removePreference(pm.findPreference(SP_KEY_ENABLE_NOTIF_ACTIONS));
         }
+        if (!Arrays.asList(MonitorService.SDK_ALLOWED_TO_AUTO_RESTART_SERVICE)
+        		.contains(Build.VERSION.SDK_INT)) {
+        	// Disable auto restart service workaround if not on KitKat nor Jelly Bean
+            final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
+        	g.removePreference(pm.findPreference(SP_KEY_ENABLE_AUTO_RESTART_SERVICE));
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        	final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
+        	g.removePreference(pm.findPreference(SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION));
+        }
     }
 
     @Override
@@ -168,13 +185,17 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             final IntListPreference lp = (IntListPreference) p;
             final int intValue = Integer.parseInt((String) value);
             lp.setSummary(timeIntervals.get(intValue));
-        }
-        if (SP_KEY_THEME.equals(k)) {
+        } else if (SP_KEY_THEME.equals(k)) {
             Integer themePrefSummary = themes.get(value);
             if (themePrefSummary == null) {
                 themePrefSummary = themes.get(THEME_DEFAULT);
             }
             p.setSummary(themePrefSummary);
+        } else if (SP_KEY_STAT_NOTIF_SOUND.equals(k)) {
+        	if (new String().equals(value)) { // Fix for phone always vibrating after selecting a sound, even "None".
+        		getPreferenceManager().getSharedPreferences().edit().putString(SP_KEY_STAT_NOTIF_SOUND, null).commit();
+        		return false;
+        	}
         }
 
         return true;

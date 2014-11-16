@@ -19,23 +19,27 @@ import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.ACTION_NOTIFICATION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 import static org.pixmob.freemobile.netstat.Constants.THEME_COLOR;
 import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
 import static org.pixmob.freemobile.netstat.Constants.THEME_PIE;
-
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.util.IntentFactory;
-
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -54,9 +58,13 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.PowerManager;
 import android.os.Process;
+import android.os.SystemClock;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.CellIdentityGsm;
 import android.telephony.CellIdentityWcdma;
@@ -91,8 +99,16 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      * Special data used for terminating the PendingInsert worker thread.
      */
     private static final Event STOP_PENDING_CONTENT_MARKER = new Event();
-    
+    /**
+     * Femtocell's LAC start with this code.
+     */
     private static final String FREE_MOBILE_FEMTOCELL_LAC_CODE = "98";
+    /**
+     * SDK Versions concerned with service auto-kill issue.
+     */
+    public static final Integer[] SDK_ALLOWED_TO_AUTO_RESTART_SERVICE =
+    	new Integer[] { Build.VERSION_CODES.JELLY_BEAN, Build.VERSION_CODES.JELLY_BEAN_MR1, 
+    	  Build.VERSION_CODES.JELLY_BEAN_MR2, Build.VERSION_CODES.KITKAT };
     
     /**
      * This intent will open the main UI.
@@ -155,7 +171,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	@Override
     public void onCreate() {
         super.onCreate();
-
+        
         prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
         prefs.registerOnSharedPreferenceChangeListener(this);
 
@@ -229,10 +245,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 mobileNetworkType = networkType;
                 
                 // Check for a network class change
-                final boolean phoneStateUpdated = onPhoneStateUpdated();
-                if (phoneStateUpdated) {
+                if (onPhoneStateUpdated() >= 0)
                     updateEventDatabase();
-                }
                 
                 updateNotification(false);
             }
@@ -258,11 +272,11 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                     serviceState != null && serviceState.getState() == ServiceState.STATE_IN_SERVICE;
                 
                 //check for femtocell
-                final boolean phoneStateUpdated = onPhoneStateUpdated();
-                if (phoneStateUpdated) {
+                final int phoneStateUpdated = onPhoneStateUpdated();
+                if (phoneStateUpdated >= 0)
                     updateEventDatabase();
-                }
-                updateNotification(phoneStateUpdated);
+                
+                updateNotification(phoneStateUpdated == 1);
             }
         };
         tm.listen(phoneMonitor, PhoneStateListener.LISTEN_SERVICE_STATE |
@@ -291,6 +305,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // http://stackoverflow.com/q/5076410/422906
         shutdownIntentFilter.addAction("android.intent.action.QUICKBOOT_POWEROFF");
         registerReceiver(shutdownMonitor, shutdownIntentFilter);
+        
+        // Kitkat and JellyBean auto-kill service workaround
+        // http://stackoverflow.com/a/20735519/1527491
+        ensureServiceStaysRunning();
     }
 
     @Override
@@ -342,30 +360,104 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         onConnectivityUpdated();
         onPhoneStateUpdated();
         updateNotification(false);
+        
+        if ((intent != null) && (intent.getBooleanExtra("ALARM_RESTART_SERVICE_DIED", false)))
+        {
+        	if (DEBUG)
+        		Log.d(TAG, "onStartCommand after ALARM_RESTART_SERVICE_DIED");
+            if (isRunning())
+            {
+            	if (DEBUG)
+            		Log.d(TAG, "Service already running - return immediately...");
+                ensureServiceStaysRunning();
+            }
+        }
 
         return START_STICKY;
+    }
+    
+    private boolean isRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))
+            if (getClass().getName().equals(service.service.getClassName()))
+                return true;
+        return false;
+    }
+    
+    private void ensureServiceStaysRunning() {
+        // KitKat appears to have (in some cases) forgotten how to honor START_STICKY
+        // and if the service is killed, it doesn't restart.  On an emulator & AOSP device, it restarts...
+        // on my CM device, it does not - WTF?  So, we'll make sure it gets back
+        // up and running in a minimum of 10 minutes.  We reset our timer on a handler every
+        // 2 minutes...but since the handler runs on uptime vs. the alarm which is on realtime,
+        // it is entirely possible that the alarm doesn't get reset.  So - we make it a noop,
+        // but this will still count against the app as a wakelock when it triggers.  Oh well,
+        // it should never cause a device wakeup.  We're also at SDK 19 preferred, so the alarm
+        // mgr set algorithm is better on memory consumption which is good.
+    	// http://stackoverflow.com/a/20735519/1527491
+        if (prefs.getBoolean(SP_KEY_ENABLE_AUTO_RESTART_SERVICE, false) ||
+        		Arrays.asList(SDK_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.SDK_INT))
+        {
+            // A restart intent - this never changes...        
+            final int restartAlarmInterval = 10*60*1000;
+            final int resetAlarmTimer = 1*60*1000;
+            final Intent restartIntent = new Intent(this, this.getClass());
+            restartIntent.putExtra("ALARM_RESTART_SERVICE_DIED", true);
+            final AlarmManager alarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+            Handler restartServiceHandler = new Handler()
+            {
+                @Override
+                public void handleMessage(Message msg) {
+                    // Create a pending intent
+                    PendingIntent pintent = PendingIntent.getService(getApplicationContext(), 0, restartIntent, 0);
+                    alarmMgr.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + restartAlarmInterval, pintent);
+                    sendEmptyMessageDelayed(0, resetAlarmTimer);
+                }            
+            };
+            restartServiceHandler.sendEmptyMessageDelayed(0, 0);  
+        }
     }
 
     /**
      * Update the status bar notification.
      */
-    private void updateNotification(boolean playSound) {
+    @SuppressLint("InlinedApi")
+	private void updateNotification(boolean playSound) {
         final MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
+        /*//
+        // Not a good solution as it might prevent the app from running at boot
+        
         if (!mobileNetworkConnected) {
             // Not connected to a mobile network: plane mode may be enabled.
             stopForeground(true);
             return;
         }
-
+        //*/
+        
         final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext());
+        
         if (mobOp == null) {
-            // Connected to a foreign mobile network.
-            final String tickerText = getString(R.string.stat_connected_to_foreign_mobile_network);
-            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
-
-            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
-                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
+        	if (isAirplaneModeOn()) { // Airplane mode
+	            final String tickerText = getString(R.string.stat_airplane_mode_on);
+	            final String contentText = getString(R.string.notif_monitoring_disabled);
+	            
+	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
+		                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
+        	} else if (mobileOperatorId == null) { // No signal
+	            final String tickerText = getString(R.string.stat_no_signal);
+	            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
+	            
+	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
+		                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW)
+		                .setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
+        	} else {
+	            final String tickerText = getString(R.string.stat_connected_to_foreign_mobile_network);
+	            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
+	
+	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
+	                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW)
+	                .setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
+        	}
         } else {
             final String tickerText =
                 String.format(getString(R.string.stat_connected_to_mobile_network), mobOp.toName(this));
@@ -390,6 +482,13 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                     networkOperatorSettingsPendingIntent);
             }
         }
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+        		&& Boolean.FALSE.equals(prefs.getBoolean(SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION, true))) {
+        	if (DEBUG)
+        		Log.d(TAG, "Lollipop : notification will not be displayed on lockscreen.");
+        	nBuilder.setVisibility(Notification.VISIBILITY_SECRET);
+        }
 
         if (playSound) {
             final String rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND, null);
@@ -400,7 +499,21 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         }
 
         final Notification n = nBuilder.build();
+        
         startForeground(R.string.stat_connected_to_mobile_network, n);
+    }
+    
+    /**
+     * Gets the state of Airplane Mode.
+     */
+    @SuppressWarnings("deprecation")
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private boolean isAirplaneModeOn() {        
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            return Settings.System.getInt(getContentResolver(), Settings.System.AIRPLANE_MODE_ON, 0) != 0;          
+        } else {
+            return Settings.Global.getInt(getContentResolver(), Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+        }       
     }
 
     private int getStatIcon(MobileOperator op) {
@@ -457,8 +570,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
     /**
      * This method is called when the phone service state is updated.
+     * @return -1 : no update ; 0 : minor update ; 1 : major update
+     * It is a major update if mobile operator changes or phone connects a network.
      */
-	private boolean onPhoneStateUpdated() {
+	private int onPhoneStateUpdated() {		
         mobileOperatorId = tm != null ? tm.getNetworkOperator() : null;
         if (TextUtils.isEmpty(mobileOperatorId)) {
             mobileOperatorId = null;
@@ -473,15 +588,22 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             && lastIsFemtocell.booleanValue() == isFemtocell 
             && lastMobileOperatorId.equals(mobileOperatorId)
             && lastMobileNetworkType.intValue() == mobileNetworkType) {
-            return false;
+            return -1;
         }
+        
+		int ret = 0;
+        
+        if (lastMobileNetworkConnected != null && lastMobileNetworkConnected.booleanValue() != mobileNetworkConnected
+        		|| lastMobileOperatorId != null && !lastMobileOperatorId.equals(mobileOperatorId))
+        	ret = 1;
+        
         lastMobileNetworkConnected = mobileNetworkConnected;
         lastMobileOperatorId = mobileOperatorId;
         lastIsFemtocell = isFemtocell;
         lastMobileNetworkType = mobileNetworkType;
         
         Log.i(TAG, "Phone state updated: operator=" + mobileOperatorId + "; connected=" + mobileNetworkConnected + "; femtocell=" + isFemtocell);
-        return true;
+        return ret;
     }
 
 	/**
