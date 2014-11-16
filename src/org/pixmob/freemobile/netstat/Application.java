@@ -19,6 +19,8 @@ import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.INTERVAL_SINCE_BOOT;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_STATISTICS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AT_BOOT;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
@@ -63,6 +65,8 @@ public class Application extends android.app.Application {
         defaultValues.put(SP_KEY_NOTIF_ACTION, NOTIF_ACTION_STATISTICS);
         defaultValues.put(SP_KEY_ENABLE_NOTIF_ACTIONS, true);
         defaultValues.put(SP_KEY_THEME, THEME_DEFAULT);
+        defaultValues.put(SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION, true);
+        defaultValues.put(SP_KEY_ENABLE_AUTO_RESTART_SERVICE, true);
 
         // Set default values for preferences.
         final SharedPreferences prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
