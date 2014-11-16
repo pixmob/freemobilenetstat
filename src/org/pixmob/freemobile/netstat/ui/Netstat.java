@@ -15,6 +15,7 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND;
 import org.pixmob.freemobile.netstat.MonitorService;
 import org.pixmob.freemobile.netstat.SyncService;
 import org.pixmob.freemobile.netstat.feature.Features;
@@ -75,6 +76,7 @@ public class Netstat extends FragmentActivity {
             // Store the current application version.
             final SharedPreferences.Editor prefsEditor = prefs.edit();
             prefsEditor.putInt(versionKey, applicationVersion);
+            prefsEditor.putString(SP_KEY_STAT_NOTIF_SOUND, null); // FIXME > We should delete this in next releases.
             Features.getFeature(SharedPreferencesSaverFeature.class).save(prefsEditor);
 
             // The application was updated: let's show changelog.
