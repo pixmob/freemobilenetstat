@@ -4,12 +4,12 @@
     android:layout_height="fill_parent"
     android:layout_weight="1"
     android:baselineAligned="false"
-    android:orientation="horizontal" >
-    
-        <org.pixmob.freemobile.netstat.ui.MobileNetworkChart
-            android:id="@+id/mobile_network_chart"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_margin="30dip" />
+    android:orientation="horizontal">
 
- </LinearLayout> 
+    <org.pixmob.freemobile.netstat.ui.MobileNetworkChart
+        android:id="@+id/mobile_network_chart"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="30dip" />
+
+</LinearLayout>

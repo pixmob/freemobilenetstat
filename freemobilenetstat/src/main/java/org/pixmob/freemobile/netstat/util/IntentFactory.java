@@ -58,7 +58,7 @@ public final class IntentFactory {
     /**
      * Open statistics.
      */
-    public static Intent statistics(Context context) {
+    private static Intent statistics(Context context) {
         return new Intent(context, Netstat.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 

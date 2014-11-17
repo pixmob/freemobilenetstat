@@ -26,22 +26,15 @@ import android.view.Window;
  */
 public class MobileNetworkChartActivity extends FragmentActivity {
 	
-	MobileNetworkChartFragment mobileNetworkChartActivity;
-	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    
+
 	    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
 	    
-	    if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null) {
-	    	mobileNetworkChartActivity = new MobileNetworkChartFragment();
-            getSupportFragmentManager().beginTransaction().add(android.R.id.content, mobileNetworkChartActivity).commit();
-        }
-        else {
-        	mobileNetworkChartActivity = (MobileNetworkChartFragment)getSupportFragmentManager().findFragmentById(android.R.id.content);
-        }
+	    if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null)
+            getSupportFragmentManager().beginTransaction().add(android.R.id.content, new MobileNetworkChartFragment()).commit();
 	}
 }

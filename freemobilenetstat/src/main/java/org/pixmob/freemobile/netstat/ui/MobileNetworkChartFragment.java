@@ -19,6 +19,7 @@ import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.content.Statistics;
 import org.pixmob.freemobile.netstat.content.StatisticsLoader;
+import org.pixmob.freemobile.netstat.ui.MobileNetworkChart.PieChartComponent;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
@@ -33,9 +34,12 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
     private View statisticsWrapperLayout;
     private ProgressBar progressBar;
     private MobileNetworkChart mobileNetworkChart;
+    private TextView onOrangeNetworkTextView;
     private TextView onOrange2GnetworkTextView;
     private TextView onOrange3GnetworkTextView;
+    private TextView onFreeMobileNetworkTextView;
     private TextView onFreeMobile3GnetworkTextView;
+    private TextView onFreeMobileFemtocellTextView;
     private TextView onFreeMobile4GnetworkTextView;
 
 
@@ -60,9 +64,12 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
         statisticsWrapperLayout = a.findViewById(R.id.statistics_wrapper_layout);
         progressBar = (ProgressBar) a.findViewById(R.id.states_progress);
         mobileNetworkChart = (MobileNetworkChart) a.findViewById(R.id.mobile_network_chart);
+        onOrangeNetworkTextView = (TextView) a.findViewById(R.id.on_orange_network);
         onOrange2GnetworkTextView = (TextView) a.findViewById(R.id.on_orange_2G_network);
         onOrange3GnetworkTextView = (TextView) a.findViewById(R.id.on_orange_3G_network);
+        onFreeMobileNetworkTextView = (TextView) a.findViewById(R.id.on_free_mobile_network);
         onFreeMobile3GnetworkTextView = (TextView) a.findViewById(R.id.on_free_mobile_3G_network);
+        onFreeMobileFemtocellTextView = (TextView) a.findViewById(R.id.on_free_mobile_femtocell);
         onFreeMobile4GnetworkTextView = (TextView) a.findViewById(R.id.on_free_mobile_4G_network);
         
         // The fields are hidden the first time this fragment is displayed,
@@ -103,12 +110,36 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
 	public void onLoadFinished(Loader<Statistics> loader, Statistics s) {
 		Log.i(TAG, "Statistics loaded: " + s);
 
-		mobileNetworkChart.setData(s.orangeUsePercent, s.freeMobileUsePercent,
-				s.orange2GUsePercent, s.freeMobile3GUsePercent);
+		onOrangeNetworkTextView.setText(s.orangeUsePercent + "%");
 	    onOrange2GnetworkTextView.setText(s.orange2GUsePercent * s.orangeUsePercent / 100 + "%");
 	    onOrange3GnetworkTextView.setText(s.orange3GUsePercent * s.orangeUsePercent / 100 + "%");
+	    onFreeMobileNetworkTextView.setText(s.freeMobileUsePercent + "%");
 	    onFreeMobile3GnetworkTextView.setText(s.freeMobile3GUsePercent * s.freeMobileUsePercent / 100 + "%");
+	    onFreeMobileFemtocellTextView.setText(s.freeMobileFemtocellUsePercent * s.freeMobile3GUsePercent * s.freeMobileUsePercent / 10000 + "%");
 	    onFreeMobile4GnetworkTextView.setText(s.freeMobile4GUsePercent * s.freeMobileUsePercent / 100 + "%");
+	    
+	    mobileNetworkChart.clear();
+        PieChartComponent orange =
+        		mobileNetworkChart.new PieChartComponent(R.color.orange_network_color1, R.color.orange_network_color2,
+        				s.orangeUsePercent);
+        PieChartComponent freeMobile =
+        		mobileNetworkChart.new PieChartComponent(R.color.free_mobile_network_color1, R.color.free_mobile_network_color2,
+        				s.freeMobileUsePercent);
+        mobileNetworkChart.new PieChartComponent(R.color.orange_2G_network_color1, R.color.orange_2G_network_color2,
+        				s.orange2GUsePercent, orange);
+        mobileNetworkChart.new PieChartComponent(R.color.orange_3G_network_color1, R.color.orange_3G_network_color2,
+        				s.orange3GUsePercent, orange);
+        PieChartComponent freeMobile3G =
+        		mobileNetworkChart.new PieChartComponent(R.color.free_mobile_3G_network_color1, R.color.free_mobile_3G_network_color2,
+        				s.freeMobile3GUsePercent, freeMobile);
+        mobileNetworkChart.new PieChartComponent(
+        		R.color.free_mobile_3G_femtocell_network_color1, R.color.free_mobile_3G_femtocell_network_color2,
+				s.freeMobileFemtocellUsePercent, freeMobile3G);
+        mobileNetworkChart.new PieChartComponent(R.color.free_mobile_4G_network_color1, R.color.free_mobile_4G_network_color2,
+        				s.freeMobile4GUsePercent, freeMobile);
+        
+        mobileNetworkChart.addPieChartComponent(freeMobile);
+        mobileNetworkChart.addPieChartComponent(orange);
 
         progressBar.setVisibility(View.INVISIBLE);
         statisticsWrapperLayout.setVisibility(View.VISIBLE);

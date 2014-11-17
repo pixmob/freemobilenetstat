@@ -39,7 +39,7 @@ public class IntListPreference extends ListPreference {
     
     @Override
     protected boolean persistString(String value) {
-        return value == null ? false : persistInt(Integer.valueOf(value));
+        return value != null && persistInt(Integer.valueOf(value));
     }
     
     @Override

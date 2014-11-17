@@ -40,8 +40,7 @@ import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND;
  */
 @SuppressLint("CommitPrefEdits")
 public class Netstat extends FragmentActivity {
-	private StatisticsFragment statisticsFragment;
-	
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,11 +49,8 @@ public class Netstat extends FragmentActivity {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
 
-        if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null) {
-        	statisticsFragment = new StatisticsFragment();
-            getSupportFragmentManager().beginTransaction().add(android.R.id.content, statisticsFragment).commit();
-        }
-        else statisticsFragment = (StatisticsFragment)getSupportFragmentManager().findFragmentById(android.R.id.content);
+        if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null)
+            getSupportFragmentManager().beginTransaction().add(android.R.id.content, new StatisticsFragment()).commit();
 
         final Context c = getApplicationContext();
         final Intent i = new Intent(c, MonitorService.class);
