@@ -21,6 +21,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -126,10 +127,15 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         lp.setOnPreferenceChangeListener(this);
 
         final String currentTheme = pm.getSharedPreferences().getString(SP_KEY_THEME, THEME_DEFAULT);
-        final Preference themePref = pm.findPreference(SP_KEY_THEME);
+        final ListPreference themePref = (ListPreference) pm.findPreference(SP_KEY_THEME);
         Integer themePrefSummary = themes.get(currentTheme);
         if (themePrefSummary == null) {
             themePrefSummary = themes.get(THEME_DEFAULT);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        	// Colors no longer supported in Lollipop notification bar
+        	themePref.setEntries(R.array.lollipop_theme_titles);
+        	themePref.setEntryValues(R.array.lollipop_theme_values);
         }
         themePref.setSummary(themePrefSummary);
         themePref.setOnPreferenceChangeListener(this);
@@ -192,7 +198,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             }
             p.setSummary(themePrefSummary);
         } else if (SP_KEY_STAT_NOTIF_SOUND.equals(k)) {
-        	if (new String().equals(value)) { // Fix for phone always vibrating after selecting a sound, even "None".
+        	if ("".equals(value)) { // Fix for phone always vibrating after selecting a sound, even "None".
         		getPreferenceManager().getSharedPreferences().edit().putString(SP_KEY_STAT_NOTIF_SOUND, null).commit();
         		return false;
         	}

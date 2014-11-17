@@ -25,7 +25,6 @@ import android.content.SharedPreferences;
 public interface SharedPreferencesSaverFeature {
     /**
      * Save a {@link SharedPreferences.Editor} instance.
-     * @param prefsEditor
      */
     void save(SharedPreferences.Editor prefsEditor);
 }

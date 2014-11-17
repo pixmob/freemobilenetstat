@@ -42,6 +42,7 @@ import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.content.Statistics;
 import org.pixmob.freemobile.netstat.content.StatisticsLoader;
+import org.pixmob.freemobile.netstat.ui.MobileNetworkChart.PieChartComponent;
 import org.pixmob.freemobile.netstat.util.DateUtils;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
@@ -123,7 +124,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     /**
      * Check if the SIM card is supported.
      */
-    public static boolean isSimSupported(Context context) {
+    private static boolean isSimSupported(Context context) {
         if (!DEBUG) {
             final TelephonyManager tm = (TelephonyManager) context
                     .getSystemService(Context.TELEPHONY_SERVICE);
@@ -226,7 +227,16 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
 
         onOrangeNetwork.setText(s.orangeUsePercent + "%");
         onFreeMobileNetwork.setText(s.freeMobileUsePercent + "%");
-        mobileNetworkChart.setData(s.orangeUsePercent, s.freeMobileUsePercent, s.orange2GUsePercent, s.freeMobile3GUsePercent);
+        
+        mobileNetworkChart.clear();
+        PieChartComponent orange =
+        		mobileNetworkChart.new PieChartComponent(R.color.orange_network_color1, R.color.orange_network_color2,
+        				s.orangeUsePercent);
+        PieChartComponent freeMobile =
+        		mobileNetworkChart.new PieChartComponent(R.color.free_mobile_network_color1, R.color.free_mobile_network_color2,
+        				s.freeMobileUsePercent);
+        mobileNetworkChart.addPieChartComponent(freeMobile);
+        mobileNetworkChart.addPieChartComponent(orange);
 
         final Activity a = getActivity();
         statMobileNetwork.setText(s.mobileOperator == null ? STAT_NO_VALUE : s.mobileOperator.toName(a));

@@ -28,6 +28,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
+import org.jetbrains.annotations.NotNull;
 import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.R;
@@ -72,7 +73,7 @@ public class BatteryChart extends View {
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(@NotNull MotionEvent event) {
         final int action = event.getAction();
         if (MotionEvent.ACTION_DOWN == action || MotionEvent.ACTION_MOVE == action) {
             final float x = event.getX();
@@ -269,8 +270,8 @@ public class BatteryChart extends View {
             mobileOperatorPaint.setStrokeWidth(16);
             mobileOperatorPaint.setStyle(Paint.Style.STROKE);
 
-            orangeColor = getResources().getColor(R.color.orange_3G_network_color1);
-            freeMobileColor = getResources().getColor(R.color.free_mobile_3G_network_color1);
+            orangeColor = getResources().getColor(R.color.orange_network_color1);
+            freeMobileColor = getResources().getColor(R.color.free_mobile_network_color1);
         }
         if (cursorPaint == null) {
             cursorPaint = new Paint();

@@ -1,112 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" 
-    android:layout_weight="0" 
-    android:layout_width="fill_parent" 
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:layout_margin="3dip"
-    android:gravity="center" >
-    
-      <!-- Left (Orange) -->
-      <LinearLayout
+    android:layout_weight="0"
+    android:gravity="center"
+    android:orientation="horizontal">
+
+    <!-- Left (Orange) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dip"
+        android:orientation="horizontal">
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="4dip"
-            android:orientation="horizontal" >
-			      <LinearLayout
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:layout_margin="4dip"
-			            android:orientation="vertical" >
-			
-			            <TextView
-			                android:layout_width="wrap_content"
-			                android:layout_height="wrap_content"
-			                android:singleLine="true"
-			                android:text="@string/network_orange_2G"
-			                android:textAppearance="?android:attr/textAppearanceLarge"
-			                android:textColor="@color/orange_2G_network_color1" />
-			
-			            <TextView
-			                android:layout_width="wrap_content"
-			                android:layout_height="wrap_content"
-			                android:singleLine="true"
-			                android:text="@string/network_orange_3G"
-			                android:textAppearance="?android:attr/textAppearanceLarge"
-			                android:textColor="@color/orange_3G_network_color1" />
-			        </LinearLayout>
-			        
-			      <LinearLayout
-			            android:layout_width="wrap_content"
-			            android:layout_height="fill_parent"
-			            android:gravity="center|right"
-			            android:orientation="vertical" >
-			
-			            <TextView
-			                android:id="@+id/on_orange_2G_network"
-			                android:layout_width="wrap_content"
-			                android:layout_height="wrap_content"
-			                android:textAppearance="?android:attr/textAppearanceLarge"
-			                android:textColor="@color/orange_2G_network_color1" />
-			
-			            <TextView
-			                android:id="@+id/on_orange_3G_network"
-			                android:layout_width="wrap_content"
-			                android:layout_height="wrap_content"
-			                android:textAppearance="?android:attr/textAppearanceLarge"
-			                android:textColor="@color/orange_3G_network_color1" />
-            	</LinearLayout>
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/network_orange"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/orange_network_color1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/network_orange_2G"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/orange_2G_network_color1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/network_orange_3G"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/orange_3G_network_color1" />
         </LinearLayout>
-        
-      <!-- Right (Free) -->
-      <LinearLayout
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:gravity="center|end"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/on_orange_network"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/orange_network_color1" />
+
+            <TextView
+                android:id="@+id/on_orange_2G_network"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/orange_2G_network_color1" />
+
+            <TextView
+                android:id="@+id/on_orange_3G_network"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/orange_3G_network_color1" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Right (Free) -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dip"
+        android:orientation="horizontal">
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dip"
-            android:orientation="horizontal" >
-			      <LinearLayout
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:layout_margin="8dip"
-			            android:orientation="vertical" >
-			
-			            <TextView
-			                android:layout_width="wrap_content"
-			                android:layout_height="wrap_content"
-			                android:singleLine="true"
-			                android:text="@string/network_free_mobile_3G"
-			                android:textAppearance="?android:attr/textAppearanceLarge"
-			                android:textColor="@color/free_mobile_3G_network_color1" />
-			
-			            <TextView
-			                android:layout_width="wrap_content"
-			                android:layout_height="wrap_content"
-			                android:singleLine="true"
-			                android:text="@string/network_free_mobile_4G"
-			                android:textAppearance="?android:attr/textAppearanceLarge"
-			                android:textColor="@color/free_mobile_4G_network_color1" />
-			        </LinearLayout>
-			        
-			      <LinearLayout
-			            android:layout_width="wrap_content"
-			            android:layout_height="fill_parent"
-			            android:gravity="center|right"
-			            android:orientation="vertical" >
-			
-			            <TextView
-			                android:id="@+id/on_free_mobile_3G_network"
-			                android:layout_width="wrap_content"
-			                android:layout_height="wrap_content"
-			                android:textAppearance="?android:attr/textAppearanceLarge"
-			                android:textColor="@color/free_mobile_3G_network_color1" />
-			
-			            <TextView
-			                android:id="@+id/on_free_mobile_4G_network"
-			                android:layout_width="wrap_content"
-			                android:layout_height="wrap_content"
-			                android:textAppearance="?android:attr/textAppearanceLarge"
-			                android:textColor="@color/free_mobile_4G_network_color1" />
-            	</LinearLayout>
-      
-  </LinearLayout> 
- </LinearLayout> 
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/network_free_mobile"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/free_mobile_network_color1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/network_free_mobile_3G"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/free_mobile_3G_network_color1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/network_free_mobile_femtocell"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/free_mobile_3G_femtocell_network_color1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@string/network_free_mobile_4G"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/free_mobile_4G_network_color1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:gravity="center|end"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/on_free_mobile_network"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/free_mobile_network_color1" />
+
+            <TextView
+                android:id="@+id/on_free_mobile_3G_network"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/free_mobile_3G_network_color1" />
+
+            <TextView
+                android:id="@+id/on_free_mobile_femtocell"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/free_mobile_3G_femtocell_network_color1" />
+
+            <TextView
+                android:id="@+id/on_free_mobile_4G_network"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/free_mobile_4G_network_color1" />
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

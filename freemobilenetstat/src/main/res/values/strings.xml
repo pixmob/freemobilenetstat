@@ -9,6 +9,7 @@
     <string name="mobile_network_type">Réseau mobile %s</string>
     <string name="network_free_mobile">Free</string>
     <string name="network_orange">Orange</string>
+    <string name="network_free_mobile_femtocell">Femto</string>
     <string name="network_unknown">inconnu</string>
     <string name="network_type_unknown">inconnu</string>
     <string name="network_type_gprs">2G (GPRS)</string>

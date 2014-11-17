@@ -126,6 +126,7 @@ public class SyncService extends IntentService {
         prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
         internalPrefs = getSharedPreferences(INTERNAL_SP_NAME, MODE_PRIVATE);
         internalPrefsEditor = internalPrefs.edit();
+        internalPrefsEditor.commit();
         cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         pm = (PowerManager) getSystemService(POWER_SERVICE);
         dbHelper = new UploadDatabaseHelper(this);

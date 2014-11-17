@@ -166,11 +166,14 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
             s.orangeUsePercent = (int) Math.round(s.orangeTime / sTime * 100d);
             s.freeMobile4GUsePercent =
             		s.freeMobileUsePercent == 0 || s.freeMobileTime == 0 ?
-            				0 : (int) Math.round((double)s.freeMobile4GTime / s.freeMobileTime * 100);
+            				0 : (int) Math.round((double)s.freeMobile4GTime / (s.freeMobile3GTime + s.freeMobile4GTime) * 100);
             s.freeMobile3GUsePercent = 100 - s.freeMobile4GUsePercent;
+            s.freeMobileFemtocellUsePercent = 
+            		s.freeMobile3GUsePercent == 0 || s.freeMobile3GTime == 0 ?
+            				0 : (int) Math.round((double)s.femtocellTime / s.freeMobile3GTime * 100);
             s.orange3GUsePercent =
             		s.orangeUsePercent == 0 || s.orangeTime == 0 ?
-            				0 : (int) Math.round((double)s.orange3GTime / s.orangeTime * 100);
+            				0 : (int) Math.round((double)s.orange3GTime / s.orange3GTime * 100);
             s.orange2GUsePercent = 100 - s.orange3GUsePercent;
             s.connectionTime = now - connectionTimestamp;
             

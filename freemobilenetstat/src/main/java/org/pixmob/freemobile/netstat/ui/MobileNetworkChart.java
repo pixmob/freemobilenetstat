@@ -26,26 +26,102 @@ import android.view.View;
 
 import org.pixmob.freemobile.netstat.R;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Custom component showing mobile network use with a pie chart.
  * 
  * @author Pixmob
  */
 public class MobileNetworkChart extends View {
+	public class PieChartComponent implements Comparable<PieChartComponent> {
+		private final int color1;
+		private final int color2;
+		private final int percent; // Relative to parent
+		private final PieChartComponent parentComponent;
+		private final List<PieChartComponent> childComponents = new ArrayList<PieChartComponent>();
+		
+		/**
+		 * Shaded top-level component
+		 */
+		public PieChartComponent(int color1, int color2, int percent) {			
+			this.color1 = color1;
+			this.color2 = color2;
+			this.percent = normalizePercent(percent);
+			this.parentComponent = null;
+		}
+		
+		/**
+		 * Shaded child component
+		 */
+		public PieChartComponent(int color1, int color2, int percent, final PieChartComponent parentComponent) {
+			this.color1 = color1;
+			this.color2 = color2;
+			this.percent = normalizePercent(percent);
+			this.parentComponent = parentComponent;
+			parentComponent.childComponents.add(this);
+			Collections.sort(parentComponent.childComponents);
+		}
+
+		public Paint getShadedPaint() {
+			Paint paint = new Paint();
+	    	paint.setAntiAlias(true);
+	    	paint.setStyle(Paint.Style.FILL);
+	    	
+	        paint.setShader(new LinearGradient(0, 0, 0, getHeight(), getResources().getColor(color1), getResources().getColor(color2), Shader.TileMode.CLAMP));
+	        
+	        return paint;
+		}
+
+		public PieChartComponent getParentComponent() {
+			return parentComponent;
+		}
+		
+		public boolean isLeaf() {
+			return childComponents.isEmpty();
+		}
+		
+		public boolean isRoot() {
+			return parentComponent == null;
+		}
+		
+		public List<PieChartComponent> getChildren() {
+			return childComponents;
+		}
+		
+		public int getPercent() {
+			return percent;
+		}
+		
+		public double getAbsolutePercent() {
+			if (isRoot())
+				return percent;
+			return percent * parentComponent.getAbsolutePercent() / 100.d;
+		}
+
+		@Override
+		public int compareTo(PieChartComponent other) {			
+			return this.percent < other.percent ? -1
+				   : this.percent == other.percent ? 0
+				   : 1;
+		}
+		
+		@Override
+		public String toString() {
+			String str = hashCode() + " | Parent : " + (parentComponent != null ? parentComponent.hashCode() : "null") + " | Children : ";
+			for (PieChartComponent component : childComponents) {
+				str += " - " + component.hashCode();
+			}
+			return str;
+		}
+	}
+	
+	private final List<PieChartComponent> components = new ArrayList<PieChartComponent>();
     private final RectF circleBounds = new RectF();
-    private float startAngle = 270;
-    private float orange2GAngle;
-    private float orange3GAngle;
-    private float freeMobile3GAngle;
-    private float freeMobile4GAngle;
     private Paint arcBorderPaint;
-    private Paint arcFillPaint;
-    private Paint orange2GPaint;
-    private Paint orange3GPaint;
-    private Paint freeMobile3GPaint;
-    private Paint freeMobile4GPaint;
     private Paint unknownPaint;
-    private int circleColor = -1;
 
     public MobileNetworkChart(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -55,15 +131,27 @@ public class MobileNetworkChart extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
-        initPaints();
+        
+        if (unknownPaint == null) {
+            unknownPaint = new Paint();
+            unknownPaint.setAntiAlias(true);
+            unknownPaint.setStyle(Paint.Style.FILL);
+            unknownPaint.setColor(getResources().getColor(R.color.unknown_mobile_network_color));
+        }
+        if (arcBorderPaint == null) {
+            arcBorderPaint = new Paint();
+            arcBorderPaint.setAntiAlias(true);
+            arcBorderPaint.setStyle(Paint.Style.STROKE);
+            arcBorderPaint.setColor(getResources().getColor(R.color.pie_border_color));
+            arcBorderPaint.setStrokeWidth(2);
+        }
 
         final int w = getWidth();
         final int h = getHeight();
-        final int radius = Math.min(w, h) - 4;
-        final int startX = (w - radius) / 2;
-        final int startY = (h - radius) / 2;
-        circleBounds.set(startX, startY, startX + radius, startY + radius);
+        final int diameter = Math.min(w, h);
+        final int startX = (w - diameter) / 2;
+        final int startY = (h - diameter) / 2;
+        circleBounds.set(startX, startY, startX + diameter, startY + diameter);
 
         drawChart(canvas);
     }
@@ -72,106 +160,99 @@ public class MobileNetworkChart extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.getSize(heightMeasureSpec));
     }
-
-    public void setData(int percentOnOrange, int percentOnFreeMobile, int percentOnOrange2G, int percentOnFreeMobile3G) {
-    	final float orangeAngle = percentToAngle(normalizePercent(percentOnOrange));
-    	final float freeMobileAngle = percentToAngle(normalizePercent(percentOnFreeMobile));
-        orange2GAngle = orangeAngle * (normalizePercent(percentOnOrange2G) / 100.f);
-        orange3GAngle = orangeAngle - orange2GAngle;
-        freeMobile3GAngle = freeMobileAngle * (normalizePercent(percentOnFreeMobile3G) / 100.f);
-        freeMobile4GAngle = freeMobileAngle - freeMobile3GAngle;
-        startAngle = freeMobileAngle / 2.f;
+    
+    public void addPieChartComponent(final PieChartComponent component) {
+    	if (!component.isRoot())
+    		throw new IllegalArgumentException("Added chart should be root.");
+    	components.add(component);
+    }
+    
+    public void clear() {
+    	components.clear();
     }
 
-    private static float percentToAngle(int p) {
-        return p * 360 / 100f;
+    private void setData(int percentOnOrange, int percentOnFreeMobile, int percentOnOrange2G, int percentOnFreeMobile3G) {
+    	clear();
+    	PieChartComponent orange =
+    		new PieChartComponent(R.color.orange_network_color1, R.color.orange_network_color2, percentOnOrange);
+    	PieChartComponent free =
+        		new PieChartComponent(R.color.free_mobile_network_color1, R.color.free_mobile_network_color2, percentOnFreeMobile);
+
+    	new PieChartComponent(R.color.orange_2G_network_color1, R.color.orange_2G_network_color2, percentOnOrange2G, orange);
+    	new PieChartComponent(R.color.orange_3G_network_color1, R.color.orange_3G_network_color2, 100 - percentOnOrange2G, orange);
+    	new PieChartComponent(R.color.free_mobile_3G_network_color1, R.color.free_mobile_3G_network_color2,
+        				percentOnFreeMobile3G, free);
+    	new PieChartComponent(R.color.free_mobile_4G_network_color1, R.color.free_mobile_4G_network_color2,
+        				100 - percentOnFreeMobile3G, free);
+
+    	addPieChartComponent(free);
+    	addPieChartComponent(orange);
+    }
+    
+    private static float percentToAngle(double p) {
+        return (float)(p * 360 / 100d);
     }
 
     private static int normalizePercent(int p) {
         return Math.min(100, Math.max(0, p));
     }
     
-    private Paint initGradientPaint(int color1, int color2) {
-    	Paint paint = new Paint();
-    	paint.setAntiAlias(true);
-    	paint.setStyle(Paint.Style.FILL);
-
-        paint.setShader(new LinearGradient(0, 0, 0, getHeight(), color1, color2, Shader.TileMode.CLAMP));
-        
-        return paint;
-    }
-    
-    private void initPaints() {
-        if (orange2GPaint == null) {
-            final int c1 = getResources().getColor(R.color.orange_2G_network_color1);
-            final int c2 = getResources().getColor(R.color.orange_2G_network_color2);
-            orange2GPaint = initGradientPaint(c1, c2);
-        }
-        if (orange3GPaint == null) {
-            final int c1 = getResources().getColor(R.color.orange_3G_network_color1);
-            final int c2 = getResources().getColor(R.color.orange_3G_network_color2);
-            orange3GPaint = initGradientPaint(c1, c2);
-        }
-        if (freeMobile3GPaint == null) {
-            final int c1 = getResources().getColor(R.color.free_mobile_3G_network_color1);
-            final int c2 = getResources().getColor(R.color.free_mobile_3G_network_color2);
-            freeMobile3GPaint = initGradientPaint(c1, c2);
-        }
-        if (freeMobile4GPaint == null) {
-            final int c1 = getResources().getColor(R.color.free_mobile_4G_network_color1);
-            final int c2 = getResources().getColor(R.color.free_mobile_4G_network_color2);
-            freeMobile4GPaint = initGradientPaint(c1, c2);
-        }
-        if (unknownPaint == null) {
-            final int c = getResources().getColor(R.color.unknown_mobile_network_color);
-            unknownPaint = initGradientPaint(c, c);
-        }
-        
-        if (circleColor == -1) {
-            circleColor = getResources().getColor(R.color.pie_border_color);
-        }
-
-        if (arcBorderPaint == null) {
-            arcBorderPaint = new Paint();
-            arcBorderPaint.setAntiAlias(true);
-            arcBorderPaint.setStyle(Paint.Style.STROKE);
-            arcBorderPaint.setColor(circleColor);
-            arcBorderPaint.setStrokeWidth(2);
-        }
-        if (arcFillPaint == null) {
-            arcFillPaint = new Paint();
-            arcFillPaint.setAntiAlias(true);
-            arcFillPaint.setStyle(Paint.Style.FILL);
-        }
-    }
-    
     private void drawChart(Canvas canvas) {
+    	final float startAngle = getStartAngle();
     	float currentAngle = startAngle;
-        if (orange2GAngle > 0) {
-            canvas.drawArc(circleBounds, currentAngle, orange2GAngle, true, arcBorderPaint);
-            canvas.drawArc(circleBounds, currentAngle, orange2GAngle, true, orange2GPaint);
-        	currentAngle += orange2GAngle;
-        }
-        if (orange3GAngle > 0) {
-            canvas.drawArc(circleBounds, currentAngle, orange3GAngle, true, arcBorderPaint);
-            canvas.drawArc(circleBounds, currentAngle, orange3GAngle, true, orange3GPaint);
-        	currentAngle += orange3GAngle;
-        }
-        if (freeMobile3GAngle > 0) {
-            canvas.drawArc(circleBounds, currentAngle, freeMobile3GAngle, true, arcBorderPaint);
-            canvas.drawArc(circleBounds, currentAngle, freeMobile3GAngle, true, freeMobile3GPaint);
-        	currentAngle += freeMobile3GAngle;
-        }
-        if (freeMobile4GAngle > 0) {
-            canvas.drawArc(circleBounds, currentAngle, freeMobile4GAngle, true, arcBorderPaint);
-            canvas.drawArc(circleBounds, currentAngle, freeMobile4GAngle, true, freeMobile4GPaint);
-            currentAngle += freeMobile4GAngle;
-        }
-
-        final float unknownAngle = 360 - currentAngle + startAngle;
+    	
+    	for (final PieChartComponent component : components) {
+    		if (component.isRoot() && component.getPercent() > 0) {
+    			currentAngle += drawPieChartComponentsRecursively(canvas, component, currentAngle, 1);
+    		}
+    	}
+        final float unknownAngle = 360 - (currentAngle - startAngle);
         if (unknownAngle > 0) {
             canvas.drawArc(circleBounds, currentAngle, unknownAngle, true, arcBorderPaint);
             canvas.drawArc(circleBounds, currentAngle, unknownAngle, true, unknownPaint);
         }
     }
+    
+    private float drawPieChartComponentsRecursively(Canvas canvas, PieChartComponent componentToDraw,
+    		final float startAngle, final int level) { 
+
+		float sweepAngle = 0;
+		
+    	if (componentToDraw.getPercent() > 0) { // Draw the component itself
+    		sweepAngle = percentToAngle(componentToDraw.getAbsolutePercent());
+    		final RectF newBounds = new RectF(circleBounds);
+    		// Sigmoid function ; f(1) = 1 ; f(infinity) = 
+    		//final float ratio = -1 / (float)(1 + Math.exp(3 - level)) + 1 + 1 / (float)(1 + Math.exp(2));
+    		float ratio = -1 / (float)(1 + Math.exp(3 - level)) + 1.119202923f;
+    		scaleRectF(newBounds, ratio);
+    		canvas.drawArc(newBounds, startAngle, sweepAngle, true, arcBorderPaint);
+    		canvas.drawArc(newBounds, startAngle, sweepAngle, true, componentToDraw.getShadedPaint());
+    		
+    		if (!componentToDraw.isLeaf()) { // Draw its childs recursively
+    			float currentAngle = startAngle;
+    			for (PieChartComponent component : componentToDraw.getChildren())
+    				currentAngle += drawPieChartComponentsRecursively(canvas, component, currentAngle, level + 1);
+    		}
+    	}
+		
+		return sweepAngle;
+    }
+
+    private static void scaleRectF(RectF rect, float factor){
+        float diffHorizontal = (rect.right-rect.left) * (factor-1f);
+        float diffVertical = (rect.bottom-rect.top) * (factor-1f);
+
+        rect.top -= diffVertical/2f;
+        rect.bottom += diffVertical/2f;
+
+        rect.left -= diffHorizontal/2f;
+        rect.right += diffHorizontal/2f;
+    }
+    
+	private float getStartAngle() {
+		for (PieChartComponent component : components)
+			if (component.getParentComponent() == null)
+				return -percentToAngle(component.getAbsolutePercent()) / 2.f;
+		return 0;
+	}
 }

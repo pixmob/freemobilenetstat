@@ -15,7 +15,6 @@
  */
 package org.pixmob.freemobile.netstat;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -363,22 +362,24 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        
+        if (intent != null && intent.getBooleanExtra("ALARM_RESTART_SERVICE_DIED", false))
+        {
+        	if (DEBUG)
+        		Log.d(TAG, "onStartCommand > after ALARM_RESTART_SERVICE_DIED");
+            if (isRunning())
+            {
+            	if (DEBUG)
+            		Log.d(TAG, "onStartCommand > Service already running - return immediately...");
+                ensureServiceStaysRunning();
+                return START_STICKY;
+            }
+        }
+        
         // Update with current state.
         onConnectivityUpdated();
         onPhoneStateUpdated();
         updateNotification(false);
-        
-        if ((intent != null) && (intent.getBooleanExtra("ALARM_RESTART_SERVICE_DIED", false)))
-        {
-        	if (DEBUG)
-        		Log.d(TAG, "onStartCommand after ALARM_RESTART_SERVICE_DIED");
-            if (isRunning())
-            {
-            	if (DEBUG)
-            		Log.d(TAG, "Service already running - return immediately...");
-                ensureServiceStaysRunning();
-            }
-        }
 
         return START_STICKY;
     }
@@ -402,13 +403,15 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // it should never cause a device wakeup.  We're also at SDK 19 preferred, so the alarm
         // mgr set algorithm is better on memory consumption which is good.
     	// http://stackoverflow.com/a/20735519/1527491
-        if (prefs.getBoolean(SP_KEY_ENABLE_AUTO_RESTART_SERVICE, false) ||
+        if (prefs.getBoolean(SP_KEY_ENABLE_AUTO_RESTART_SERVICE, false) &&
         		Arrays.asList(SDK_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.SDK_INT))
         {
-            // A restart intent - this never changes...        
+        	if (DEBUG)
+        		Log.d(TAG, "ensureServiceStaysRunning > setting alarm.");
+        	// A restart intent - this never changes...        
             final int restartAlarmInterval = 10*60*1000;
             final int resetAlarmTimer = 1*60*1000;
-            final Intent restartIntent = new Intent(this, this.getClass());
+            final Intent restartIntent = new Intent(this, MonitorService.class);
             restartIntent.putExtra("ALARM_RESTART_SERVICE_DIED", true);
             final AlarmManager alarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
             Handler restartServiceHandler = new Handler()
@@ -421,14 +424,13 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                     sendEmptyMessageDelayed(0, resetAlarmTimer);
                 }            
             };
-            restartServiceHandler.sendEmptyMessageDelayed(0, 0);  
+            restartServiceHandler.sendEmptyMessageDelayed(0, 0); 
         }
     }
 
     /**
      * Update the status bar notification.
      */
-    @SuppressLint("InlinedApi")
 	private void updateNotification(boolean playSound) {
         final MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
         /*//
@@ -469,9 +471,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             final String tickerText =
                 String.format(getString(R.string.stat_connected_to_mobile_network), mobOp.toName(this));
             Integer networkTypeRes = NETWORK_TYPE_STRINGS.get(mobileNetworkType);
-            if(networkTypeRes == null) {
-                networkTypeRes = R.string.network_type_unknown;
-            }
+
             String contentText =
                 String.format(getString(R.string.mobile_network_type), getString(networkTypeRes));
 
@@ -493,7 +493,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
         		&& Boolean.FALSE.equals(prefs.getBoolean(SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION, true))) {
         	if (DEBUG)
-        		Log.d(TAG, "Lollipop : notification will not be displayed on lockscreen.");
+        		Log.d(TAG, "Lollipop : notification will not display on lockscreen.");
         	nBuilder.setVisibility(Notification.VISIBILITY_SECRET);
         }
 
@@ -566,7 +566,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         final boolean wifiNetworkConnected = ni != null && ni.isConnected();
 
         // Prevent duplicated inserts.
-        if (lastWifiConnected != null && lastWifiConnected.booleanValue() == wifiNetworkConnected) {
+        if (lastWifiConnected != null && lastWifiConnected == wifiNetworkConnected) {
             return false;
         }
         lastWifiConnected = wifiNetworkConnected;
@@ -591,16 +591,16 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // Prevent duplicated inserts.
         if (lastMobileNetworkConnected != null && lastMobileOperatorId != null
         	&& lastIsFemtocell != null && lastMobileNetworkType != null
-            && lastMobileNetworkConnected.booleanValue() == mobileNetworkConnected
-            && lastIsFemtocell.booleanValue() == isFemtocell 
+            && lastMobileNetworkConnected == mobileNetworkConnected
+            && lastIsFemtocell == isFemtocell
             && lastMobileOperatorId.equals(mobileOperatorId)
-            && lastMobileNetworkType.intValue() == mobileNetworkType) {
+            && lastMobileNetworkType == mobileNetworkType) {
             return -1;
         }
         
 		int ret = 0;
         
-        if (lastMobileNetworkConnected != null && lastMobileNetworkConnected.booleanValue() != mobileNetworkConnected
+        if (lastMobileNetworkConnected != null && lastMobileNetworkConnected != mobileNetworkConnected
         		|| lastMobileOperatorId != null && !lastMobileOperatorId.equals(mobileOperatorId))
         	ret = 1;
         
@@ -664,26 +664,30 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         	}
         }
         /*/ Fake femtocell
-        lac = 3981;
+        Random rnd = new Random();
+        if (rnd.nextInt() % 2 == 0)
+        	lac = 3981;
         //*/
-        Log.d(TAG, "LAC value : " + lac);
+        if (DEBUG) Log.d(TAG, "LAC value : " + lac);
+        
+        Log.i(TAG, "Femtocell value : " + isFemtocell);
+        
         if (lac != null) {
         	String lacAsString = String.valueOf(lac);
         	isFemtocell = (lacAsString.length() == 4) && (lacAsString.subSequence(1, 3).equals(FREE_MOBILE_FEMTOCELL_LAC_CODE));
         }
-        Log.i(TAG, "Femtocell value : " + isFemtocell);
 	}
 
     private void updateEventDatabase() {
         final Event e = new Event();
         e.timestamp = System.currentTimeMillis();
-        e.screenOn = pm != null ? pm.isScreenOn() : false;
+        e.screenOn = pm != null && pm.isScreenOn();
         e.batteryLevel = getBatteryLevel();
         e.wifiConnected = Boolean.TRUE.equals(lastWifiConnected);
         e.mobileConnected = powerOn && Boolean.TRUE.equals(lastMobileNetworkConnected);
         e.mobileOperator = lastMobileOperatorId;
         e.mobileNetworkType = lastMobileNetworkType != null ?
-        		lastMobileNetworkType.intValue() : TelephonyManager.NETWORK_TYPE_UNKNOWN;
+        		lastMobileNetworkType : TelephonyManager.NETWORK_TYPE_UNKNOWN;
         e.powerOn = powerOn;
         e.femtocell  = Boolean.TRUE.equals(lastIsFemtocell);
         

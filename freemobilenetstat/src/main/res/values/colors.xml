@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>   
     
+    <color name="orange_network_color1">#FF6600</color>
+    <color name="orange_network_color2">#993D00</color>
     <color name="orange_2G_network_color1">#FF944D</color>
     <color name="orange_2G_network_color2">#FFB280</color>
-    <color name="orange_3G_network_color1">#FF6600</color>
-    <color name="orange_3G_network_color2">#993D00</color>
-    <color name="free_mobile_3G_network_color1">#CD1E25</color>
-    <color name="free_mobile_3G_network_color2">#90151A</color>
+    <color name="orange_3G_network_color1">#FF9500</color>
+    <color name="orange_3G_network_color2">#FFBA59</color>
+    <color name="free_mobile_network_color1">#CD1E25</color>
+    <color name="free_mobile_network_color2">#90151A</color>
+    <color name="free_mobile_3G_network_color1">#FF7A80</color>
+    <color name="free_mobile_3G_network_color2">#FF4D54</color>
+    <color name="free_mobile_3G_femtocell_network_color1">#CC0066</color>
+    <color name="free_mobile_3G_femtocell_network_color2">#FF409F</color>
     <color name="free_mobile_4G_network_color1">#90151A</color>
     <color name="free_mobile_4G_network_color2">#520C0F</color>
     <color name="unknown_mobile_network_color">#444444</color>

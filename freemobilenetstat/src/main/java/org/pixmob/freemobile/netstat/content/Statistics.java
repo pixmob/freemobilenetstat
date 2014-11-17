@@ -19,6 +19,7 @@ public class Statistics {
     public int orange3GUsePercent;
     public int orangeUsePercent;
     public int freeMobile3GUsePercent;
+    public int freeMobileFemtocellUsePercent;
     public int freeMobile4GUsePercent;
     public int freeMobileUsePercent;
     public MobileOperator mobileOperator;

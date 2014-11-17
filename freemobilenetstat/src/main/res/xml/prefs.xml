@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/pref_background_service" >
+    <PreferenceCategory android:title="@string/pref_background_service">
         <CheckBoxPreference
             android:enabled="true"
             android:key="pref_enable_at_boot"
@@ -20,7 +20,7 @@
     </PreferenceCategory>
     <PreferenceCategory
         android:key="notif_category"
-        android:title="@string/pref_notif" >
+        android:title="@string/pref_notif">
         <ListPreference
             android:dialogTitle="@string/pref_notif_action"
             android:entries="@array/notif_action_titles"
@@ -47,19 +47,19 @@
             android:entryValues="@array/theme_values"
             android:key="pref_theme"
             android:title="@string/pref_theme" />
-        
+
         <CheckBoxPreference
             android:key="pref_enable_auto_restart_service"
             android:summary="@string/pref_enable_auto_restart_service_summary"
             android:title="@string/pref_enable_auto_restart_service" />
-        
+
         <CheckBoxPreference
             android:enabled="true"
             android:key="pref_enable_lollipop_lockscreen_notification"
             android:summary="@string/pref_enable_lollipop_lockscreen_notification_summary"
             android:title="@string/pref_enable_lollipop_lockscreen_notification" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/pref_about" >
+    <PreferenceCategory android:title="@string/pref_about">
         <Preference
             android:key="pref_version"
             android:title="@string/pref_version" />
@@ -69,8 +69,12 @@
             android:title="@string/pref_license" />
         <Preference
             android:key="pref_changelog"
-            android:title="@string/pref_changelog" android:summary="@string/pref_changelog_summary"/>
-        <Preference android:summary="@string/pref_homesite_summary" android:title="@string/pref_homesite" android:key="pref_homesite"/>
+            android:summary="@string/pref_changelog_summary"
+            android:title="@string/pref_changelog" />
+        <Preference
+            android:key="pref_homesite"
+            android:summary="@string/pref_homesite_summary"
+            android:title="@string/pref_homesite" />
     </PreferenceCategory>
 
 </PreferenceScreen>
