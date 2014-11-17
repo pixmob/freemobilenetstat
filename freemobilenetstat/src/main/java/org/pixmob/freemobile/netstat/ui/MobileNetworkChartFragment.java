@@ -19,7 +19,6 @@ import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.content.Statistics;
 import org.pixmob.freemobile.netstat.content.StatisticsLoader;
-import org.pixmob.freemobile.netstat.ui.MobileNetworkChart.PieChartComponent;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
@@ -119,17 +118,17 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
 	    onFreeMobile4GnetworkTextView.setText(s.freeMobile4GUsePercent * s.freeMobileUsePercent / 100 + "%");
 	    
 	    mobileNetworkChart.clear();
-        PieChartComponent orange =
+        PieChartView.PieChartComponent orange =
         		mobileNetworkChart.new PieChartComponent(R.color.orange_network_color1, R.color.orange_network_color2,
         				s.orangeUsePercent);
-        PieChartComponent freeMobile =
+        PieChartView.PieChartComponent freeMobile =
         		mobileNetworkChart.new PieChartComponent(R.color.free_mobile_network_color1, R.color.free_mobile_network_color2,
         				s.freeMobileUsePercent);
         mobileNetworkChart.new PieChartComponent(R.color.orange_2G_network_color1, R.color.orange_2G_network_color2,
         				s.orange2GUsePercent, orange);
         mobileNetworkChart.new PieChartComponent(R.color.orange_3G_network_color1, R.color.orange_3G_network_color2,
         				s.orange3GUsePercent, orange);
-        PieChartComponent freeMobile3G =
+        PieChartView.PieChartComponent freeMobile3G =
         		mobileNetworkChart.new PieChartComponent(R.color.free_mobile_3G_network_color1, R.color.free_mobile_3G_network_color2,
         				s.freeMobile3GUsePercent, freeMobile);
         mobileNetworkChart.new PieChartComponent(

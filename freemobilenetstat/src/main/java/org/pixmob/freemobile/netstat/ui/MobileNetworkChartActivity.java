@@ -15,6 +15,7 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
+import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -37,4 +38,15 @@ public class MobileNetworkChartActivity extends FragmentActivity {
 	    if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null)
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, new MobileNetworkChartFragment()).commit();
 	}
+
+    @Override
+     public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        // Enable "better" gradients:
+        // http://stackoverflow.com/a/2932030/422906
+        final Window window = getWindow();
+        window.setFormat(PixelFormat.RGBA_8888);
+        window.getDecorView().getBackground().setDither(true);
+    }
 }
