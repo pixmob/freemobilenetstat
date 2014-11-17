@@ -42,7 +42,6 @@ import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.content.Statistics;
 import org.pixmob.freemobile.netstat.content.StatisticsLoader;
-import org.pixmob.freemobile.netstat.ui.MobileNetworkChart.PieChartComponent;
 import org.pixmob.freemobile.netstat.util.DateUtils;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
@@ -229,10 +228,10 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         onFreeMobileNetwork.setText(s.freeMobileUsePercent + "%");
         
         mobileNetworkChart.clear();
-        PieChartComponent orange =
+        PieChartView.PieChartComponent orange =
         		mobileNetworkChart.new PieChartComponent(R.color.orange_network_color1, R.color.orange_network_color2,
         				s.orangeUsePercent);
-        PieChartComponent freeMobile =
+        PieChartView.PieChartComponent freeMobile =
         		mobileNetworkChart.new PieChartComponent(R.color.free_mobile_network_color1, R.color.free_mobile_network_color2,
         				s.freeMobileUsePercent);
         mobileNetworkChart.addPieChartComponent(freeMobile);
