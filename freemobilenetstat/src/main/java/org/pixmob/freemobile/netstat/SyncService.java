@@ -483,8 +483,10 @@ public class SyncService extends IntentService {
     }
 
     private static class UploadDatabaseHelper extends SQLiteOpenHelper {
+        private static final int UPLOAD_DATABASE_VERSION = 1;
+
         public UploadDatabaseHelper(final Context context) {
-            super(context, "upload.db", null, 1);
+            super(context, "upload.db", null, UPLOAD_DATABASE_VERSION);
         }
 
         @Override
