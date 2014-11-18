@@ -9,9 +9,12 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- disable for tablet test -->
+    <!--
     <uses-feature
         android:name="android.hardware.telephony.gsm"
         android:required="true" />
+    -->
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
