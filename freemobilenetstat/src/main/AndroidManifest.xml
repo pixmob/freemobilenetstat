@@ -71,7 +71,12 @@
 
         <activity
             android:name=".ui.Preferences"
-            android:label="@string/menu_preferences" />
+            android:label="@string/menu_preferences"
+            android:parentActivityName="org.pixmob.freemobile.netstat.ui.Netstat">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.pixmob.freemobile.netstat.ui.Netstat" />
+        </activity>
 
         <activity
             android:name=".ui.MobileNetworkChartActivity"
