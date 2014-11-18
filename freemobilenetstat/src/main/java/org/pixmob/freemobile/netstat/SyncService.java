@@ -193,20 +193,31 @@ public class SyncService extends IntentService {
         final long statTimestampStart = now - 7 * DAY_IN_MILLISECONDS;
 
         // Get pending uploads.
-        try (Cursor c = db.query("daily_stat", new String[]{"stat_timestamp", "orange", "free_mobile", "sync"},
-                "stat_timestamp>=? AND stat_timestamp<?", new String[]{String.valueOf(statTimestampStart),
-                        String.valueOf(now)}, null, null, null)) {
-            while (c.moveToNext()) {
-                final long d = c.getLong(0);
-                final int sync = c.getInt(3);
+        Cursor pendingUploadsCursor = null;
+        try {
+            pendingUploadsCursor = db.query("daily_stat", new String[]{"stat_timestamp", "orange", "free_mobile", "sync"},
+                    "stat_timestamp>=? AND stat_timestamp<?", new String[]{String.valueOf(statTimestampStart),
+                            String.valueOf(now)}, null, null, null);
+            while (pendingUploadsCursor.moveToNext()) {
+                final long d = pendingUploadsCursor.getLong(0);
+                final int sync = pendingUploadsCursor.getInt(3);
                 if (SYNC_UPLOADED == sync) {
                     uploadedStats.add(d);
                 } else if (SYNC_PENDING == sync) {
                     final DailyStat s = new DailyStat();
-                    s.orange = c.getInt(1);
-                    s.freeMobile = c.getInt(2);
+                    s.orange = pendingUploadsCursor.getInt(1);
+                    s.freeMobile = pendingUploadsCursor.getInt(2);
                     stats.put(d, s);
                 }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+        } finally {
+            try {
+                if (pendingUploadsCursor != null)
+                    pendingUploadsCursor.close();
+            } catch (Exception e) {
+                Log.e(TAG, Log.getStackTraceString(e));
             }
         }
 
@@ -325,17 +336,20 @@ public class SyncService extends IntentService {
             Log.d(TAG, "Computing statistics for " + DateUtils.formatDate(date));
         }
 
-        try (Cursor c = getContentResolver().query(Events.CONTENT_URI,
-                new String[]{Events.TIMESTAMP, Events.MOBILE_OPERATOR},
-                Events.TIMESTAMP + ">=? AND " + Events.TIMESTAMP + "<=?",
-                new String[]{String.valueOf(date), String.valueOf(date + 86400 * 1000)}, Events.TIMESTAMP)) {
+        Cursor computeStatisticsCursor = null;
+        try {
+            computeStatisticsCursor = getContentResolver().query(Events.CONTENT_URI,
+                    new String[]{Events.TIMESTAMP, Events.MOBILE_OPERATOR},
+                    Events.TIMESTAMP + ">=? AND " + Events.TIMESTAMP + "<=?",
+                    new String[]{String.valueOf(date), String.valueOf(date + 86400 * 1000)}, Events.TIMESTAMP);
+
             long t0 = 0;
             MobileOperator op0 = null;
             CharArrayBuffer cBuf = new CharArrayBuffer(6);
 
-            while (c.moveToNext()) {
-                final long t = c.getLong(0);
-                c.copyStringToBuffer(1, cBuf);
+            while (computeStatisticsCursor.moveToNext()) {
+                final long t = computeStatisticsCursor.getLong(0);
+                computeStatisticsCursor.copyStringToBuffer(1, cBuf);
                 final MobileOperator op = MobileOperator.fromString(cBuf);
 
                 if (t0 != 0) {
@@ -351,6 +365,15 @@ public class SyncService extends IntentService {
 
                 t0 = t;
                 op0 = op;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+        } finally {
+            try {
+                if (computeStatisticsCursor != null)
+                    computeStatisticsCursor.close();
+            } catch (Exception e) {
+                Log.e(TAG, Log.getStackTraceString(e));
             }
         }
 
@@ -405,6 +428,7 @@ public class SyncService extends IntentService {
                 final PackageInfo pkgInfo = pm.getPackageInfo(getPackageName(), 0);
                 applicationVersion = pkgInfo.versionName;
             } catch (NameNotFoundException e) {
+                Log.e(TAG, Log.getStackTraceString(e));
             }
             httpUserAgent = "FreeMobileNetstat/" + applicationVersion + " Android/" + Build.VERSION.SDK_INT;
         }
@@ -419,9 +443,20 @@ public class SyncService extends IntentService {
     private String getDeviceId() {
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
         String deviceId = null;
-        try (Cursor c = db.query("device", new String[]{"device_id"}, null, null, null, null, null)) {
-            if (c.moveToNext()) {
-                deviceId = c.getString(0);
+        Cursor deviceCursor = null;
+        try {
+            deviceCursor = db.query("device", new String[]{"device_id"}, null, null, null, null, null);
+            if (deviceCursor.moveToNext()) {
+                deviceId = deviceCursor.getString(0);
+            }
+        }  catch (Exception e) {
+            Log.e(TAG, Log.getStackTraceString(e));
+        } finally {
+            try {
+                if (deviceCursor != null)
+                    deviceCursor.close();
+            } catch (Exception e) {
+                Log.e(TAG, Log.getStackTraceString(e));
             }
         }
         if (deviceId == null) {
