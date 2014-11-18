@@ -42,7 +42,7 @@
     <string name="menu_export">Exporter</string>
     <string name="menu_preferences">Préférences</string>
     <string name="menu_quit">Quitter</string>
-    <string name="chart">Camembert</string>
+    <string name="chart">Détails des connexions</string>
     <string name="pref_background_service">Surveillance du réseau</string>
     <string name="pref_enable_at_boot">Activer au démarrage</string>
     <string name="pref_enable_at_boot_summary">Démarrer automatiquement la surveillance</string>
