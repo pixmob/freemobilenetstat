@@ -37,17 +37,17 @@ public class Statistics {
     }
 
     public static void roundTwoPercentagesUpTo100(double[] percents) {
-        roundTwoPercentagesUpTo100(percents, 100);
+        roundTwoPercentagesUpToN(percents, 100);
     }
 
-    public static void roundTwoPercentagesUpTo100(double[] percents, int sum) {
+    public static void roundTwoPercentagesUpToN(double[] percents, int sum) {
         if (percents.length != 2)
             throw new IllegalArgumentException("There should be only two percentages in the array");
 
         final double[] integerParts = { (int) percents[0], (int) percents[1] };
         final double[] decimalParts = { percents[0] - integerParts[0], percents[1] - integerParts[1] };
 
-        if (percents[0] == 0 && percents[1] == 0)
+        if (integerParts[0] + integerParts[1] < sum - 1) // Check if we can on day reach the sum
             return;
 
         if (integerParts[0] + integerParts[1] == sum) {
