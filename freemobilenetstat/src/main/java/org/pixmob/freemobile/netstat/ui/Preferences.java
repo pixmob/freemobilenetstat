@@ -136,6 +136,13 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         	// Colors no longer supported in Lollipop notification bar
         	themePref.setEntries(R.array.lollipop_theme_titles);
         	themePref.setEntryValues(R.array.lollipop_theme_values);
+
+           // Set default theme if we are using colors (after android upgrade)
+           if (THEME_COLOR.equals(currentTheme)) {
+               pm.getSharedPreferences().edit().putString(SP_KEY_THEME, THEME_DEFAULT).apply(); //save in the shared pref
+               themePrefSummary = themes.get(THEME_DEFAULT); //also update the widget
+               themePref.setValueIndex(0);
+           }
         }
         themePref.setSummary(themePrefSummary);
         themePref.setOnPreferenceChangeListener(this);
