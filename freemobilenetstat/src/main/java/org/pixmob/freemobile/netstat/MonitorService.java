@@ -311,10 +311,14 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // http://stackoverflow.com/q/5076410/422906
         shutdownIntentFilter.addAction("android.intent.action.QUICKBOOT_POWEROFF");
         registerReceiver(shutdownMonitor, shutdownIntentFilter);
-        
-        // Kitkat and JellyBean auto-kill service workaround
-        // http://stackoverflow.com/a/20735519/1527491
-        ensureServiceStaysRunning();
+
+
+        if (prefs.getBoolean(SP_KEY_ENABLE_AUTO_RESTART_SERVICE, false) &&
+                Arrays.asList(SDK_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.SDK_INT)) {
+            // Kitkat and JellyBean auto-kill service workaround
+            // http://stackoverflow.com/a/20735519/1527491
+            ensureServiceStaysRunning();
+        }
     }
 
     @Override
@@ -362,15 +366,15 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        
+
         if (intent != null && intent.getBooleanExtra("ALARM_RESTART_SERVICE_DIED", false))
         {
         	if (DEBUG)
-        		Log.d(TAG, "onStartCommand > after ALARM_RESTART_SERVICE_DIED");
+        		Log.d(TAG, "onStartCommand > after ALARM_RESTART_SERVICE_DIED [ Kitkat START_STICKY bug ]");
             if (isRunning())
             {
             	if (DEBUG)
-            		Log.d(TAG, "onStartCommand > Service already running - return immediately...");
+            		Log.d(TAG, "onStartCommand > Service already running - return immediately... [ Kitkat START_STICKY bug ]");
                 ensureServiceStaysRunning();
                 return START_STICKY;
             }
@@ -383,11 +387,30 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
         return START_STICKY;
     }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        if (prefs.getBoolean(SP_KEY_ENABLE_AUTO_RESTART_SERVICE, false) &&
+                Arrays.asList(SDK_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.SDK_INT)) {
+            // If task was removed, we should launch the service again.
+            if (DEBUG)
+                Log.d(TAG, "onTaskRemoved > setting alarm to restart service [ Kitkat START_STICKY bug ]");
+            Intent restartService = new Intent(getApplicationContext(),
+                    this.getClass());
+            restartService.setPackage(getPackageName());
+            PendingIntent restartServicePI = PendingIntent.getService(
+                    getApplicationContext(), 1, restartService,
+                    PendingIntent.FLAG_ONE_SHOT);
+            AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            alarmService.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 1000, restartServicePI);
+        }
+
+    }
     
     private boolean isRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE))
-            if (getClass().getName().equals(service.service.getClassName()))
+            if (MonitorService.class.getName().equals(service.service.getClassName()))
                 return true;
         return false;
     }
@@ -407,7 +430,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         		Arrays.asList(SDK_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.SDK_INT))
         {
         	if (DEBUG)
-        		Log.d(TAG, "ensureServiceStaysRunning > setting alarm.");
+        		Log.d(TAG, "ensureServiceStaysRunning > setting alarm. [ Kitkat START_STICKY bug ]");
         	// A restart intent - this never changes...        
             final int restartAlarmInterval = 10*60*1000;
             final int resetAlarmTimer = 1*60*1000;
