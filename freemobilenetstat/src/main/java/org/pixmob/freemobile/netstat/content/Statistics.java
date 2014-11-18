@@ -35,4 +35,34 @@ public class Statistics {
         return "Statistics[events=" + events.length + "; orange=" + orangeUsePercent + "%; free="
                 + freeMobileUsePercent + "%]";
     }
+
+    public static void roundTwoPercentagesUpTo100(double[] percents) {
+        roundTwoPercentagesUpTo100(percents, 100);
+    }
+
+    public static void roundTwoPercentagesUpTo100(double[] percents, int sum) {
+        if (percents.length != 2)
+            throw new IllegalArgumentException("There should be only two percentages in the array");
+
+        final double[] integerParts = { (int) percents[0], (int) percents[1] };
+        final double[] decimalParts = { percents[0] - integerParts[0], percents[1] - integerParts[1] };
+
+        if (percents[0] == 0 && percents[1] == 0)
+            return;
+
+        if (integerParts[0] + integerParts[1] == sum) {
+            percents[0] = integerParts[0];
+            percents[1] = integerParts[1];
+            return;
+        }
+
+        if (decimalParts[0] <= decimalParts[1]) {
+            percents[0] = integerParts[0];
+            percents[1] = integerParts[1] + 1;
+            return;
+        }
+
+        percents[0] = integerParts[0] + 1;
+        percents[1] = integerParts[1];
+    }
 }

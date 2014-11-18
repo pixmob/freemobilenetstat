@@ -110,12 +110,22 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
 		Log.i(TAG, "Statistics loaded: " + s);
 
 		onOrangeNetworkTextView.setText(s.orangeUsePercent + "%");
-	    onOrange2GnetworkTextView.setText(s.orange2GUsePercent * s.orangeUsePercent / 100 + "%");
-	    onOrange3GnetworkTextView.setText(s.orange3GUsePercent * s.orangeUsePercent / 100 + "%");
+        final double[] orange2G3GUsePercents = {
+                (double) s.orange2GUsePercent * s.orangeUsePercent / 100d,
+                (double) s.orange3GUsePercent * s.orangeUsePercent / 100d
+        };
+        Statistics.roundTwoPercentagesUpTo100(orange2G3GUsePercents, s.orangeUsePercent);
+	    onOrange2GnetworkTextView.setText((int) orange2G3GUsePercents[0] + "%");
+	    onOrange3GnetworkTextView.setText((int) orange2G3GUsePercents[1] + "%");
 	    onFreeMobileNetworkTextView.setText(s.freeMobileUsePercent + "%");
-	    onFreeMobile3GnetworkTextView.setText(s.freeMobile3GUsePercent * s.freeMobileUsePercent / 100 + "%");
+        final double[] freeMobile3G4GUsePercents = {
+                (double) s.freeMobile3GUsePercent * s.freeMobileUsePercent / 100d,
+                (double) s.freeMobile4GUsePercent * s.freeMobileUsePercent / 100d
+        };
+        Statistics.roundTwoPercentagesUpTo100(freeMobile3G4GUsePercents, s.freeMobileUsePercent);
+	    onFreeMobile3GnetworkTextView.setText((int) freeMobile3G4GUsePercents[0] + "%");
 	    onFreeMobileFemtocellTextView.setText(s.freeMobileFemtocellUsePercent * s.freeMobile3GUsePercent * s.freeMobileUsePercent / 10000 + "%");
-	    onFreeMobile4GnetworkTextView.setText(s.freeMobile4GUsePercent * s.freeMobileUsePercent / 100 + "%");
+	    onFreeMobile4GnetworkTextView.setText((int) freeMobile3G4GUsePercents[1] + "%");
 	    
 	    mobileNetworkChart.clear();
         PieChartView.PieChartComponent orange =

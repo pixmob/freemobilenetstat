@@ -366,7 +366,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        
+
         if (intent != null && intent.getBooleanExtra("ALARM_RESTART_SERVICE_DIED", false))
         {
         	if (DEBUG)
