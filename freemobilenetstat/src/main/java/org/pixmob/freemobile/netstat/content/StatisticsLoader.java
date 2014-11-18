@@ -171,26 +171,24 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
             s.orangeUsePercent = (int) freeMobileOrangeUsePercents[1];
 
             // Bonus trying to compensate "unknown network class" time
-            final long freeMobile4GBonusTime = (long)(freeMobileUnknownNetworkClassTime * ((double)s.freeMobile4GTime / s.freeMobileTime));
+            final long freeMobile4GBonusTime = s.freeMobileTime == 0 ?
+                    0 : (long)(freeMobileUnknownNetworkClassTime * ((double)s.freeMobile4GTime / s.freeMobileTime));
             final long freeMobile3GBonusTime = freeMobileUnknownNetworkClassTime - freeMobile4GBonusTime;
             final double[] freeMobile3G4GUsePercents =
-                    { s.freeMobileUsePercent == 0 || s.freeMobileTime == 0 ?
-                            0 : (double)(s.freeMobile3GTime + freeMobile3GBonusTime) / s.freeMobileTime * 100d,
-                        s.freeMobileUsePercent == 0 || s.freeMobileTime == 0 ?
-                            0 : (double)(s.freeMobile4GTime + freeMobile4GBonusTime) / s.freeMobileTime * 100d
+                    {
+                      s.freeMobileTime == 0 ? 0 : (double)(s.freeMobile3GTime + freeMobile3GBonusTime) / s.freeMobileTime * 100d,
+                      s.freeMobileTime == 0 ? 0 : (double)(s.freeMobile4GTime + freeMobile4GBonusTime) / s.freeMobileTime * 100d
                     };
             Statistics.roundTwoPercentagesUpTo100(freeMobile3G4GUsePercents);
             s.freeMobile3GUsePercent = (int) freeMobile3G4GUsePercents[0];
             s.freeMobile4GUsePercent = (int) freeMobile3G4GUsePercents[1];
 
-            final long orange3GBonusTime = (long)(orangeUnknownNetworkClassTime * ((double)s.orange3GTime / s.orangeTime));
+            final long orange3GBonusTime = s.orangeTime == 0 ? 0 : (long)(orangeUnknownNetworkClassTime * ((double)s.orange3GTime / s.orangeTime));
             final long orange2GBonusTime = orangeUnknownNetworkClassTime - orange3GBonusTime;
             final double[] orange2G3GUsePercents =
                     {
-                        s.orangeUsePercent == 0 || s.orangeTime == 0 ?
-                            0 : (double)(s.orange2GTime + orange2GBonusTime) / s.orangeTime * 100,
-                        s.orangeUsePercent == 0 || s.orangeTime == 0 ?
-                            0 : (double)(s.orange3GTime + orange3GBonusTime) / s.orangeTime * 100
+                        s.orangeTime == 0 ? 0 : (double)(s.orange2GTime + orange2GBonusTime) / s.orangeTime * 100,
+                        s.orangeTime == 0 ? 0 : (double)(s.orange3GTime + orange3GBonusTime) / s.orangeTime * 100
                     };
             Statistics.roundTwoPercentagesUpTo100(orange2G3GUsePercents);
             s.orange2GUsePercent = (int) orange2G3GUsePercents[0];
