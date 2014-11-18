@@ -15,8 +15,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
-}
 
-dependencies {
-    compile files('/home/nils/Documents/projets/fmns/libs/bugsense3.2.2.jar')
+    //use java 7
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }

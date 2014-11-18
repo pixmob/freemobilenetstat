@@ -32,8 +32,8 @@ import static org.pixmob.freemobile.netstat.Constants.TAG;
 public enum MobileOperator {
     FREE_MOBILE, ORANGE;
 
-    private static final Set<String> FREE_MOBILE_IDENTIFIERS = new HashSet<String>(2);
-    private static final Set<String> ORANGE_IDENTIFIERS = new HashSet<String>(3);
+    private static final Set<String> FREE_MOBILE_IDENTIFIERS = new HashSet<>(2);
+    private static final Set<String> ORANGE_IDENTIFIERS = new HashSet<>(3);
 
     static {
         // MCC+MNC identifier list:

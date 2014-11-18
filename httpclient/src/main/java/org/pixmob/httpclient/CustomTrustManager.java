@@ -70,9 +70,9 @@ class CustomTrustManager implements X509TrustManager {
     
     static X509TrustManager findX509TrustManager(TrustManagerFactory tmf) {
         TrustManager tms[] = tmf.getTrustManagers();
-        for (int i = 0; i < tms.length; i++) {
-            if (tms[i] instanceof X509TrustManager) {
-                return (X509TrustManager) tms[i];
+        for (TrustManager tm : tms) {
+            if (tm instanceof X509TrustManager) {
+                return (X509TrustManager) tm;
             }
         }
         
@@ -98,7 +98,7 @@ class CustomTrustManager implements X509TrustManager {
             
             localTrustManager = new LocalStoreX509TrustManager(localKeyStore);
             
-            List<X509Certificate> allIssuers = new ArrayList<X509Certificate>();
+            List<X509Certificate> allIssuers = new ArrayList<>();
             for (X509Certificate cert : defaultTrustManager
                     .getAcceptedIssuers()) {
                 allIssuers.add(cert);

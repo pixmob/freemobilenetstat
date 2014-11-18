@@ -69,9 +69,9 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     private static final String SP_KEY_CHANGELOG = "pref_changelog";
     private static final String SP_KEY_LICENSE = "pref_license";
     private static final String SP_KEY_HOMESITE = "pref_homesite";
-    private final SparseArray<CharSequence> timeIntervals = new SparseArray<CharSequence>(4);
-    private final Map<String, String> notifActions = new HashMap<String, String>(2);
-    private final Map<String, Integer> themes = new HashMap<String, Integer>(3);
+    private final SparseArray<CharSequence> timeIntervals = new SparseArray<>(4);
+    private final Map<String, String> notifActions = new HashMap<>(2);
+    private final Map<String, Integer> themes = new HashMap<>(3);
 
     @SuppressWarnings("deprecation")
     @Override
@@ -194,21 +194,25 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     @Override
     public boolean onPreferenceChange(Preference p, Object value) {
         final String k = p.getKey();
-        if (SP_KEY_TIME_INTERVAL.equals(k)) {
-            final IntListPreference lp = (IntListPreference) p;
-            final int intValue = Integer.parseInt((String) value);
-            lp.setSummary(timeIntervals.get(intValue));
-        } else if (SP_KEY_THEME.equals(k)) {
-            Integer themePrefSummary = themes.get(value);
-            if (themePrefSummary == null) {
-                themePrefSummary = themes.get(THEME_DEFAULT);
-            }
-            p.setSummary(themePrefSummary);
-        } else if (SP_KEY_STAT_NOTIF_SOUND.equals(k)) {
-        	if ("".equals(value)) { // Fix for phone always vibrating after selecting a sound, even "None".
-        		getPreferenceManager().getSharedPreferences().edit().putString(SP_KEY_STAT_NOTIF_SOUND, null).commit();
-        		return false;
-        	}
+        switch (k) {
+            case SP_KEY_TIME_INTERVAL:
+                final IntListPreference lp = (IntListPreference) p;
+                final int intValue = Integer.parseInt((String) value);
+                lp.setSummary(timeIntervals.get(intValue));
+                break;
+            case SP_KEY_THEME:
+                Integer themePrefSummary = themes.get(value);
+                if (themePrefSummary == null) {
+                    themePrefSummary = themes.get(THEME_DEFAULT);
+                }
+                p.setSummary(themePrefSummary);
+                break;
+            case SP_KEY_STAT_NOTIF_SOUND:
+                if ("".equals(value)) { // Fix for phone always vibrating after selecting a sound, even "None".
+                    getPreferenceManager().getSharedPreferences().edit().putString(SP_KEY_STAT_NOTIF_SOUND, null).commit();
+                    return false;
+                }
+                break;
         }
 
         return true;
@@ -235,20 +239,25 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     @Override
     public boolean onPreferenceClick(Preference p) {
         final String k = p.getKey();
-        if (SP_KEY_CHANGELOG.equals(k)) {
-            openDocument("CHANGELOG.html");
-        } else if (SP_KEY_LICENSE.equals(k)) {
-            openDocument("LICENSE.html");
-        } else if (SP_KEY_VERSION.equals(k)) {
-            final String appName = getPackageName();
-            try {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appName)));
-            } catch (android.content.ActivityNotFoundException anfe) {
-                startActivity(new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("http://play.google.com/store/apps/details?id=" + appName)));
-            }
-        } else if (SP_KEY_HOMESITE.equals(k)) {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://freemobilenetstat.appspot.com")));
+        switch (k) {
+            case SP_KEY_CHANGELOG:
+                openDocument("CHANGELOG.html");
+                break;
+            case SP_KEY_LICENSE:
+                openDocument("LICENSE.html");
+                break;
+            case SP_KEY_VERSION:
+                final String appName = getPackageName();
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appName)));
+                } catch (android.content.ActivityNotFoundException anfe) {
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("http://play.google.com/store/apps/details?id=" + appName)));
+                }
+                break;
+            case SP_KEY_HOMESITE:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://freemobilenetstat.appspot.com")));
+                break;
         }
 
         return true;

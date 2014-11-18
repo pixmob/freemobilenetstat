@@ -45,7 +45,7 @@ public final class HttpClient {
     private int connectTimeout;
     private int readTimeout;
     private String userAgent;
-    private final Map<String, String> inMemoryCookies = new HashMap<String, String>(8);
+    private final Map<String, String> inMemoryCookies = new HashMap<>(8);
 
     /**
      * Create a new instance for this {@link Context}.

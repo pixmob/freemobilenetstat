@@ -188,16 +188,14 @@ public class SyncService extends IntentService {
 
         Log.i(TAG, "Initializing statistics before uploading");
 
-        final LongSparseArray< DailyStat> stats = new LongSparseArray< DailyStat>(15);
-        final Set< Long> uploadedStats = new HashSet< Long>(15);
+        final LongSparseArray< DailyStat> stats = new LongSparseArray<>(15);
+        final Set< Long> uploadedStats = new HashSet<>(15);
         final long statTimestampStart = now - 7 * DAY_IN_MILLISECONDS;
 
         // Get pending uploads.
-        Cursor c =
-            db.query("daily_stat", new String[] {"stat_timestamp", "orange", "free_mobile", "sync" },
-                "stat_timestamp>=? AND stat_timestamp<?", new String[] {String.valueOf(statTimestampStart),
-                    String.valueOf(now) }, null, null, null);
-        try {
+        try (Cursor c = db.query("daily_stat", new String[]{"stat_timestamp", "orange", "free_mobile", "sync"},
+                "stat_timestamp>=? AND stat_timestamp<?", new String[]{String.valueOf(statTimestampStart),
+                        String.valueOf(now)}, null, null, null)) {
             while (c.moveToNext()) {
                 final long d = c.getLong(0);
                 final int sync = c.getInt(3);
@@ -210,8 +208,6 @@ public class SyncService extends IntentService {
                     stats.put(d, s);
                 }
             }
-        } finally {
-            c.close();
         }
 
         // Compute missing uploads.
@@ -329,12 +325,10 @@ public class SyncService extends IntentService {
             Log.d(TAG, "Computing statistics for " + DateUtils.formatDate(date));
         }
 
-        final Cursor c =
-            getContentResolver().query(Events.CONTENT_URI,
-                new String[] {Events.TIMESTAMP, Events.MOBILE_OPERATOR },
+        try (Cursor c = getContentResolver().query(Events.CONTENT_URI,
+                new String[]{Events.TIMESTAMP, Events.MOBILE_OPERATOR},
                 Events.TIMESTAMP + ">=? AND " + Events.TIMESTAMP + "<=?",
-                new String[] {String.valueOf(date), String.valueOf(date + 86400 * 1000) }, Events.TIMESTAMP);
-        try {
+                new String[]{String.valueOf(date), String.valueOf(date + 86400 * 1000)}, Events.TIMESTAMP)) {
             long t0 = 0;
             MobileOperator op0 = null;
             CharArrayBuffer cBuf = new CharArrayBuffer(6);
@@ -358,8 +352,6 @@ public class SyncService extends IntentService {
                 t0 = t;
                 op0 = op;
             }
-        } finally {
-            c.close();
         }
 
         final DailyStat s = new DailyStat();
@@ -426,14 +418,11 @@ public class SyncService extends IntentService {
 
     private String getDeviceId() {
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
-        final Cursor c = db.query("device", new String[] {"device_id" }, null, null, null, null, null);
         String deviceId = null;
-        try {
+        try (Cursor c = db.query("device", new String[]{"device_id"}, null, null, null, null, null)) {
             if (c.moveToNext()) {
                 deviceId = c.getString(0);
             }
-        } finally {
-            c.close();
         }
         if (deviceId == null) {
             // Generate a new device identifier.
