@@ -65,14 +65,14 @@ import static org.pixmob.httpclient.Constants.HTTP_PUT;
 public final class HttpRequestBuilder {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final String CONTENT_CHARSET = "UTF-8";
-    private static final Map<String, List<String>> NO_HEADERS = new HashMap<String, List<String>>(0);
+    private static final Map<String, List<String>> NO_HEADERS = new HashMap<>(0);
     private static TrustManager[] trustManagers;
     private final byte[] buffer = new byte[1024];
     private final HttpClient hc;
-    private final List<HttpRequestHandler> reqHandlers = new ArrayList<HttpRequestHandler>(2);
+    private final List<HttpRequestHandler> reqHandlers = new ArrayList<>(2);
     private String uri;
     private String method;
-    private Set<Integer> expectedStatusCodes = new HashSet<Integer>(2);
+    private Set<Integer> expectedStatusCodes = new HashSet<>(2);
     private Map<String, String> cookies;
     private Map<String, List<String>> headers;
     private Map<String, String> parameters;
@@ -133,11 +133,11 @@ public final class HttpRequestBuilder {
             throw new IllegalArgumentException("Header value cannot be null");
         }
         if (headers == null) {
-            headers = new HashMap<String, List<String>>(2);
+            headers = new HashMap<>(2);
         }
         List<String> values = headers.get(name);
         if (values == null) {
-            values = new ArrayList<String>(1);
+            values = new ArrayList<>(1);
             headers.put(name, values);
         }
         values.add(value);
@@ -157,7 +157,7 @@ public final class HttpRequestBuilder {
             throw new IllegalArgumentException("Parameter value cannot be null");
         }
         if (parameters == null) {
-            parameters = new HashMap<String, String>(4);
+            parameters = new HashMap<>(4);
         }
         parameters.put(name, value);
         return this;
@@ -171,7 +171,7 @@ public final class HttpRequestBuilder {
             throw new IllegalArgumentException("Cookie value cannot be null");
         }
         if (cookies == null) {
-            cookies = new HashMap<String, String>(2);
+            cookies = new HashMap<>(2);
         }
         cookies.put(name, value);
         return this;
@@ -444,11 +444,8 @@ public final class HttpRequestBuilder {
     private static KeyStore loadCertificates(Context context) throws IOException {
         try {
             final KeyStore localTrustStore = KeyStore.getInstance("BKS");
-            final InputStream in = context.getResources().openRawResource(R.raw.hc_keystore);
-            try {
+            try (InputStream in = context.getResources().openRawResource(R.raw.hc_keystore)) {
                 localTrustStore.load(in, null);
-            } finally {
-                in.close();
             }
 
             return localTrustStore;

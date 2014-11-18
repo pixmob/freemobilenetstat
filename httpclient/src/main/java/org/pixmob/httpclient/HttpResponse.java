@@ -49,7 +49,7 @@ public final class HttpResponse {
             // Before Gingerbread, Android has a bug where all headers are
             // stored in lower-case:
             // http://code.google.com/p/android/issues/detail?id=6684
-            final Map<String, List<String>> newHeaders = new HashMap<String, List<String>>(rawHeaders.size());
+            final Map<String, List<String>> newHeaders = new HashMap<>(rawHeaders.size());
             for (final Map.Entry<String, List<String>> e : rawHeaders.entrySet()) {
                 final String key = e.getKey();
                 final int keyLen = key.length();

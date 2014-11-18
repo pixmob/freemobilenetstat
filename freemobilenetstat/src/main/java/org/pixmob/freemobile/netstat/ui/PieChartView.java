@@ -61,7 +61,7 @@ public class PieChartView extends View {
 		private final int color2;
 		private final int percent; // Relative to parent
 		private final PieChartComponent parentComponent;
-		private final List<PieChartComponent> childComponents = new ArrayList<PieChartComponent>();
+		private final List<PieChartComponent> childComponents = new ArrayList<>();
 
 		/**
 		 * Shaded top-level component
@@ -129,7 +129,7 @@ public class PieChartView extends View {
 		}
 	}
 
-	private final List<PieChartComponent> components = new ArrayList<PieChartComponent>();
+	private final List<PieChartComponent> components = new ArrayList<>();
     private final RectF circleBounds = new RectF();
     private Paint arcBorderPaint;
     private Paint unknownPaint;

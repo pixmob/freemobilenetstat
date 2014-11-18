@@ -26,7 +26,7 @@ import java.util.Map;
  * @author Pixmob
  */
 public final class Features {
-    private static final Map<Class<?>, Object> FEATURES = new HashMap<Class<?>, Object>(
+    private static final Map<Class<?>, Object> FEATURES = new HashMap<>(
             4);
     static {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {

@@ -72,7 +72,7 @@ public class Application extends android.app.Application {
             Features.getFeature(StrictModeFeature.class).enable();
         }
 
-        final Map<String, Object> defaultValues = new HashMap<String, Object>();
+        final Map<String, Object> defaultValues = new HashMap<>();
         defaultValues.put(SP_KEY_ENABLE_AT_BOOT, true);
         defaultValues.put(SP_KEY_TIME_INTERVAL, INTERVAL_SINCE_BOOT);
         defaultValues.put(SP_KEY_UPLOAD_STATS, true);

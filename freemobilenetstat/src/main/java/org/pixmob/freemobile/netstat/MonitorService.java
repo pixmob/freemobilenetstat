@@ -92,7 +92,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     /**
      * Notification themes.
      */
-    private static final Map< String, Theme> THEMES = new HashMap< String, Theme>(3);
+    private static final Map< String, Theme> THEMES = new HashMap<>(3);
     /**
      * Match network types from {@link TelephonyManager} with the corresponding string.
      */
@@ -214,7 +214,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // Initialize and start a worker thread for inserting rows into the
         // application database.
         final Context c = getApplicationContext();
-        pendingInsert = new ArrayBlockingQueue< Event>(8);
+        pendingInsert = new ArrayBlockingQueue<>(8);
         new PendingInsertWorker(c, pendingInsert).start();
 
         // This intent is fired when the application notification is clicked.
