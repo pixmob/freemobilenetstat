@@ -266,6 +266,12 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             findPreference(key).setSummary(notifActions.get(notifAction));
         }
 
+        if (SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION.equals(key)) {
+            Intent intent = new Intent(this, MonitorService.class);
+            intent.putExtra(MonitorService.INTENT_UPDATE_NOTIF_ON_LOCKSCREEN, true);
+            startService(intent);
+        }
+
         Log.d(TAG, "Application preferences updated: " + "calling BackupManager.dataChanged()");
         Features.getFeature(BackupManagerFeature.class).dataChanged(this);
     }

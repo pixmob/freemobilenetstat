@@ -111,7 +111,17 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     public static final Integer[] SDK_ALLOWED_TO_AUTO_RESTART_SERVICE =
     	new Integer[] { Build.VERSION_CODES.JELLY_BEAN, Build.VERSION_CODES.JELLY_BEAN_MR1, 
     	  Build.VERSION_CODES.JELLY_BEAN_MR2, Build.VERSION_CODES.KITKAT };
-    
+
+    /**
+     * Intent extra when requesting service restart after died
+     */
+    private static final String INTENT_ALARM_RESTART_SERVICE_DIED = "ALARM_RESTART_SERVICE_DIED";
+
+    /**
+     * Intent extra when requesting service restart after died
+     */
+    public static final String INTENT_UPDATE_NOTIF_ON_LOCKSCREEN = "UPDATE_NOTIF_ON_LOCKSCREEN";
+
     /**
      * This intent will open the main UI.
      */
@@ -367,16 +377,23 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        if (intent != null && intent.getBooleanExtra("ALARM_RESTART_SERVICE_DIED", false))
-        {
-        	if (DEBUG)
-        		Log.d(TAG, "onStartCommand > after ALARM_RESTART_SERVICE_DIED [ Kitkat START_STICKY bug ]");
-            if (isRunning())
-            {
-            	if (DEBUG)
-            		Log.d(TAG, "onStartCommand > Service already running - return immediately... [ Kitkat START_STICKY bug ]");
-                ensureServiceStaysRunning();
-                return START_STICKY;
+        if (intent != null) //we have intent to handle
+        {   if (intent.getBooleanExtra(INTENT_ALARM_RESTART_SERVICE_DIED, false)) { //intent to check service is alive
+                if (DEBUG)
+                    Log.d(TAG, "onStartCommand > after ALARM_RESTART_SERVICE_DIED [ Kitkat START_STICKY bug ]");
+                if (isRunning()) {
+                    if (DEBUG)
+                        Log.d(TAG, "onStartCommand > Service already running - return immediately... [ Kitkat START_STICKY bug ]");
+                    ensureServiceStaysRunning();
+                    return START_STICKY;
+                }
+            }
+
+            if (intent.getBooleanExtra(INTENT_UPDATE_NOTIF_ON_LOCKSCREEN, false)) { //intent to update the notification on lockscreen (hide / show)
+                if (DEBUG) {
+                    Log.d(TAG, "onStartCommand > update the notification on lockscreen (hide / show)");
+                }
+                updateNotification(false);
             }
         }
         
@@ -435,7 +452,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             final int restartAlarmInterval = 10*60*1000;
             final int resetAlarmTimer = 1*60*1000;
             final Intent restartIntent = new Intent(this, MonitorService.class);
-            restartIntent.putExtra("ALARM_RESTART_SERVICE_DIED", true);
+            restartIntent.putExtra(INTENT_ALARM_RESTART_SERVICE_DIED, true);
             final AlarmManager alarmMgr = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
             Handler restartServiceHandler = new Handler()
             {
