@@ -66,7 +66,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -188,6 +187,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	@Override
     public void onCreate() {
         super.onCreate();
+
+        pm = (PowerManager) getSystemService(POWER_SERVICE);
+        tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         
         prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);
         prefs.registerOnSharedPreferenceChangeListener(this);
@@ -207,10 +210,6 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
                     R.drawable.ic_stat_notify_service_orange_large), largeIconWidth, largeIconHeight, true);
         }
-
-        pm = (PowerManager) getSystemService(POWER_SERVICE);
-        tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-        cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
         // Initialize and start a worker thread for inserting rows into the
         // application database.
@@ -379,7 +378,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         if (intent != null) //we have intent to handle
-        {   if (intent.getBooleanExtra(INTENT_ALARM_RESTART_SERVICE_DIED, false)) { //intent to check service is alive
+        {
+            if (intent.getBooleanExtra(INTENT_ALARM_RESTART_SERVICE_DIED, false)) { //intent to check service is alive
                 if (DEBUG)
                     Log.d(TAG, "onStartCommand > after ALARM_RESTART_SERVICE_DIED [ Kitkat START_STICKY bug ]");
                 if (isRunning()) {
@@ -396,6 +396,11 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 }
                 updateNotification(false);
             }
+        }
+
+        if (MobileOperator.FREE_MOBILE.isCurrentSimOwner(getApplicationContext()) == -1) {
+            stopSelf();
+            return START_NOT_STICKY;
         }
         
         // Update with current state.

@@ -24,7 +24,6 @@ import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.telephony.TelephonyManager;
 import android.view.View;
 import android.view.Window;
 
@@ -34,7 +33,6 @@ import org.pixmob.freemobile.netstat.SyncService;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
 
-import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND;
 
 /**
@@ -55,7 +53,7 @@ public class Netstat extends FragmentActivity {
         if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null)
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, new StatisticsFragment()).commit();
 
-        if (!isSimSupported()) {
+        if (MobileOperator.FREE_MOBILE.isCurrentSimOwner(this) != 1) {
             new UnsupportedSimDialogFragment().show(getSupportFragmentManager(), "error");
             return;
         }
@@ -93,23 +91,6 @@ public class Netstat extends FragmentActivity {
     public void enlargeChart(View view) {
     	Intent intent = new Intent(this, MobileNetworkChartActivity.class);
     	startActivity(intent);
-    }
-
-
-
-    /**
-     * Check if the SIM card is supported.
-     */
-    private boolean isSimSupported() {
-        if (!DEBUG) {
-            final TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-            if (TelephonyManager.SIM_STATE_READY != tm.getSimState()) {
-                return false;
-            }
-            return MobileOperator.FREE_MOBILE.equals(MobileOperator.fromString(tm.getSimOperator()));
-        }
-
-        return true;
     }
 
     @Override

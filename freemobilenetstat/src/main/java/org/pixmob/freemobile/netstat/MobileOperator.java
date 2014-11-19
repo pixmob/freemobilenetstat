@@ -17,6 +17,7 @@ package org.pixmob.freemobile.netstat;
 
 import android.content.Context;
 import android.database.CharArrayBuffer;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import java.util.HashSet;
@@ -90,5 +91,21 @@ public enum MobileOperator {
             return context.getString(R.string.network_orange);
         }
         return context.getString(R.string.network_unknown);
+    }
+
+    /**
+     * @return -1 > SIM not ready ; 0 SIM ready but not owner ; 1 SIM ready and owner of the SIM
+     */
+    public int isCurrentSimOwner(Context context) {
+        if (!DEBUG) {
+            TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            if (TelephonyManager.SIM_STATE_READY != tm.getSimState())
+                return -1;
+            if (equals(MobileOperator.fromString(tm.getSimOperator())))
+                return 1;
+            return 0;
+        }
+
+        return 1;
     }
 }
