@@ -18,9 +18,11 @@ package org.pixmob.freemobile.netstat.ui;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
+import org.pixmob.freemobile.netstat.MonitorService;
 import org.pixmob.freemobile.netstat.R;
 
 /**
@@ -41,5 +43,11 @@ public class UnsupportedSimDialogFragment extends DialogFragment {
                             getActivity().finish();
                         }
                     }).create();
+    }
+
+    @Override
+    public void onStop() {
+        getActivity().stopService(new Intent(getActivity().getApplicationContext(), MonitorService.class));
+        System.exit(0);
     }
 }

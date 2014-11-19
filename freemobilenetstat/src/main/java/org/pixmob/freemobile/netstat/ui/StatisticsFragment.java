@@ -17,7 +17,6 @@ package org.pixmob.freemobile.netstat.ui;
 
 import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.os.Bundle;
@@ -25,7 +24,6 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,7 +34,6 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.MonitorService;
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
@@ -73,10 +70,6 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        if (!isSimSupported(getActivity())) {
-            new UnsupportedSimDialogFragment().show(getFragmentManager(), "error");
-        }
 
         if (exportTask != null) {
             exportTask.setFragmentManager(getFragmentManager());
@@ -118,22 +111,6 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         setHasOptionsMenu(true);
 
         getLoaderManager().initLoader(0, null, this);
-    }
-
-    /**
-     * Check if the SIM card is supported.
-     */
-    private static boolean isSimSupported(Context context) {
-        if (!DEBUG) {
-            final TelephonyManager tm = (TelephonyManager) context
-                    .getSystemService(Context.TELEPHONY_SERVICE);
-            if (TelephonyManager.SIM_STATE_READY != tm.getSimState()) {
-                return false;
-            }
-            return MobileOperator.FREE_MOBILE.equals(MobileOperator.fromString(tm.getSimOperator()));
-        }
-
-        return true;
     }
 
     @Override
