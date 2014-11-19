@@ -181,6 +181,7 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
                     };
             Statistics.roundTwoPercentagesUpTo100(freeMobile3G4GUsePercents);
             s.freeMobile3GUsePercent = (int) freeMobile3G4GUsePercents[0];
+            s.freeMobileFemtocellUsePercent = (int) Math.round((double)s.femtocellTime / (s.freeMobile3GTime + freeMobile3GBonusTime) * 100d);
             s.freeMobile4GUsePercent = (int) freeMobile3G4GUsePercents[1];
 
             final long orange3GBonusTime = s.orangeTime == 0 ? 0 : (long)(orangeUnknownNetworkClassTime * ((double)s.orange3GTime / s.orangeTime));
