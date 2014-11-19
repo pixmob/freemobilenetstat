@@ -36,33 +36,43 @@ public class Statistics {
                 + freeMobileUsePercent + "%]";
     }
 
-    public static void roundTwoPercentagesUpTo100(double[] percents) {
-        roundTwoPercentagesUpToN(percents, 100);
+    public static void roundPercentagesUpTo100(double[] percents) {
+        roundPercentagesUpToN(percents, 100);
     }
 
-    public static void roundTwoPercentagesUpToN(double[] percents, int sum) {
-        if (percents.length != 2)
-            throw new IllegalArgumentException("There should be only two percentages in the array");
+    public static void roundPercentagesUpToN(double[] percents, int sum) {
 
-        final double[] integerParts = { (int) percents[0], (int) percents[1] };
-        final double[] decimalParts = { percents[0] - integerParts[0], percents[1] - integerParts[1] };
+        final double[] integerParts = new double[percents.length];
+        final double[] decimalParts = new double[percents.length];
+        for (int i = 0; i < percents.length; i++) {
+            integerParts[i] = (int) percents[i];
+            decimalParts[i] = percents[i] - integerParts[i];
+        }
 
-        if (integerParts[0] + integerParts[1] < sum - 1) // Check if we can on day reach the sum
+        double integerSum = 0;
+        for (double integer : integerParts) {
+            integerSum += integer;
+        }
+        if (integerSum < sum - 1) // Check if we can on day reach the sum
             return;
 
-        if (integerParts[0] + integerParts[1] == sum) {
-            percents[0] = integerParts[0];
-            percents[1] = integerParts[1];
+        if (integerSum == sum) {
+            System.arraycopy(integerParts, 0, percents, 0, integerParts.length);
             return;
         }
 
-        if (decimalParts[0] <= decimalParts[1]) {
-            percents[0] = integerParts[0];
-            percents[1] = integerParts[1] + 1;
-            return;
+        boolean earlyExit = false;
+        for (int i = 0; i < percents.length - 1; i++) {
+            if (decimalParts[i] <= decimalParts[i + 1]) {
+                percents[i] = integerParts[i];
+                percents[i + 1] = integerParts[i + 1] + 1;
+                earlyExit = true;
+            }
         }
 
-        percents[0] = integerParts[0] + 1;
-        percents[1] = integerParts[1];
+        if (!earlyExit) {
+            percents[0] = integerParts[0] + 1;
+            System.arraycopy(integerParts, 1, percents, 1, integerParts.length - 1);
+        }
     }
 }
