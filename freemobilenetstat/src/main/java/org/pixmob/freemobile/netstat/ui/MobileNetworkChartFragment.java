@@ -114,7 +114,7 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
                 (double) s.orange2GUsePercent * s.orangeUsePercent / 100d,
                 (double) s.orange3GUsePercent * s.orangeUsePercent / 100d
         };
-        Statistics.roundTwoPercentagesUpToN(orange2G3GUsePercents, s.orangeUsePercent);
+        Statistics.roundPercentagesUpToN(orange2G3GUsePercents, s.orangeUsePercent);
 	    onOrange2GnetworkTextView.setText((int) orange2G3GUsePercents[0] + "%");
 	    onOrange3GnetworkTextView.setText((int) orange2G3GUsePercents[1] + "%");
 	    onFreeMobileNetworkTextView.setText(s.freeMobileUsePercent + "%");
@@ -122,7 +122,7 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
                 (double) s.freeMobile3GUsePercent * s.freeMobileUsePercent / 100d,
                 (double) s.freeMobile4GUsePercent * s.freeMobileUsePercent / 100d
         };
-        Statistics.roundTwoPercentagesUpToN(freeMobile3G4GUsePercents, s.freeMobileUsePercent);
+        Statistics.roundPercentagesUpToN(freeMobile3G4GUsePercents, s.freeMobileUsePercent);
 	    onFreeMobile3GnetworkTextView.setText((int) freeMobile3G4GUsePercents[0] + "%");
 	    onFreeMobileFemtocellTextView.setText(Math.min((int) freeMobile3G4GUsePercents[0],
                 s.freeMobileFemtocellUsePercent * s.freeMobile3GUsePercent * s.freeMobileUsePercent / 10000) + "%");
@@ -139,12 +139,11 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
         				s.orange2GUsePercent, orange);
         mobileNetworkChart.new PieChartComponent(R.color.orange_3G_network_color1, R.color.orange_3G_network_color2,
         				s.orange3GUsePercent, orange);
-        PieChartView.PieChartComponent freeMobile3G =
-        		mobileNetworkChart.new PieChartComponent(R.color.free_mobile_3G_network_color1, R.color.free_mobile_3G_network_color2,
+        mobileNetworkChart.new PieChartComponent(R.color.free_mobile_3G_network_color1, R.color.free_mobile_3G_network_color2,
         				s.freeMobile3GUsePercent, freeMobile);
         mobileNetworkChart.new PieChartComponent(
         		R.color.free_mobile_3G_femtocell_network_color1, R.color.free_mobile_3G_femtocell_network_color2,
-				s.freeMobileFemtocellUsePercent, freeMobile3G);
+				s.freeMobileFemtocellUsePercent, freeMobile);
         mobileNetworkChart.new PieChartComponent(R.color.free_mobile_4G_network_color1, R.color.free_mobile_4G_network_color2,
         				s.freeMobile4GUsePercent, freeMobile);
         
