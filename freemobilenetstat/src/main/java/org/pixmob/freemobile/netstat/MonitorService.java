@@ -710,9 +710,9 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	    		}
         	}
         }
-        //*/ Fake femtocell
-        //Random rnd = new Random();
-        //if (rnd.nextInt() % 2 == 0)
+        /*/ Fake femtocell
+        Random rnd = new Random();
+        if (rnd.nextInt() % 2 == 0)
         	lac = 3981;
         //*/
         if (DEBUG) Log.d(TAG, "LAC value : " + lac);
