@@ -66,6 +66,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -658,6 +659,12 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	 */
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	private void updateFemtocellStatus() {
+        // No need to check LAC if current operator is not free mobile
+        if (!MobileOperator.FREE_MOBILE.equals(MobileOperator.fromString(mobileOperatorId))) {
+            isFemtocell = false;
+            return;
+        }
+
 		Integer lac = null;
         if (tm != null) {
         	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
@@ -703,9 +710,9 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	    		}
         	}
         }
-        /*/ Fake femtocell
-        Random rnd = new Random();
-        if (rnd.nextInt() % 2 == 0)
+        //*/ Fake femtocell
+        //Random rnd = new Random();
+        //if (rnd.nextInt() % 2 == 0)
         	lac = 3981;
         //*/
         if (DEBUG) Log.d(TAG, "LAC value : " + lac);
