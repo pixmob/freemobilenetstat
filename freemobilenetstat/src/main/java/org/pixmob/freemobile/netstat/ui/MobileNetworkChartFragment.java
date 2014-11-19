@@ -124,7 +124,8 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
         };
         Statistics.roundTwoPercentagesUpToN(freeMobile3G4GUsePercents, s.freeMobileUsePercent);
 	    onFreeMobile3GnetworkTextView.setText((int) freeMobile3G4GUsePercents[0] + "%");
-	    onFreeMobileFemtocellTextView.setText(s.freeMobileFemtocellUsePercent * s.freeMobile3GUsePercent * s.freeMobileUsePercent / 10000 + "%");
+	    onFreeMobileFemtocellTextView.setText(Math.min((int) freeMobile3G4GUsePercents[0],
+                s.freeMobileFemtocellUsePercent * s.freeMobile3GUsePercent * s.freeMobileUsePercent / 10000) + "%");
 	    onFreeMobile4GnetworkTextView.setText((int) freeMobile3G4GUsePercents[1] + "%");
 	    
 	    mobileNetworkChart.clear();

@@ -122,20 +122,28 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
                     final MobileOperator op = MobileOperator.fromString(e.mobileOperator);
                     final MobileOperator op0 = MobileOperator.fromString(e0.mobileOperator);
                 	final NetworkClass nc = NetworkClass.getNetworkClass(e.mobileNetworkType);
+                    final NetworkClass nc0 = NetworkClass.getNetworkClass(e0.mobileNetworkType);
                     if (op != null && op.equals(op0)) {
                         if (MobileOperator.ORANGE.equals(op)) {
                             s.orangeTime += dt;
-                            if (NetworkClass.NC_2G.equals(nc)) {
-                            	s.orange2GTime += dt;
-                            } else if (NetworkClass.NC_3G.equals(nc)) {
-                            	s.orange3GTime += dt;
+                            if (nc != null && nc.equals(nc0)) {
+                                if (NetworkClass.NC_2G.equals(nc)) {
+                                    s.orange2GTime += dt;
+                                } else if (NetworkClass.NC_3G.equals(nc)) {
+                                    s.orange3GTime += dt;
+                                }
                             }
                         } else if (MobileOperator.FREE_MOBILE.equals(op)) {
                             s.freeMobileTime += dt;
-                            if (NetworkClass.NC_3G.equals(nc)) {
-                            	s.freeMobile3GTime += dt;
-                            } else if (NetworkClass.NC_4G.equals(nc)) {
-                            	s.freeMobile4GTime += dt;
+                            if (nc != null && nc.equals(nc0)) {
+                                if (NetworkClass.NC_3G.equals(nc)) {
+                                    s.freeMobile3GTime += dt;
+                                    if (e.femtocell && e0.femtocell) {
+                                        s.femtocellTime += dt;
+                                    }
+                                } else if (NetworkClass.NC_4G.equals(nc)) {
+                                    s.freeMobile4GTime += dt;
+                                }
                             }
                         }
                     }
@@ -150,9 +158,6 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
                     }
                     if (e.screenOn && e0.screenOn) {
                         s.screenOnTime += dt;
-                    }
-                    if (e.femtocell && e0.femtocell) {
-                        s.femtocellTime += dt;
                     }
                 }
             }
@@ -181,7 +186,8 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
                     };
             Statistics.roundTwoPercentagesUpTo100(freeMobile3G4GUsePercents);
             s.freeMobile3GUsePercent = (int) freeMobile3G4GUsePercents[0];
-            s.freeMobileFemtocellUsePercent = (int) Math.round((double)s.femtocellTime / (s.freeMobile3GTime + freeMobile3GBonusTime) * 100d);
+            s.freeMobileFemtocellUsePercent = (s.freeMobile3GTime + freeMobile3GBonusTime) == 0 ?
+                    0 : (int) Math.round((double)s.femtocellTime / (s.freeMobile3GTime + freeMobile3GBonusTime) * 100d);
             s.freeMobile4GUsePercent = (int) freeMobile3G4GUsePercents[1];
 
             final long orange3GBonusTime = s.orangeTime == 0 ? 0 : (long)(orangeUnknownNetworkClassTime * ((double)s.orange3GTime / s.orangeTime));
