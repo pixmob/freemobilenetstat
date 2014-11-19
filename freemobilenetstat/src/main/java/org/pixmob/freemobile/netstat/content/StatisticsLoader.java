@@ -171,25 +171,29 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
             final long freeMobileUnknownNetworkClassTime = s.freeMobileTime - s.freeMobile3GTime - s.freeMobile4GTime;
 
             final double[] freeMobileOrangeUsePercents = { (double)s.freeMobileTime / sTime * 100d, (double)s.orangeTime / sTime * 100d };
-            Statistics.roundTwoPercentagesUpTo100(freeMobileOrangeUsePercents);
+            Statistics.roundPercentagesUpTo100(freeMobileOrangeUsePercents);
             s.freeMobileUsePercent = (int) freeMobileOrangeUsePercents[0];
             s.orangeUsePercent = (int) freeMobileOrangeUsePercents[1];
 
+            // Free mobile network part
             // Bonus trying to compensate "unknown network class" time
             final long freeMobile4GBonusTime = s.freeMobileTime == 0 ?
                     0 : (long)(freeMobileUnknownNetworkClassTime * ((double)s.freeMobile4GTime / s.freeMobileTime));
-            final long freeMobile3GBonusTime = freeMobileUnknownNetworkClassTime - freeMobile4GBonusTime;
-            final double[] freeMobile3G4GUsePercents =
+            final long freeMobile3GBonusTime = s.freeMobileTime == 0 ?
+                    0 : (long)(freeMobileUnknownNetworkClassTime * ((double)s.freeMobile3GTime / s.freeMobileTime));
+            final long femtocellBonusTime = freeMobileUnknownNetworkClassTime - freeMobile4GBonusTime - freeMobile3GBonusTime;
+            final double[] freeMobile3G4GFemtoUsePercents =
                     {
                       s.freeMobileTime == 0 ? 0 : (double)(s.freeMobile3GTime + freeMobile3GBonusTime) / s.freeMobileTime * 100d,
-                      s.freeMobileTime == 0 ? 0 : (double)(s.freeMobile4GTime + freeMobile4GBonusTime) / s.freeMobileTime * 100d
+                      s.freeMobileTime == 0 ? 0 : (double)(s.freeMobile4GTime + freeMobile4GBonusTime) / s.freeMobileTime * 100d,
+                      s.freeMobileTime == 0 ? 0 : (double)(s.femtocellTime + femtocellBonusTime) / s.freeMobileTime * 100d
                     };
-            Statistics.roundTwoPercentagesUpTo100(freeMobile3G4GUsePercents);
-            s.freeMobile3GUsePercent = (int) freeMobile3G4GUsePercents[0];
-            s.freeMobileFemtocellUsePercent = (s.freeMobile3GTime + freeMobile3GBonusTime) == 0 ?
-                    0 : (int) Math.round((double)s.femtocellTime / (s.freeMobile3GTime + freeMobile3GBonusTime) * 100d);
-            s.freeMobile4GUsePercent = (int) freeMobile3G4GUsePercents[1];
+            Statistics.roundPercentagesUpTo100(freeMobile3G4GFemtoUsePercents);
+            s.freeMobile3GUsePercent = (int) freeMobile3G4GFemtoUsePercents[0];
+            s.freeMobile4GUsePercent = (int) freeMobile3G4GFemtoUsePercents[1];
+            s.freeMobileFemtocellUsePercent = (int) freeMobile3G4GFemtoUsePercents[2];
 
+            // Orange network part
             final long orange3GBonusTime = s.orangeTime == 0 ? 0 : (long)(orangeUnknownNetworkClassTime * ((double)s.orange3GTime / s.orangeTime));
             final long orange2GBonusTime = orangeUnknownNetworkClassTime - orange3GBonusTime;
             final double[] orange2G3GUsePercents =
@@ -197,7 +201,7 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
                         s.orangeTime == 0 ? 0 : (double)(s.orange2GTime + orange2GBonusTime) / s.orangeTime * 100,
                         s.orangeTime == 0 ? 0 : (double)(s.orange3GTime + orange3GBonusTime) / s.orangeTime * 100
                     };
-            Statistics.roundTwoPercentagesUpTo100(orange2G3GUsePercents);
+            Statistics.roundPercentagesUpTo100(orange2G3GUsePercents);
             s.orange2GUsePercent = (int) orange2G3GUsePercents[0];
             s.orange3GUsePercent = (int) orange2G3GUsePercents[1];
 
