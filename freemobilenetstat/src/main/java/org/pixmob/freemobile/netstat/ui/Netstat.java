@@ -55,7 +55,7 @@ public class Netstat extends FragmentActivity {
         if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null)
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, new StatisticsFragment()).commit();
 
-        if (isSimSupported()) {
+        if (!isSimSupported()) {
             new UnsupportedSimDialogFragment().show(getSupportFragmentManager(), "error");
             return;
         }
