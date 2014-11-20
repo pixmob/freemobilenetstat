@@ -3,6 +3,10 @@ package org.pixmob.freemobile.netstat.content;
 import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Store statistics.
  * @author Pixmob
@@ -42,37 +46,37 @@ public class Statistics {
 
     public static void roundPercentagesUpToN(double[] percents, int sum) {
 
+        class Pair <K, V extends Comparable> implements Comparable<Pair <K, V>> {
+            public final K left;
+            public final V right;
+            Pair(K left, V right) { this.left = left; this.right = right; }
+
+            @Override
+            public int compareTo(Pair<K, V> another) {
+                return right.compareTo(another.right);
+            }
+        }
+
         final double[] integerParts = new double[percents.length];
-        final double[] decimalParts = new double[percents.length];
+        final List<Pair<Integer, Double>> sortedDecimalParts = new ArrayList<>();
+        int integerSum = 0;
         for (int i = 0; i < percents.length; i++) {
             integerParts[i] = (int) percents[i];
-            decimalParts[i] = percents[i] - integerParts[i];
+            sortedDecimalParts.add(new Pair<>(i, percents[i] - (int)percents[i]));
+            integerSum += integerParts[i];
         }
-
-        double integerSum = 0;
-        for (double integer : integerParts) {
-            integerSum += integer;
-        }
-        if (integerSum < sum - 1) // Check if we can on day reach the sum
-            return;
-
         if (integerSum == sum) {
             System.arraycopy(integerParts, 0, percents, 0, integerParts.length);
             return;
         }
+        if (integerSum < sum - percents.length) // Check if we can one day reach the sum
+            return;
 
-        boolean earlyExit = false;
-        for (int i = 0; i < percents.length - 1; i++) {
-            if (decimalParts[i] <= decimalParts[i + 1]) {
-                percents[i] = integerParts[i];
-                percents[i + 1] = integerParts[i + 1] + 1;
-                earlyExit = true;
-            }
-        }
+        Collections.sort(sortedDecimalParts, Collections.reverseOrder());
 
-        if (!earlyExit) {
-            percents[0] = integerParts[0] + 1;
-            System.arraycopy(integerParts, 1, percents, 1, integerParts.length - 1);
-        }
+        for (int i = 0, end = sum - integerSum; i < end; ++i)
+            ++integerParts[sortedDecimalParts.get(i).left];
+
+        System.arraycopy(integerParts, 0, percents, 0, integerParts.length);
     }
 }
