@@ -120,13 +120,13 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
 	    onFreeMobileNetworkTextView.setText(s.freeMobileUsePercent + "%");
         final double[] freeMobile3G4GUsePercents = {
                 (double) s.freeMobile3GUsePercent * s.freeMobileUsePercent / 100d,
+                (double) s.freeMobileFemtocellUsePercent * s.freeMobileUsePercent / 100d,
                 (double) s.freeMobile4GUsePercent * s.freeMobileUsePercent / 100d
         };
         Statistics.roundPercentagesUpToN(freeMobile3G4GUsePercents, s.freeMobileUsePercent);
 	    onFreeMobile3GnetworkTextView.setText((int) freeMobile3G4GUsePercents[0] + "%");
-	    onFreeMobileFemtocellTextView.setText(Math.min((int) freeMobile3G4GUsePercents[0],
-                s.freeMobileFemtocellUsePercent * s.freeMobile3GUsePercent * s.freeMobileUsePercent / 10000) + "%");
-	    onFreeMobile4GnetworkTextView.setText((int) freeMobile3G4GUsePercents[1] + "%");
+	    onFreeMobileFemtocellTextView.setText((int) freeMobile3G4GUsePercents[1] + "%");
+	    onFreeMobile4GnetworkTextView.setText((int) freeMobile3G4GUsePercents[2] + "%");
 	    
 	    mobileNetworkChart.clear();
         PieChartView.PieChartComponent orange =
