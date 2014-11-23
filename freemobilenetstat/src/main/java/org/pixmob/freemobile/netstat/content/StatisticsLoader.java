@@ -137,9 +137,10 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
                             s.freeMobileTime += dt;
                             if (nc != null && nc.equals(nc0)) {
                                 if (NetworkClass.NC_3G.equals(nc)) {
-                                    s.freeMobile3GTime += dt;
                                     if (e.femtocell && e0.femtocell) {
                                         s.femtocellTime += dt;
+                                    } else {
+                                        s.freeMobile3GTime += dt;
                                     }
                                 } else if (NetworkClass.NC_4G.equals(nc)) {
                                     s.freeMobile4GTime += dt;
@@ -168,7 +169,7 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
 
             final double sTime = s.orangeTime + s.freeMobileTime;
             final long orangeUnknownNetworkClassTime = s.orangeTime - s.orange2GTime - s.orange3GTime;
-            final long freeMobileUnknownNetworkClassTime = s.freeMobileTime - s.freeMobile3GTime - s.freeMobile4GTime;
+            final long freeMobileUnknownNetworkClassTime = s.freeMobileTime - s.freeMobile3GTime - s.freeMobile4GTime - s.femtocellTime;
 
             final double[] freeMobileOrangeUsePercents = { (double)s.freeMobileTime / sTime * 100d, (double)s.orangeTime / sTime * 100d };
             Statistics.roundPercentagesUpTo100(freeMobileOrangeUsePercents);
