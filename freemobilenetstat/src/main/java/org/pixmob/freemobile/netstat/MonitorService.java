@@ -62,6 +62,7 @@ import android.util.SparseIntArray;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.util.IntentFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -122,6 +123,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      */
     public static final String INTENT_UPDATE_NOTIF_ON_LOCKSCREEN = "UPDATE_NOTIF_ON_LOCKSCREEN";
 
+    private static final List<Integer> FEMTOCELL_AVAILABLE_NETWORK_TYPE = new ArrayList<>();
+
     /**
      * This intent will open the main UI.
      */
@@ -167,6 +170,14 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         }
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_CDMA, R.string.network_type_cdma);
         NETWORK_TYPE_STRINGS.put(TelephonyManager.NETWORK_TYPE_UNKNOWN, R.string.network_type_unknown);
+
+        FEMTOCELL_AVAILABLE_NETWORK_TYPE.add(TelephonyManager.NETWORK_TYPE_HSDPA);
+        FEMTOCELL_AVAILABLE_NETWORK_TYPE.add(TelephonyManager.NETWORK_TYPE_HSPA);
+        FEMTOCELL_AVAILABLE_NETWORK_TYPE.add(TelephonyManager.NETWORK_TYPE_HSUPA);
+        FEMTOCELL_AVAILABLE_NETWORK_TYPE.add(TelephonyManager.NETWORK_TYPE_UMTS);
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB_MR2) {
+            FEMTOCELL_AVAILABLE_NETWORK_TYPE.add(TelephonyManager.NETWORK_TYPE_HSPAP);
+        }
 
         THEMES.put(THEME_DEFAULT, new Theme(R.drawable.ic_stat_notify_service_free,
             R.drawable.ic_stat_notify_service_free_femto, R.drawable.ic_stat_notify_service_orange));
@@ -665,7 +676,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	private void updateFemtocellStatus() {
         // No need to check LAC if current operator is not free mobile
-        if (!MobileOperator.FREE_MOBILE.equals(MobileOperator.fromString(mobileOperatorId))) {
+        // And no need to check if network type is not femtocell supported network
+        if ((!MobileOperator.FREE_MOBILE.equals(MobileOperator.fromString(mobileOperatorId)))
+            || ((MobileOperator.FREE_MOBILE.equals(MobileOperator.fromString(mobileOperatorId)))
+                && (!FEMTOCELL_AVAILABLE_NETWORK_TYPE.contains(mobileNetworkType)))) {
             isFemtocell = false;
             return;
         }
@@ -715,11 +729,6 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	    		}
         	}
         }
-        /*/ Fake femtocell
-        Random rnd = new Random();
-        if (rnd.nextInt() % 2 == 0)
-        	lac = 3981;
-        //*/
         if (DEBUG) Log.d(TAG, "LAC value : " + lac);
         
         Log.i(TAG, "Femtocell value : " + isFemtocell);
