@@ -56,8 +56,10 @@
     <string name="pref_license_summary">Code source disponible sur github.com/vdavy/freemobilenetstat</string>
     <string name="pref_homesite">Statistiques nationales</string>
     <string name="pref_homesite_summary">Ouvrir la page freemobilenetstat.appspot.com</string>
-    <string name="pref_notif_sound">Alarme sonore</string>
-    <string name="pref_notif_sound_summary">Avertir lorsque l\'opérateur de réseau change</string>
+    <string name="pref_notif_sound_free_mobile">Alarme sonore Free Mobile</string>
+    <string name="pref_notif_sound_free_mobile_summary">Avertir lorsque le téléphone bascule sur le réseau Free Mobile</string>
+    <string name="pref_notif_sound_orange">Alarme sonore Orange</string>
+    <string name="pref_notif_sound_orange_summary">Avertir lorsque le téléphone bascule sur le réseau Orange</string>
     <string name="pref_enable_auto_restart_service">Relancement automatique du service</string>
     <string name="pref_enable_auto_restart_service_summary">Si la notification ne s\'actualise plus (Bug KitKat).</string>
     <string name="pref_enable_lollipop_lockscreen_notification">Notification sur l\'écran de verrouillage.</string>

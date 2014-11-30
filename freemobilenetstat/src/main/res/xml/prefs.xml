@@ -34,12 +34,20 @@
             android:title="@string/pref_enable_notif_actions" />
 
         <RingtonePreference
-            android:key="pref_notif_sound"
+            android:key="pref_notif_sound_free_mobile"
             android:ringtoneType="notification"
             android:showDefault="true"
             android:showSilent="true"
-            android:summary="@string/pref_notif_sound_summary"
-            android:title="@string/pref_notif_sound" />
+            android:summary="@string/pref_notif_sound_free_mobile_summary"
+            android:title="@string/pref_notif_sound_free_mobile" />
+
+        <RingtonePreference
+            android:key="pref_notif_sound_orange"
+            android:ringtoneType="notification"
+            android:showDefault="true"
+            android:showSilent="true"
+            android:summary="@string/pref_notif_sound_orange_summary"
+            android:title="@string/pref_notif_sound_orange" />
 
         <ListPreference
             android:dialogTitle="@string/pref_theme"
