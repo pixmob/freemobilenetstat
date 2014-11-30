@@ -37,9 +37,14 @@ public final class Constants {
     public static final String SP_KEY_ENABLE_AT_BOOT = "pref_enable_at_boot";
     /**
      * {@link SharedPreferences} key: play a sound when the mobile operator is
-     * updated.
+     * updated, on Free Mobile network.
      */
-    public static final String SP_KEY_STAT_NOTIF_SOUND = "pref_notif_sound";
+    public static final String SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE = "pref_notif_sound_free_mobile";
+    /**
+     * {@link SharedPreferences} key: play a sound when the mobile operator is
+     * updated, on Orange network.
+     */
+    public static final String SP_KEY_STAT_NOTIF_SOUND_ORANGE = "pref_notif_sound_orange";
     /**
      * {@link SharedPreferences} key: enable a workaround for KitKat START_STICKY bug.
      */
