@@ -411,7 +411,7 @@ public class SyncService extends IntentService {
     private String createServerUrl(String path) {
         final String safePath;
         if (path == null) {
-            safePath = "";
+            return "http://freemobilenetstat.appspot.com/";
         } else if (path.startsWith("/")) {
             safePath = path;
         } else {
