@@ -1,5 +1,6 @@
 package org.pixmob.freemobile.netstat.content;
 
+import org.jetbrains.annotations.NotNull;
 import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
 
@@ -46,13 +47,13 @@ public class Statistics {
 
     public static void roundPercentagesUpToN(double[] percents, int sum) {
 
-        class Pair <K, V extends Comparable> implements Comparable<Pair <K, V>> {
+        class Pair <K, V extends Comparable<? super V>> implements Comparable<Pair<K, V>> {
             public final K left;
             public final V right;
             Pair(K left, V right) { this.left = left; this.right = right; }
 
             @Override
-            public int compareTo(Pair<K, V> another) {
+            public int compareTo(@NotNull Pair<K, V> another) {
                 return right.compareTo(another.right);
             }
         }

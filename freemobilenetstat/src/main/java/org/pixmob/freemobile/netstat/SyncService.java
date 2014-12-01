@@ -65,6 +65,7 @@ import static org.pixmob.freemobile.netstat.Constants.TAG;
  */
 public class SyncService extends IntentService {
     private static final Random RANDOM = new Random();
+    private static final String SERVER_API_URL = "http://freemobilenetstat.appspot.com/";
     private static final int SERVER_API_VERSION = 1;
     private static final String EXTRA_DEVICE_REG = "org.pixmob.freemobile.netstat.deviceReg";
     private static final long DAY_IN_MILLISECONDS = 86400 * 1000;
@@ -411,13 +412,13 @@ public class SyncService extends IntentService {
     private String createServerUrl(String path) {
         final String safePath;
         if (path == null) {
-            return "http://freemobilenetstat.appspot.com/";
+            return SERVER_API_URL;
         } else if (path.startsWith("/")) {
             safePath = path;
         } else {
             safePath = "/" + path;
         }
-        return "http://freemobilenetstat.appspot.com/" + SERVER_API_VERSION + safePath;
+        return SERVER_API_URL + SERVER_API_VERSION + safePath;
     }
 
     private HttpClient createHttpClient() {

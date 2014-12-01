@@ -168,8 +168,10 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
             }
 
             final double sTime = s.orangeTime + s.freeMobileTime;
-            final long orangeUnknownNetworkClassTime = s.orangeTime - s.orange2GTime - s.orange3GTime;
-            final long freeMobileUnknownNetworkClassTime = s.freeMobileTime - s.freeMobile3GTime - s.freeMobile4GTime - s.femtocellTime;
+            final long orangeKnownNetworkClassTime = s.orange2GTime + s.orange3GTime;
+            final long orangeUnknownNetworkClassTime = s.orangeTime - orangeKnownNetworkClassTime;
+            final long freeMobileKnownNetworkClassTime =  s.freeMobile3GTime + s.freeMobile4GTime + s.femtocellTime;
+            final long freeMobileUnknownNetworkClassTime = s.freeMobileTime - freeMobileKnownNetworkClassTime;
 
             final double[] freeMobileOrangeUsePercents = { (double)s.freeMobileTime / sTime * 100d, (double)s.orangeTime / sTime * 100d };
             Statistics.roundPercentagesUpTo100(freeMobileOrangeUsePercents);
@@ -179,10 +181,11 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
             // Free mobile network part
             // Bonus trying to compensate "unknown network class" time
             final long freeMobile4GBonusTime = s.freeMobileTime == 0 ?
-                    0 : (long)(freeMobileUnknownNetworkClassTime * ((double)s.freeMobile4GTime / s.freeMobileTime));
+                    0 : (long)(freeMobileUnknownNetworkClassTime * ((double)s.freeMobile4GTime / freeMobileKnownNetworkClassTime));
             final long freeMobile3GBonusTime = s.freeMobileTime == 0 ?
-                    0 : (long)(freeMobileUnknownNetworkClassTime * ((double)s.freeMobile3GTime / s.freeMobileTime));
-            final long femtocellBonusTime = freeMobileUnknownNetworkClassTime - freeMobile4GBonusTime - freeMobile3GBonusTime;
+                    0 : (long)(freeMobileUnknownNetworkClassTime * ((double)s.freeMobile3GTime / freeMobileKnownNetworkClassTime));
+            final long femtocellBonusTime = s.freeMobileTime == 0 ?
+                    0 : freeMobileUnknownNetworkClassTime - freeMobile3GBonusTime - freeMobile4GBonusTime;
             final double[] freeMobile3G4GFemtoUsePercents =
                     {
                       s.freeMobileTime == 0 ? 0 : (double)(s.freeMobile3GTime + freeMobile3GBonusTime) / s.freeMobileTime * 100d,
@@ -195,8 +198,10 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
             s.freeMobileFemtocellUsePercent = (int) freeMobile3G4GFemtoUsePercents[2];
 
             // Orange network part
-            final long orange3GBonusTime = s.orangeTime == 0 ? 0 : (long)(orangeUnknownNetworkClassTime * ((double)s.orange3GTime / s.orangeTime));
-            final long orange2GBonusTime = orangeUnknownNetworkClassTime - orange3GBonusTime;
+            final long orange3GBonusTime = s.orangeTime == 0 ?
+                    0 : (long)(orangeUnknownNetworkClassTime * ((double)s.orange3GTime / orangeKnownNetworkClassTime));
+            final long orange2GBonusTime = s.orangeTime == 0 ?
+                    0 : orangeUnknownNetworkClassTime - orange3GBonusTime;
             final double[] orange2G3GUsePercents =
                     {
                         s.orangeTime == 0 ? 0 : (double)(s.orange2GTime + orange2GBonusTime) / s.orangeTime * 100,
