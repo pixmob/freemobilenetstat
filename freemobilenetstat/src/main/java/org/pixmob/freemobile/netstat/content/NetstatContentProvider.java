@@ -243,7 +243,7 @@ public class NetstatContentProvider extends ContentProvider {
         
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            if ((!db.isReadOnly()) && (oldVersion < newVersion) && (newVersion < DATABASE_VERSION)) { //check if we need to upgrade
+            if (!db.isReadOnly()) {
                 Log.w(TAG, "Upgrading database from version " + oldVersion
                         + " to " + newVersion + " which will destroy all data");
                 db.execSQL("DROP TABLE IF EXISTS " + EVENTS_TABLE);
