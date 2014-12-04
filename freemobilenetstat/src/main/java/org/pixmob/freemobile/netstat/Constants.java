@@ -50,10 +50,6 @@ public final class Constants {
      */
     public static final String SP_KEY_ENABLE_AUTO_RESTART_SERVICE = "pref_enable_auto_restart_service";
     /**
-     * {@link SharedPreferences} key: Allows to disable notification on Lockscreen.
-     */
-    public static final String SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION = "pref_enable_lollipop_lockscreen_notification";
-    /**
      * {@link SharedPreferences} key: set the time interval for displayed data.
      */
     public static final String SP_KEY_TIME_INTERVAL = "pref_time_interval";

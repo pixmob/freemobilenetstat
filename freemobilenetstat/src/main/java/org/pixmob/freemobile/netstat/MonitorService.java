@@ -73,7 +73,6 @@ import java.util.concurrent.BlockingQueue;
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.ACTION_NOTIFICATION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
-import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_ORANGE;
@@ -546,13 +545,6 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                     getString(R.string.notif_action_open_network_operator_settings),
                     networkOperatorSettingsPendingIntent);
             }
-        }
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-        		&& Boolean.FALSE.equals(prefs.getBoolean(SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION, true))) {
-        	if (DEBUG)
-        		Log.d(TAG, "Lollipop : notification will not display on lockscreen.");
-        	nBuilder.setVisibility(Notification.VISIBILITY_SECRET);
         }
 
         if (playSound) {
