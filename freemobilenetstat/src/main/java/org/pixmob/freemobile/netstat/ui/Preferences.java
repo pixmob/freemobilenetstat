@@ -47,7 +47,6 @@ import static org.pixmob.freemobile.netstat.Constants.INTERVAL_TODAY;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_STATISTICS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
-import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE;
@@ -174,10 +173,6 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
         	g.removePreference(pm.findPreference(SP_KEY_ENABLE_AUTO_RESTART_SERVICE));
         }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-        	final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
-        	g.removePreference(pm.findPreference(SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION));
-        }
     }
 
     @Override
@@ -281,12 +276,6 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         if (SP_KEY_NOTIF_ACTION.equals(key)) {
             final String notifAction = sharedPreferences.getString(key, null);
             findPreference(key).setSummary(notifActions.get(notifAction));
-        }
-
-        if (SP_KEY_ENABLE_LOLLIPOP_LOCKSCREEN_NOTIFICATION.equals(key)) {
-            Intent intent = new Intent(this, MonitorService.class);
-            intent.putExtra(MonitorService.INTENT_UPDATE_NOTIF_ON_LOCKSCREEN, true);
-            startService(intent);
         }
 
         Log.d(TAG, "Application preferences updated: " + "calling BackupManager.dataChanged()");
