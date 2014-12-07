@@ -41,7 +41,10 @@
             android:name=".MonitorService"
             android:label="@string/service_monitor" />
 
-        <receiver android:name=".MonitorServiceStarter">
+        <receiver
+            android:name=".MonitorServiceStarter"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

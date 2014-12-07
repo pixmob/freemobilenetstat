@@ -409,7 +409,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             }
         }
 
-        if (MobileOperator.FREE_MOBILE.isCurrentSimOwner(getApplicationContext()) == -1) {
+        if (MobileOperator.FREE_MOBILE.isCurrentSimOwner(getApplicationContext()) == 0) {
             stopSelf();
             return START_NOT_STICKY;
         }
@@ -491,7 +491,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	private void updateNotification(boolean playSound) {
         final MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
         /*//
-        // Not a good solution as it might prevent the app from running at boot
+        // Not a good solution as app could be killed by system
         
         if (!mobileNetworkConnected) {
             // Not connected to a mobile network: plane mode may be enabled.
