@@ -7,8 +7,8 @@
     <color name="orange_2G_network_color2">#FFB280</color>
     <color name="orange_3G_network_color1">#FF9500</color>
     <color name="orange_3G_network_color2">#FFBA59</color>
-    <color name="free_mobile_network_color1">#FF0000</color>
-    <color name="free_mobile_network_color2">#e60000</color>
+    <color name="free_mobile_network_color1">#ffcd1e25</color>
+    <color name="free_mobile_network_color2">#ffa91d20</color>
     <color name="free_mobile_3G_network_color1">#bf4149</color>
     <color name="free_mobile_3G_network_color2">#ffad3d45</color>
     <color name="free_mobile_3G_femtocell_network_color1">#ffb20f45</color>
