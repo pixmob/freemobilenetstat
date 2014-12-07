@@ -280,20 +280,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
             @Override
             public void onServiceStateChanged(ServiceState serviceState) {
-                if (!DEBUG) {
-                    // Check if the SIM card is compatible.
-                    if (tm != null && TelephonyManager.SIM_STATE_READY == tm.getSimState()) {
-                        final String rawMobOp = tm.getSimOperator();
-                        final MobileOperator mobOp = MobileOperator.fromString(rawMobOp);
-                        if (!MobileOperator.FREE_MOBILE.equals(mobOp)) {
-                            Log.e(TAG, "SIM card is not compatible: " + rawMobOp);
-
-                            // The service is stopped, since the SIM card is not
-                            // compatible.
-                            stopSelf();
-                        }
-                    }
-                }
+                if (stopServiceIfSimOperatorIsNotFreeMobile())
+                    return;
 
                 mobileNetworkConnected =
                     serviceState != null && serviceState.getState() == ServiceState.STATE_IN_SERVICE;
@@ -409,10 +397,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             }
         }
 
-        if (MobileOperator.FREE_MOBILE.isCurrentSimOwner(getApplicationContext()) == 0) {
-            stopSelf();
+        if (stopServiceIfSimOperatorIsNotFreeMobile())
             return START_NOT_STICKY;
-        }
         
         // Update with current state.
         onConnectivityUpdated();
@@ -420,6 +406,20 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         updateNotification(false);
 
         return START_STICKY;
+    }
+
+    /**
+     * Stops the service if sim operator is not free mobile.
+     *
+     * @return true if the service was killed
+     */
+    private boolean stopServiceIfSimOperatorIsNotFreeMobile() {
+        if (!DEBUG && MobileOperator.FREE_MOBILE.isCurrentSimOwner(getApplicationContext()) == 0) {
+            stopSelf();
+            return true;
+        }
+
+        return false;
     }
 
     @Override
