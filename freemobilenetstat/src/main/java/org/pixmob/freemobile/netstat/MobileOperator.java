@@ -94,7 +94,7 @@ public enum MobileOperator {
     }
 
     /**
-     * @return -1 > SIM not ready ; 0 SIM ready but not owner ; 1 SIM ready and owner of the SIM
+     * @return -1 SIM not ready ; 0 SIM ready but not owner ; 1 SIM ready and owner of the SIM
      */
     public int isCurrentSimOwner(Context context) {
         if (!DEBUG) {
