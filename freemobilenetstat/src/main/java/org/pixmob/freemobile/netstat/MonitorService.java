@@ -507,23 +507,22 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	            final String tickerText = getString(R.string.stat_airplane_mode_on);
 	            final String contentText = getString(R.string.notif_monitoring_disabled);
 	            
-	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
-		                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
+	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText)
+                        .setSmallIcon(android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
         	} else if (mobileOperatorId == null) { // No signal
 	            final String tickerText = getString(R.string.stat_no_signal);
 	            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
 	            
 	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
-		                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW)
-		                .setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
+		                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
         	} else {
 	            final String tickerText = getString(R.string.stat_connected_to_foreign_mobile_network);
 	            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
 	
 	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
-	                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW)
-	                .setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
+	                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
         	}
+            nBuilder.setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
         } else {
             final String tickerText =
                 String.format(getString(R.string.stat_connected_to_mobile_network), mobOp.toName(this));
@@ -537,18 +536,20 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             
             final int iconRes = getStatIcon(mobOp);
             nBuilder.setSmallIcon(iconRes).setLargeIcon(getStatLargeIcon(mobOp)).setTicker(tickerText)
-                .setContentText(contentText).setContentTitle(tickerText).setPriority(
-                    NotificationCompat.PRIORITY_LOW).setContentIntent(openUIPendingIntent).setWhen(0);
+                    .setContentText(contentText).setContentTitle(tickerText).setPriority(NotificationCompat.PRIORITY_LOW);
 
             if (prefs.getBoolean(SP_KEY_ENABLE_NOTIF_ACTIONS, true)) {
                 nBuilder.addAction(R.drawable.ic_stat_notify_action_network_operator_settings,
                     getString(R.string.notif_action_open_network_operator_settings),
                     networkOperatorSettingsPendingIntent);
             }
+
+            nBuilder.setContentIntent(openUIPendingIntent).setWhen(0);
         }
 
         if (playSound) {
-            final String rawSoundUri = prefs.getString((mobOp == MobileOperator.FREE_MOBILE) ? SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE : SP_KEY_STAT_NOTIF_SOUND_ORANGE, null);
+            final String rawSoundUri = prefs.getString((mobOp == MobileOperator.FREE_MOBILE)
+                    ? SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE : SP_KEY_STAT_NOTIF_SOUND_ORANGE, null);
             if (rawSoundUri != null) {
                 final Uri soundUri = Uri.parse(rawSoundUri);
                 nBuilder.setSound(soundUri);
@@ -556,7 +557,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         }
 
         final Notification n = nBuilder.build();
-        
+
         startForeground(R.string.stat_connected_to_mobile_network, n);
     }
     
