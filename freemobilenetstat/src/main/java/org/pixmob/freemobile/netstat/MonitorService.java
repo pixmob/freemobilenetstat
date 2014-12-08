@@ -97,7 +97,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     /**
      * Match network types from {@link TelephonyManager} with the corresponding string.
      */
-    private static final SparseIntArray NETWORK_TYPE_STRINGS = new SparseIntArray(8);
+    private static final SparseIntArray NETWORK_TYPE_STRINGS = new SparseIntArray(10);
     /**
      * Special data used for terminating the PendingInsert worker thread.
      */
@@ -274,7 +274,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 // Check for a network class change
                 if (onPhoneStateUpdated() >= 0)
                     updateEventDatabase();
-                
+
                 updateNotification(false);
             }
 
@@ -503,35 +503,32 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext());
         
         if (mobOp == null) {
+            String tickerText;
+            String contentText;
+
         	if (isAirplaneModeOn()) { // Airplane mode
-	            final String tickerText = getString(R.string.stat_airplane_mode_on);
-	            final String contentText = getString(R.string.notif_monitoring_disabled);
+	            tickerText = getString(R.string.stat_airplane_mode_on);
+	            contentText = getString(R.string.notif_monitoring_disabled);
 	            
 	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText)
                         .setSmallIcon(android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
         	} else if (mobileOperatorId == null) { // No signal
-	            final String tickerText = getString(R.string.stat_no_signal);
-	            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
-	            
-	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
-		                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
-        	} else {
-	            final String tickerText = getString(R.string.stat_connected_to_foreign_mobile_network);
-	            final String contentText = getString(R.string.notif_action_open_network_operator_settings);
-	
-	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText).setSmallIcon(
-	                android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
+	            tickerText = getString(R.string.stat_no_signal);
+	            contentText = getString(R.string.notif_action_open_network_operator_settings);
+        	} else { // Foreign operator
+	            tickerText = getString(R.string.stat_connected_to_foreign_mobile_network);
+	            contentText = getString(R.string.notif_action_open_network_operator_settings);
         	}
-            nBuilder.setContentIntent(networkOperatorSettingsPendingIntent).setWhen(0);
+
+            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText)
+                    .setSmallIcon(android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
         } else {
-            final String tickerText =
-                String.format(getString(R.string.stat_connected_to_mobile_network), mobOp.toName(this));
-            Integer networkTypeRes = NETWORK_TYPE_STRINGS.get(mobileNetworkType);
+            final String tickerText = String.format(getString(R.string.stat_connected_to_mobile_network), mobOp.toName(this));
+            Integer networkTypeRes = NETWORK_TYPE_STRINGS.get(mobileNetworkType, R.string.network_type_unknown);
 
-            String contentText =
-                String.format(getString(R.string.mobile_network_type), getString(networkTypeRes));
+            String contentText = String.format(getString(R.string.mobile_network_type), getString(networkTypeRes));
 
-            if ((mobOp == MobileOperator.FREE_MOBILE) && (isFemtocell)) 
+            if (MobileOperator.FREE_MOBILE.equals(mobOp) && isFemtocell)
             	contentText = getString(R.string.network_free_femtocell, contentText);
             
             final int iconRes = getStatIcon(mobOp);
