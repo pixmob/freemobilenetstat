@@ -235,9 +235,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
         // This intent is only available as a Jelly Bean notification action in
         // order to open network operator settings.
-        networkOperatorSettingsPendingIntent =
-            PendingIntent.getActivity(this, 0, IntentFactory.networkOperatorSettings(this),
-                PendingIntent.FLAG_CANCEL_CURRENT);
+        Intent networkSettingsIntent = IntentFactory.networkOperatorSettings(this);
+        if (networkSettingsIntent != null) {
+            networkOperatorSettingsPendingIntent = PendingIntent.getActivity(this, 0, networkSettingsIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        }
 
         // Watch screen light: is the screen on?
         screenMonitor = new BroadcastReceiver() {
@@ -535,7 +536,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             nBuilder.setSmallIcon(iconRes).setLargeIcon(getStatLargeIcon(mobOp)).setTicker(tickerText)
                     .setContentText(contentText).setContentTitle(tickerText).setPriority(NotificationCompat.PRIORITY_LOW);
 
-            if (prefs.getBoolean(SP_KEY_ENABLE_NOTIF_ACTIONS, true)) {
+            if ((prefs.getBoolean(SP_KEY_ENABLE_NOTIF_ACTIONS, true)) && (networkOperatorSettingsPendingIntent != null)) {
                 nBuilder.addAction(R.drawable.ic_stat_notify_action_network_operator_settings,
                     getString(R.string.notif_action_open_network_operator_settings),
                     networkOperatorSettingsPendingIntent);

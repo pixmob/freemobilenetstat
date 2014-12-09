@@ -52,7 +52,7 @@ public final class IntentFactory {
                     "com.android.phone.NetworkSetting"));
             networkOperatorSettingsAvailable = isIntentAvailable(context, networkOperatorSettingsIntent);
         }
-        return networkOperatorSettingsIntent;
+        return (networkOperatorSettingsAvailable) ? networkOperatorSettingsIntent : null;
     }
 
     /**
