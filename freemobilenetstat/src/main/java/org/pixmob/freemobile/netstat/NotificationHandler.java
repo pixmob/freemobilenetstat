@@ -15,6 +15,7 @@
  */
 package org.pixmob.freemobile.netstat;
 
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,20 +24,26 @@ import android.util.Log;
 import org.pixmob.freemobile.netstat.util.IntentFactory;
 
 import static org.pixmob.freemobile.netstat.Constants.ACTION_NOTIFICATION;
-import static org.pixmob.freemobile.netstat.Constants.TAG;
 
 /**
  * Handle notification action.
  * @author Pixmob
  */
 public class NotificationHandler extends BroadcastReceiver {
+
+    private static final String TAG = "NotificationHandler";
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (ACTION_NOTIFICATION.equals(intent.getAction())) {
             final Intent i = IntentFactory.notificationAction(context);
             if (i != null) {
                 i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(i);
+                try {
+                    context.startActivity(i);
+                } catch(ActivityNotFoundException e) {
+                    Log.w(TAG, "Activity not found for notification action", e);
+                }
             } else {
                 Log.e(TAG, "Cannot handle notification action");
             }
