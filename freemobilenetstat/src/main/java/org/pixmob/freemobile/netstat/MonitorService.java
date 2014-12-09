@@ -549,7 +549,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                     ? SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE : SP_KEY_STAT_NOTIF_SOUND_ORANGE, null);
             if (rawSoundUri != null) {
                 final Uri soundUri = Uri.parse(rawSoundUri);
-                nBuilder.setSound(soundUri);
+                if (soundUri != null) nBuilder.setSound(soundUri);
             }
         }
 
