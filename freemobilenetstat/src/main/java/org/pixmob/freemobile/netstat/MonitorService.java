@@ -546,7 +546,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // always set the content intent - exception fired if null
         nBuilder.setContentIntent(openUIPendingIntent).setWhen(0);
 
-        if (playSound) {
+        if ((playSound) && (prefs != null)) {
             final String rawSoundUri = prefs.getString((mobOp == MobileOperator.FREE_MOBILE)
                     ? SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE : SP_KEY_STAT_NOTIF_SOUND_ORANGE, null);
             if (rawSoundUri != null) {
