@@ -541,9 +541,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                     getString(R.string.notif_action_open_network_operator_settings),
                     networkOperatorSettingsPendingIntent);
             }
-
-            nBuilder.setContentIntent(openUIPendingIntent).setWhen(0);
         }
+
+        // always set the content intent - exception fired if null
+        nBuilder.setContentIntent(openUIPendingIntent).setWhen(0);
 
         if (playSound) {
             final String rawSoundUri = prefs.getString((mobOp == MobileOperator.FREE_MOBILE)
