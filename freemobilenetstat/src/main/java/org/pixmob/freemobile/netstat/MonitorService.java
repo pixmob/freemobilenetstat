@@ -19,7 +19,6 @@ import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -130,6 +129,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      */
     private PendingIntent openUIPendingIntent;
     private PendingIntent networkOperatorSettingsPendingIntent;
+    private PendingIntent wirelessSettingsPendingIntent;
     private IntentFilter batteryIntentFilter;
     private PowerManager pm;
     private TelephonyManager tm;
@@ -238,6 +238,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         Intent networkSettingsIntent = IntentFactory.networkOperatorSettings(this);
         if (networkSettingsIntent != null) {
             networkOperatorSettingsPendingIntent = PendingIntent.getActivity(this, 0, networkSettingsIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        }
+        Intent wirelessSettingsIntent = IntentFactory.wirelessSettings(this);
+        if (wirelessSettingsIntent != null) {
+            wirelessSettingsPendingIntent = PendingIntent.getActivity(this, 0, wirelessSettingsIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         }
 
         // Watch screen light: is the screen on?
@@ -490,29 +494,19 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      * Update the status bar notification.
      */
 	private void updateNotification(boolean playSound) {
-        final MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
-        /*//
-        // Not a good solution as app could be killed by system
-        
-        if (!mobileNetworkConnected) {
-            // Not connected to a mobile network: plane mode may be enabled.
-            stopForeground(true);
-            return;
-        }
-        //*/
-        
-        final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext());
-        
-        if (mobOp == null) {
-            String tickerText;
-            String contentText;
+        String tickerText, contentText;
+        int smallIcon;
+        final int notificationPriority = NotificationCompat.PRIORITY_LOW;
+        Bitmap largeIcon;
+        final PendingIntent contentIntent = openUIPendingIntent;
+        boolean airplaneModeOn = false;
 
-        	if (isAirplaneModeOn()) { // Airplane mode
+        final MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
+
+        if (mobOp == null) { // Not Free Mobile nor Orange
+        	if (airplaneModeOn = isAirplaneModeOn()) { // Airplane mode
 	            tickerText = getString(R.string.stat_airplane_mode_on);
 	            contentText = getString(R.string.notif_monitoring_disabled);
-	            
-	            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText)
-                        .setSmallIcon(android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
         	} else if (mobileOperatorId == null) { // No signal
 	            tickerText = getString(R.string.stat_no_signal);
 	            contentText = getString(R.string.notif_action_open_network_operator_settings);
@@ -521,43 +515,51 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	            contentText = getString(R.string.notif_action_open_network_operator_settings);
         	}
 
-            nBuilder.setTicker(tickerText).setContentText(contentText).setContentTitle(tickerText)
-                    .setSmallIcon(android.R.drawable.stat_sys_warning).setPriority(NotificationCompat.PRIORITY_LOW);
-        } else {
-            final String tickerText = String.format(getString(R.string.stat_connected_to_mobile_network), mobOp.toName(this));
-            Integer networkTypeRes = NETWORK_TYPE_STRINGS.get(mobileNetworkType, R.string.network_type_unknown);
+            smallIcon = android.R.drawable.stat_sys_warning;
+            largeIcon = null; // Use small icon as large icon.
+        } else { // Free Mobile or Orange detected
+            tickerText = String.format(getString(R.string.stat_connected_to_mobile_network), mobOp.toName(this));
 
-            String contentText = String.format(getString(R.string.mobile_network_type), getString(networkTypeRes));
-
+            final Integer networkTypeRes = NETWORK_TYPE_STRINGS.get(mobileNetworkType, R.string.network_type_unknown);
+            contentText = String.format(getString(R.string.mobile_network_type), getString(networkTypeRes));
             if (MobileOperator.FREE_MOBILE.equals(mobOp) && isFemtocell)
             	contentText = getString(R.string.network_free_femtocell, contentText);
             
-            final int iconRes = getStatIcon(mobOp);
-            nBuilder.setSmallIcon(iconRes).setLargeIcon(getStatLargeIcon(mobOp)).setTicker(tickerText)
-                    .setContentText(contentText).setContentTitle(tickerText).setPriority(NotificationCompat.PRIORITY_LOW);
+            smallIcon = getStatIcon(mobOp);
+            largeIcon = getStatLargeIcon(mobOp);
+        }
 
-            if ((prefs.getBoolean(SP_KEY_ENABLE_NOTIF_ACTIONS, true)) && (networkOperatorSettingsPendingIntent != null)) {
-                nBuilder.addAction(R.drawable.ic_stat_notify_action_network_operator_settings,
-                    getString(R.string.notif_action_open_network_operator_settings),
-                    networkOperatorSettingsPendingIntent);
+        final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext());
+        nBuilder.setSmallIcon(smallIcon).setLargeIcon(largeIcon)
+                .setContentTitle(tickerText).setContentText(contentText).setTicker(tickerText)
+                .setContentIntent(contentIntent) // always set the content intent - exception fired on GB if null
+                .setPriority(notificationPriority)
+                .setWhen(0);
+
+        if (prefs.getBoolean(SP_KEY_ENABLE_NOTIF_ACTIONS, true)) {
+            if (airplaneModeOn && wirelessSettingsPendingIntent != null) {
+                nBuilder.addAction(android.R.drawable.ic_menu_preferences,
+                        getString(R.string.notif_action_open_wireless_settings),
+                        wirelessSettingsPendingIntent);
+            }
+            else if (networkOperatorSettingsPendingIntent != null) {
+                nBuilder.addAction(android.R.drawable.ic_menu_preferences,
+                        getString(R.string.notif_action_open_network_operator_settings),
+                        networkOperatorSettingsPendingIntent);
             }
         }
 
-        // always set the content intent - exception fired if null
-        nBuilder.setContentIntent(openUIPendingIntent).setWhen(0);
 
         if ((playSound) && (prefs != null)) {
             final String rawSoundUri = prefs.getString((mobOp == MobileOperator.FREE_MOBILE)
                     ? SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE : SP_KEY_STAT_NOTIF_SOUND_ORANGE, null);
             if (rawSoundUri != null) {
                 final Uri soundUri = Uri.parse(rawSoundUri);
-                if (soundUri != null) nBuilder.setSound(soundUri);
+                nBuilder.setSound(soundUri);
             }
         }
 
-        final Notification n = nBuilder.build();
-
-        startForeground(R.string.stat_connected_to_mobile_network, n);
+        startForeground(R.string.stat_connected_to_mobile_network, nBuilder.build());
     }
     
     /**

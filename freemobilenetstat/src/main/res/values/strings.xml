@@ -76,6 +76,7 @@
     <string name="notif_action_statistics">Statistiques</string>
     <string name="notif_action_network_operator_settings">Opérateur de réseau</string>
     <string name="notif_action_open_network_operator_settings">Paramètres des opérateurs</string>
+    <string name="notif_action_open_wireless_settings">Paramètres sans-fil</string>
     <string name="notif_monitoring_disabled">Le monitoring a été désactivé.</string>
     <string name="interval_since_boot">Démarrage du téléphone</string>
     <string name="interval_today">Aujourd\'hui</string>
