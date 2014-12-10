@@ -56,6 +56,14 @@ public final class IntentFactory {
     }
 
     /**
+     * Open wireless settings
+     */
+     public static Intent wirelessSettings(Context context) {
+         final Intent wirelessSettingsIntent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+         return isIntentAvailable(context, wirelessSettingsIntent) ? wirelessSettingsIntent : null;
+     }
+
+    /**
      * Open statistics.
      */
     private static Intent statistics(Context context) {
