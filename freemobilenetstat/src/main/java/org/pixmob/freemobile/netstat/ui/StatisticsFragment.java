@@ -171,7 +171,7 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     }
 
     private void refresh() {
-        if (isDetached()) {
+        if ((isDetached()) || (!isAdded())) { //handle case if fragment is not properly attached to the parent activity
             return;
         }
         if (getLoaderManager().hasRunningLoaders()) {
