@@ -161,7 +161,7 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
 	}
 
     private void refresh() {
-        if (isDetached()) {
+        if ((isDetached()) || (!isAdded())) { //handle case if fragment is not properly attached to the parent activity
             return;
         }
         if (getLoaderManager().hasRunningLoaders()) {
