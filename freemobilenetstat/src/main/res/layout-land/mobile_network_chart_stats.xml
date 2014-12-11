@@ -1,220 +1,192 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="150dp"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
 
-    <!-- Left (Orange) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="end|center_vertical"
-        android:orientation="vertical">
+    <TableLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:padding="50dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end|center_vertical"
-            android:orientation="horizontal">
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_weight="3"
-                android:gravity="end"
+                android:layout_weight="1"
+                android:singleLine="true"
                 android:text="@string/network_orange"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/orange_network_color1" />
 
             <TextView
                 android:id="@+id/on_orange_network"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:singleLine="true"
+                android:paddingLeft="20dp"
+                android:paddingRight="0dp"
+                android:paddingEnd="0dp"
+                android:text="100%"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/orange_network_color1" />
+        </TableRow>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end|center_vertical"
-            android:orientation="horizontal">
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_weight="3"
-                android:gravity="end"
+                android:layout_weight="1"
+                android:singleLine="true"
                 android:text="@string/network_orange_2G"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/orange_2G_network_color1" />
 
             <TextView
                 android:id="@+id/on_orange_2G_network"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:singleLine="true"
+                android:paddingLeft="20dp"
+                android:paddingRight="0dp"
+                android:paddingEnd="0dp"
+                android:text="100%"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/orange_2G_network_color1" />
+        </TableRow>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end|center_vertical"
-            android:orientation="horizontal">
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_weight="3"
-                android:gravity="end"
+                android:layout_weight="1"
                 android:singleLine="true"
                 android:text="@string/network_orange_3G"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/orange_3G_network_color1" />
 
             <TextView
                 android:id="@+id/on_orange_3G_network"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:singleLine="true"
+                android:paddingLeft="20dp"
+                android:paddingRight="0dp"
+                android:paddingEnd="0dp"
+                android:text="100%"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/orange_3G_network_color1" />
+        </TableRow>
 
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <!-- Right (Free) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end|center_vertical"
-            android:orientation="horizontal">
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="20dp">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_weight="3"
-                android:gravity="end"
+                android:layout_weight="1"
                 android:singleLine="true"
                 android:text="@string/network_free_mobile"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/free_mobile_network_color1" />
 
             <TextView
                 android:id="@+id/on_free_mobile_network"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:singleLine="true"
+                android:paddingLeft="20dp"
+                android:paddingRight="0dp"
+                android:paddingEnd="0dp"
+                android:text="100%"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/free_mobile_network_color1" />
+        </TableRow>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end|center_vertical"
-            android:orientation="horizontal">
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_weight="3"
-                android:gravity="end"
+                android:layout_weight="1"
                 android:singleLine="true"
                 android:text="@string/network_free_mobile_3G"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/free_mobile_3G_network_color1" />
 
             <TextView
                 android:id="@+id/on_free_mobile_3G_network"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:singleLine="true"
+                android:paddingLeft="20dp"
+                android:paddingRight="0dp"
+                android:paddingEnd="0dp"
+                android:text="100%"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/free_mobile_3G_network_color1" />
+        </TableRow>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end|center_vertical"
-            android:orientation="horizontal">
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_weight="3"
-                android:gravity="end"
+                android:layout_weight="1"
                 android:singleLine="true"
                 android:text="@string/network_free_mobile_femtocell"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/free_mobile_3G_femtocell_network_color1" />
 
             <TextView
                 android:id="@+id/on_free_mobile_femtocell"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:singleLine="true"
+                android:paddingLeft="20dp"
+                android:paddingRight="0dp"
+                android:paddingEnd="0dp"
+                android:text="100%"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/free_mobile_3G_femtocell_network_color1" />
+        </TableRow>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end|center_vertical"
-            android:orientation="horizontal">
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
-                android:layout_weight="3"
-                android:gravity="end"
+                android:layout_weight="1"
                 android:singleLine="true"
                 android:text="@string/network_free_mobile_4G"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/free_mobile_4G_network_color1" />
 
             <TextView
                 android:id="@+id/on_free_mobile_4G_network"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:singleLine="true"
+                android:paddingLeft="20dp"
+                android:paddingRight="0dp"
+                android:paddingEnd="0dp"
+                android:text="100%"
+                android:textSize="@dimen/detailed_stats_text_size"
                 android:textColor="@color/free_mobile_4G_network_color1" />
+        </TableRow>
 
-        </LinearLayout>
-
-    </LinearLayout>
-</LinearLayout>
+    </TableLayout>
