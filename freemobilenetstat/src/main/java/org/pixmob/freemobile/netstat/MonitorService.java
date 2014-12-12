@@ -532,11 +532,17 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         }
 
         final NotificationCompat.Builder nBuilder = new NotificationCompat.Builder(getApplicationContext());
-        nBuilder.setSmallIcon(smallIcon).setLargeIcon(largeIcon)
+        nBuilder.setSmallIcon(smallIcon)
                 .setContentTitle(tickerText).setContentText(contentText).setTicker(tickerText)
                 .setContentIntent(contentIntent) // always set the content intent - exception fired on GB if null
                 .setPriority(notificationPriority)
                 .setWhen(0);
+
+        //ACRA bug
+        //see : http://stackoverflow.com/questions/15642900/bad-notification-posted-from-package-couldnt-expand-remoteviews
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB_MR2) {
+            nBuilder.setLargeIcon(largeIcon);
+        }
 
         if (prefs.getBoolean(SP_KEY_ENABLE_NOTIF_ACTIONS, true)) {
             if (airplaneModeOn && wirelessSettingsPendingIntent != null) {
