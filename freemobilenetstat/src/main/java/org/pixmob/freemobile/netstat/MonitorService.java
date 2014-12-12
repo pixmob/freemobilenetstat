@@ -211,15 +211,17 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_width);
             final int largeIconHeight =
                 getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
-            freeLargeIcon =
-                Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.ic_stat_notify_service_free_large), largeIconWidth, largeIconHeight, true);
-            freeFemtoLargeIcon =
-        		Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.ic_stat_notify_service_free_femto_large), largeIconWidth, largeIconHeight, true);
-            orangeLargeIcon =
-                Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                    R.drawable.ic_stat_notify_service_orange_large), largeIconWidth, largeIconHeight, true);
+            if ((largeIconWidth > 0) && (largeIconHeight > 0)) {
+                freeLargeIcon =
+                        Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                                R.drawable.ic_stat_notify_service_free_large), largeIconWidth, largeIconHeight, true);
+                freeFemtoLargeIcon =
+                        Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                                R.drawable.ic_stat_notify_service_free_femto_large), largeIconWidth, largeIconHeight, true);
+                orangeLargeIcon =
+                        Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
+                                R.drawable.ic_stat_notify_service_orange_large), largeIconWidth, largeIconHeight, true);
+            }
         }
 
         // Initialize and start a worker thread for inserting rows into the
