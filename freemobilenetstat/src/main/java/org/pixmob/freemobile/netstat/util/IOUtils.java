@@ -15,6 +15,10 @@
  */
 package org.pixmob.freemobile.netstat.util;
 
+import android.util.Log;
+
+import static org.pixmob.freemobile.netstat.Constants.TAG;
+
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -34,7 +38,8 @@ public final class IOUtils {
         if (stream != null) {
             try {
                 stream.close();
-            } catch (IOException ignore) {
+            } catch (IOException exception) {
+                Log.e(TAG, Log.getStackTraceString(exception));
             }
         }
     }
