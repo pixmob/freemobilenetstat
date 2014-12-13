@@ -103,7 +103,7 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
                     Events.CONTENT_URI,
                     new String[] { Events.TIMESTAMP, Events.SCREEN_ON, Events.WIFI_CONNECTED,
                             Events.MOBILE_CONNECTED, Events.MOBILE_NETWORK_TYPE, Events.MOBILE_OPERATOR,
-                            Events.BATTERY_LEVEL, Events.POWER_ON, Events.FEMTOCELL }, Events.TIMESTAMP + ">?",
+                            Events.BATTERY_LEVEL, Events.POWER_ON, Events.FEMTOCELL, Events.FIRST_INSERT }, Events.TIMESTAMP + ">?",
                     new String[] { String.valueOf(fromTimestamp) }, Events.TIMESTAMP + " ASC");
             final int rowCount = c.getCount();
 
@@ -124,7 +124,15 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
                     e0.read(c);
                 }
                 else { // Last event
+                    e0 = new Event(e);
                     e0.timestamp = now;
+                    e0.firstInsert = false;
+                }
+
+                if (e0.firstInsert) {
+                    // If the next event is the first event added to the database since close,
+                    // we can't predict how much time has passed on the given network.
+                    continue;
                 }
 
                 final long dt = e0.timestamp - e.timestamp;

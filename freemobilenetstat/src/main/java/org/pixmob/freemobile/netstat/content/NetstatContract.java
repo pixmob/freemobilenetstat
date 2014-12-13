@@ -39,6 +39,7 @@ public class NetstatContract {
         String SCREEN_ON = "screen_on";
         String POWER_ON = "power_on";
         String FEMTOCELL = "femtocell";
+        String FIRST_INSERT = "first_insert";
     }
     
     /**
@@ -58,7 +59,7 @@ public class NetstatContract {
          */
         public static final String CONTENT_ITEM_TYPE = "vnd.android.cursor.item/event";
         /**
-         * The MIME type of {@link #CONTENT_TYPE} providing a directory of
+         * The MIME type of a {@link #CONTENT_URI} providing a directory of
          * entries.
          */
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/event";

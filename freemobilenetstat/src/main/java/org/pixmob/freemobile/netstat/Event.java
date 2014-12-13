@@ -34,6 +34,22 @@ public class Event {
     public int batteryLevel;
     public boolean powerOn;
     public boolean femtocell;
+    public boolean firstInsert;
+
+    public Event() {}
+
+    public Event(Event e) {
+        timestamp = e.timestamp;
+        screenOn = e.screenOn;
+        wifiConnected = e.wifiConnected;
+        mobileConnected = e.mobileConnected;
+        mobileOperator = e.mobileOperator;
+        mobileNetworkType = e.mobileNetworkType;
+        batteryLevel = e.batteryLevel;
+        powerOn = e.powerOn;
+        femtocell = e.femtocell;
+        firstInsert = e.firstInsert;
+    }
 
     /**
      * Read an {@link Event} instance from a database {@link Cursor}. The cursor
@@ -52,6 +68,7 @@ public class Event {
         batteryLevel = c.getInt(c.getColumnIndexOrThrow(Events.BATTERY_LEVEL));
         powerOn = c.getInt(c.getColumnIndexOrThrow(Events.POWER_ON)) == 1;
         femtocell = c.getInt(c.getColumnIndexOrThrow(Events.FEMTOCELL)) == 1;
+        firstInsert = c.getInt(c.getColumnIndexOrThrow(Events.FIRST_INSERT)) == 1;
     }
 
     /**
@@ -67,6 +84,7 @@ public class Event {
         values.put(Events.BATTERY_LEVEL, batteryLevel);
         values.put(Events.POWER_ON, powerOn ? 1 : 0);
         values.put(Events.FEMTOCELL, femtocell ? 1 : 0);
+        values.put(Events.FIRST_INSERT, firstInsert ? 1 : 0);
     }
 
 	@Override
@@ -75,7 +93,7 @@ public class Event {
 				+ ", wifiConnected=" + wifiConnected + ", mobileConnected="	+ mobileConnected
 				+ ", mobileOperator=" + mobileOperator + ", mobileNetworkType=" + mobileNetworkType
 				+ ", batteryLevel=" + batteryLevel + ", powerOn=" + powerOn
-				+ ", femtocell=" + femtocell + "]";
+				+ ", femtocell=" + femtocell + ", firstInsert=" + firstInsert + "]";
 	}
     
 }
