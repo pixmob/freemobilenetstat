@@ -106,65 +106,71 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
                             Events.BATTERY_LEVEL, Events.POWER_ON, Events.FEMTOCELL }, Events.TIMESTAMP + ">?",
                     new String[] { String.valueOf(fromTimestamp) }, Events.TIMESTAMP + " ASC");
             final int rowCount = c.getCount();
+
             s.events = new Event[rowCount];
-            for (int i = 0; c.moveToNext(); ++i) {
-                final Event e = new Event();
-                e.read(c);
+            Event e = null, // current event
+                  e0 = new Event(); // next event
+
+            if (c.moveToNext()) {
+                e0 = new Event();
+                e0.read(c);
+            }
+
+            for (int i = 0; i < rowCount; ++i) {
+                e = e0;
                 s.events[i] = e;
+                if (c.moveToNext()) {
+                    e0 = new Event();
+                    e0.read(c);
+                }
+                else { // Last event
+                    e0.timestamp = now;
+                }
 
-                if (i > 0) {
-                    final Event e0 = s.events[i - 1];
-                    if (e.powerOn && !e0.powerOn) {
-                        continue;
-                    }
-                    final long dt = e.timestamp - e0.timestamp;
+                final long dt = e0.timestamp - e.timestamp;
 
-                    final MobileOperator op = MobileOperator.fromString(e.mobileOperator);
-                    final MobileOperator op0 = MobileOperator.fromString(e0.mobileOperator);
-                	final NetworkClass nc = NetworkClass.getNetworkClass(e.mobileNetworkType);
-                    final NetworkClass nc0 = NetworkClass.getNetworkClass(e0.mobileNetworkType);
-                    if (op != null && op.equals(op0)) {
-                        if (MobileOperator.ORANGE.equals(op)) {
-                            s.orangeTime += dt;
-                            if (nc != null && nc.equals(nc0)) {
-                                if (NetworkClass.NC_2G.equals(nc)) {
-                                    s.orange2GTime += dt;
-                                } else if (NetworkClass.NC_3G.equals(nc)) {
-                                    s.orange3GTime += dt;
-                                }
+                final MobileOperator op = MobileOperator.fromString(e.mobileOperator);
+                final NetworkClass nc = NetworkClass.getNetworkClass(e.mobileNetworkType);
+                if (op != null) {
+                    if (MobileOperator.ORANGE.equals(op)) {
+                        s.orangeTime += dt;
+                        if (nc != null) {
+                            if (NetworkClass.NC_2G.equals(nc)) {
+                                s.orange2GTime += dt;
+                            } else if (NetworkClass.NC_3G.equals(nc)) {
+                                s.orange3GTime += dt;
                             }
-                        } else if (MobileOperator.FREE_MOBILE.equals(op)) {
-                            s.freeMobileTime += dt;
-                            if (nc != null && nc.equals(nc0)) {
-                                if (NetworkClass.NC_3G.equals(nc)) {
-                                    if (e.femtocell && e0.femtocell) {
-                                        s.femtocellTime += dt;
-                                    } else {
-                                        s.freeMobile3GTime += dt;
-                                    }
-                                } else if (NetworkClass.NC_4G.equals(nc)) {
-                                    s.freeMobile4GTime += dt;
+                        }
+                    } else if (MobileOperator.FREE_MOBILE.equals(op)) {
+                        s.freeMobileTime += dt;
+                        if (nc != null) {
+                            if (NetworkClass.NC_3G.equals(nc)) {
+                                if (e.femtocell) {
+                                    s.femtocellTime += dt;
+                                } else {
+                                    s.freeMobile3GTime += dt;
                                 }
+                            } else if (NetworkClass.NC_4G.equals(nc)) {
+                                s.freeMobile4GTime += dt;
                             }
                         }
                     }
-                    if (e.mobileConnected && !e0.mobileConnected) {
-                        connectionTimestamp = e.timestamp;
-                    }
-                    if (!e.mobileConnected) {
-                        connectionTimestamp = 0;
-                    }
-                    if (e.wifiConnected && e0.wifiConnected) {
-                        s.wifiOnTime += dt;
-                    }
-                    if (e.screenOn && e0.screenOn) {
-                        s.screenOnTime += dt;
-                    }
                 }
+
+                if (e.mobileConnected)
+                    connectionTimestamp = e.timestamp;
+                else
+                    connectionTimestamp = 0;
+
+                if (e.wifiConnected)
+                    s.wifiOnTime += dt;
+
+                if (e.screenOn)
+                    s.screenOnTime += dt;
             }
 
-            if (s.events.length > 0) {
-                s.battery = s.events[s.events.length - 1].batteryLevel;
+            if (e != null) {
+                s.battery = e.batteryLevel;
             }
 
             final double sTime = s.orangeTime + s.freeMobileTime;
