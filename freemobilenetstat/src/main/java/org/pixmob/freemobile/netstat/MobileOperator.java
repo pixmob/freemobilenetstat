@@ -103,7 +103,10 @@ public enum MobileOperator {
                 return -1;
 
             final String mobileOperatorStr = tm.getSimOperator();
-            if (mobileOperatorStr == null)
+            // Acer E350 device is returning SIM_STATE_READY as SIM State and an empty string as SIM Operator
+            // just after disabling Airplane mode.
+            // Return SIM not ready when SIM Operator equals an empty string seems to be a workaround.
+            if ("".equals(mobileOperatorStr))
                 return -1;
             else if (this.equals(MobileOperator.fromString(mobileOperatorStr)))
                 return 1;
