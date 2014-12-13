@@ -216,7 +216,7 @@ public class NetstatContentProvider extends ContentProvider {
      * @author Pixmob
      */
     private static class DatabaseHelper extends SQLiteOpenHelper {
-    	private final static int DATABASE_VERSION = 3;
+    	private final static int DATABASE_VERSION = 5;
     	
         public DatabaseHelper(final Context context) {
         	
@@ -236,7 +236,8 @@ public class NetstatContentProvider extends ContentProvider {
                         + Events.BATTERY_LEVEL + " INTEGER NOT NULL, "
                         + Events.SCREEN_ON + " INTEGER NOT NULL, "
                         + Events.POWER_ON + " INTEGER NOT NULL, "
-                        + Events.FEMTOCELL + " INTEGER NOT NULL)";
+                        + Events.FEMTOCELL + " INTEGER NOT NULL, "
+                        + Events.FIRST_INSERT + " INTEGER NOT NULL)";
                 db.execSQL(req);
             }
         }
