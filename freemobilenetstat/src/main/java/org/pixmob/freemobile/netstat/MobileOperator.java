@@ -101,7 +101,11 @@ public enum MobileOperator {
             TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             if (TelephonyManager.SIM_STATE_READY != tm.getSimState())
                 return -1;
-            if (equals(MobileOperator.fromString(tm.getSimOperator())))
+
+            final String mobileOperatorStr = tm.getSimOperator();
+            if (mobileOperatorStr == null)
+                return -1;
+            else if (this.equals(MobileOperator.fromString(mobileOperatorStr)))
                 return 1;
             return 0;
         }
