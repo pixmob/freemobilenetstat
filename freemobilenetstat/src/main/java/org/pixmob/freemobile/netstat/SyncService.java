@@ -41,6 +41,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
 import org.pixmob.freemobile.netstat.util.DateUtils;
+import org.pixmob.freemobile.netstat.util.IOUtils;
 import org.pixmob.httpclient.HttpClient;
 import org.pixmob.httpclient.HttpClientException;
 import org.pixmob.httpclient.HttpResponse;
@@ -214,12 +215,7 @@ public class SyncService extends IntentService {
         } catch (Exception e) {
             Log.e(TAG, Log.getStackTraceString(e));
         } finally {
-            try {
-                if (pendingUploadsCursor != null)
-                    pendingUploadsCursor.close();
-            } catch (Exception e) {
-                Log.e(TAG, Log.getStackTraceString(e));
-            }
+            IOUtils.close(pendingUploadsCursor);
         }
 
         // Compute missing uploads.
@@ -370,12 +366,7 @@ public class SyncService extends IntentService {
         } catch (Exception e) {
             Log.e(TAG, Log.getStackTraceString(e));
         } finally {
-            try {
-                if (computeStatisticsCursor != null)
-                    computeStatisticsCursor.close();
-            } catch (Exception e) {
-                Log.e(TAG, Log.getStackTraceString(e));
-            }
+            IOUtils.close(computeStatisticsCursor);
         }
 
         final DailyStat s = new DailyStat();
@@ -453,12 +444,7 @@ public class SyncService extends IntentService {
         }  catch (Exception e) {
             Log.e(TAG, Log.getStackTraceString(e));
         } finally {
-            try {
-                if (deviceCursor != null)
-                    deviceCursor.close();
-            } catch (Exception e) {
-                Log.e(TAG, Log.getStackTraceString(e));
-            }
+            IOUtils.close(deviceCursor);
         }
         if (deviceId == null) {
             // Generate a new device identifier.

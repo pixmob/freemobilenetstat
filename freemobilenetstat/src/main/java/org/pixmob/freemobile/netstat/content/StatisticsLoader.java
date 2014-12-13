@@ -14,6 +14,7 @@ import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.NetworkClass;
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
+import org.pixmob.freemobile.netstat.util.IOUtils;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -216,12 +217,7 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
             Log.e(TAG, "Failed to load statistics", e);
             s.events = new Event[0];
         } finally {
-            try {
-                if (c != null) {
-                    c.close();
-                }
-            } catch (Exception ignore) {
-            }
+            IOUtils.close(c);
         }
 
         if (DEBUG) {
