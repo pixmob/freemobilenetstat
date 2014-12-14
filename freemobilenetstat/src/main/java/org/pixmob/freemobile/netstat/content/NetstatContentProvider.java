@@ -216,7 +216,7 @@ public class NetstatContentProvider extends ContentProvider {
      * @author Pixmob
      */
     private static class DatabaseHelper extends SQLiteOpenHelper {
-    	private final static int DATABASE_VERSION = 5;
+    	private final static int DATABASE_VERSION = 7;
     	
         public DatabaseHelper(final Context context) {
         	
