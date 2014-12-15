@@ -83,9 +83,9 @@ public final class Constants {
      */
     public static final int INTERVAL_SINCE_BOOT = 0;
     /**
-     * Time interval value: show data from today.
+     * Time interval value: show data from one day.
      */
-    public static final int INTERVAL_TODAY = 1;
+    public static final int INTERVAL_ONE_DAY = 1;
     /**
      * Time interval value: show data from one week.
      */

@@ -51,7 +51,7 @@ public class PieChartView extends View {
         super(context, attrs, defStyleAttr);
     }
 
-    @TargetApi(Build.VERSION_CODES.L)
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public PieChartView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }

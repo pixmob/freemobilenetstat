@@ -7,7 +7,6 @@ import android.os.SystemClock;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.telephony.TelephonyManager;
-import android.text.format.Time;
 import android.util.Log;
 
 import org.pixmob.freemobile.netstat.Event;
@@ -22,7 +21,7 @@ import java.util.Date;
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.INTERVAL_ONE_MONTH;
 import static org.pixmob.freemobile.netstat.Constants.INTERVAL_ONE_WEEK;
-import static org.pixmob.freemobile.netstat.Constants.INTERVAL_TODAY;
+import static org.pixmob.freemobile.netstat.Constants.INTERVAL_ONE_DAY;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
@@ -72,14 +71,9 @@ public class StatisticsLoader extends AsyncTaskLoader<Statistics> {
             cal.setTimeInMillis(now);
             cal.add(Calendar.DATE, -7);
             fromTimestamp = cal.getTimeInMillis();
-        } else if (interval == INTERVAL_TODAY) {
-            // Get the date at midnight today.
-            final Time t = new Time();
-            t.set(now);
-            t.hour = 0;
-            t.minute = 0;
-            t.second = 0;
-            fromTimestamp = t.toMillis(false);
+        } else if (interval == INTERVAL_ONE_DAY) {
+            final long one_day_in_millis = 86400000; // 24*60*60*1000
+            fromTimestamp = now - one_day_in_millis;
         } else {
             fromTimestamp = now - SystemClock.elapsedRealtime();
         }
