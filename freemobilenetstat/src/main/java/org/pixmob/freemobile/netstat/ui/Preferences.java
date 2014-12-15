@@ -43,7 +43,7 @@ import java.util.Map;
 import static org.pixmob.freemobile.netstat.Constants.INTERVAL_ONE_MONTH;
 import static org.pixmob.freemobile.netstat.Constants.INTERVAL_ONE_WEEK;
 import static org.pixmob.freemobile.netstat.Constants.INTERVAL_SINCE_BOOT;
-import static org.pixmob.freemobile.netstat.Constants.INTERVAL_TODAY;
+import static org.pixmob.freemobile.netstat.Constants.INTERVAL_ONE_DAY;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_STATISTICS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
@@ -80,7 +80,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
 
         timeIntervals.clear();
         timeIntervals.append(INTERVAL_SINCE_BOOT, getString(R.string.interval_since_boot));
-        timeIntervals.append(INTERVAL_TODAY, getString(R.string.interval_today));
+        timeIntervals.append(INTERVAL_ONE_DAY, getString(R.string.interval_one_day));
         timeIntervals.append(INTERVAL_ONE_WEEK, getString(R.string.interval_one_week));
         timeIntervals.append(INTERVAL_ONE_MONTH, getString(R.string.interval_one_month));
 
