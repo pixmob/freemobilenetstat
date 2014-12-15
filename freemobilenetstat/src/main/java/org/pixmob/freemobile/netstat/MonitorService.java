@@ -748,14 +748,14 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         e.timestamp = System.currentTimeMillis();
         e.screenOn = pm != null && pm.isScreenOn();
         e.batteryLevel = getBatteryLevel();
-        e.wifiConnected = lastWifiConnected;
-        e.mobileConnected = powerOn && lastMobileNetworkConnected;
+        e.wifiConnected = Boolean.TRUE.equals(lastWifiConnected);
+        e.mobileConnected = powerOn && Boolean.TRUE.equals(lastMobileNetworkConnected);
         e.mobileOperator = lastMobileOperatorId;
         e.mobileNetworkType = lastMobileNetworkType != null ?
         		lastMobileNetworkType : TelephonyManager.NETWORK_TYPE_UNKNOWN;
-        e.powerOn = powerOn;
-        e.femtocell  = lastIsFemtocell;
-        e.firstInsert = firstInsert;
+        e.powerOn = Boolean.TRUE.equals(powerOn);
+        e.femtocell  = Boolean.TRUE.equals(lastIsFemtocell);
+        e.firstInsert = Boolean.TRUE.equals(firstInsert);
         firstInsert = false;
         
         try {
