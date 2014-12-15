@@ -80,8 +80,6 @@ public class Netstat extends FragmentActivity {
             // Store the current application version.
             final SharedPreferences.Editor prefsEditor = prefs.edit();
             prefsEditor.putInt(versionKey, applicationVersion);
-            prefsEditor.putString(SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE, null); // FIXME > We should delete this in next releases.
-            prefsEditor.putString(SP_KEY_STAT_NOTIF_SOUND_ORANGE, null); // FIXME > We should delete this in next releases.
             Features.getFeature(SharedPreferencesSaverFeature.class).save(prefsEditor);
 
             // The application was updated: let's show changelog.
