@@ -753,9 +753,9 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         e.mobileOperator = lastMobileOperatorId;
         e.mobileNetworkType = lastMobileNetworkType != null ?
         		lastMobileNetworkType : TelephonyManager.NETWORK_TYPE_UNKNOWN;
-        e.powerOn = Boolean.TRUE.equals(powerOn);
+        e.powerOn = powerOn;
         e.femtocell  = Boolean.TRUE.equals(lastIsFemtocell);
-        e.firstInsert = Boolean.TRUE.equals(firstInsert);
+        e.firstInsert = firstInsert;
         firstInsert = false;
         
         try {
