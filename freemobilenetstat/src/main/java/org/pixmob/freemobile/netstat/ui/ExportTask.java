@@ -193,7 +193,11 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
                 publishProgress(++currentRow, rowCount);
             }
         } finally {
-            IOUtils.close(c);
+            try {
+                if (c != null)
+                    c.close();
+            } catch (Exception ignore) {}
+
             IOUtils.close(out);
 
         }
