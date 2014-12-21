@@ -279,11 +279,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             public void onDataConnectionStateChanged(int state, int networkType) {
                 mobileNetworkType = networkType;
                 
-                // Check for a network class change
-                if (onPhoneStateUpdated() >= 0)
-                    updateEventDatabase();
-
-                updateNotification(false);
+                updateService();
             }
 
             @Override
@@ -292,18 +288,31 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                     return;
 
                 mobileNetworkConnected =
-                    serviceState != null && serviceState.getState() == ServiceState.STATE_IN_SERVICE;
-                
-                //check for femtocell
+                        (serviceState != null) && (serviceState.getState() == ServiceState.STATE_IN_SERVICE);
+
+                updateService();
+            }
+
+            @Override
+            public void onCellInfoChanged(List<CellInfo> cellInfo) {
+                updateService();
+            }
+
+            private void updateService() {
                 final int phoneStateUpdated = onPhoneStateUpdated();
                 if (phoneStateUpdated >= 0)
                     updateEventDatabase();
-                
+
                 updateNotification(phoneStateUpdated == 1);
             }
         };
-        tm.listen(phoneMonitor, PhoneStateListener.LISTEN_SERVICE_STATE |
-            PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
+        int events =
+                  PhoneStateListener.LISTEN_SERVICE_STATE
+                | PhoneStateListener.LISTEN_DATA_CONNECTION_STATE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+            events |= PhoneStateListener.LISTEN_CELL_INFO;
+
+        tm.listen(phoneMonitor, events);
 
         // Watch battery level.
         batteryMonitor = new BroadcastReceiver() {
