@@ -108,9 +108,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     /**
      * SDK Versions concerned with service auto-kill issue.
      */
-    public static final Integer[] SDK_ALLOWED_TO_AUTO_RESTART_SERVICE =
-    	new Integer[] { Build.VERSION_CODES.JELLY_BEAN, Build.VERSION_CODES.JELLY_BEAN_MR1, 
-    	  Build.VERSION_CODES.JELLY_BEAN_MR2, Build.VERSION_CODES.KITKAT };
+    public static final String[] ANDROID_VERSIONS_ALLOWED_TO_AUTO_RESTART_SERVICE = new String[] { "4.4", "4.4.1", "4.4.2" };
 
     /**
      * Intent extra when requesting service restart after died
@@ -340,7 +338,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
 
         if (prefs.getBoolean(SP_KEY_ENABLE_AUTO_RESTART_SERVICE, false) &&
-                Arrays.asList(SDK_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.SDK_INT)) {
+                Arrays.asList(ANDROID_VERSIONS_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.RELEASE)) {
             // Kitkat and JellyBean auto-kill service workaround
             // http://stackoverflow.com/a/20735519/1527491
             ensureServiceStaysRunning();
@@ -442,7 +440,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         if (prefs.getBoolean(SP_KEY_ENABLE_AUTO_RESTART_SERVICE, false) &&
-                Arrays.asList(SDK_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.SDK_INT)) {
+                Arrays.asList(ANDROID_VERSIONS_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.RELEASE)) {
             // If task was removed, we should launch the service again.
             if (DEBUG)
                 Log.d(TAG, "onTaskRemoved > setting alarm to restart service [ Kitkat START_STICKY bug ]");
@@ -478,7 +476,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // mgr set algorithm is better on memory consumption which is good.
     	// http://stackoverflow.com/a/20735519/1527491
         if (prefs.getBoolean(SP_KEY_ENABLE_AUTO_RESTART_SERVICE, false) &&
-        		Arrays.asList(SDK_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.SDK_INT))
+        		Arrays.asList(ANDROID_VERSIONS_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.RELEASE))
         {
         	if (DEBUG)
         		Log.d(TAG, "ensureServiceStaysRunning > setting alarm. [ Kitkat START_STICKY bug ]");

@@ -167,8 +167,8 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
             g.removePreference(pm.findPreference(SP_KEY_ENABLE_NOTIF_ACTIONS));
         }
-        if (!Arrays.asList(MonitorService.SDK_ALLOWED_TO_AUTO_RESTART_SERVICE)
-        		.contains(Build.VERSION.SDK_INT)) {
+        if (!Arrays.asList(MonitorService.ANDROID_VERSIONS_ALLOWED_TO_AUTO_RESTART_SERVICE)
+        		.contains(Build.VERSION.RELEASE)) {
         	// Disable auto restart service workaround if not on KitKat nor Jelly Bean
             final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
         	g.removePreference(pm.findPreference(SP_KEY_ENABLE_AUTO_RESTART_SERVICE));
