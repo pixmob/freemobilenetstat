@@ -660,9 +660,9 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         if (lastMobileNetworkConnected != null && lastMobileOperatorId != null
         	&& lastIsFemtocell != null && lastMobileNetworkType != null
             && lastMobileNetworkConnected == mobileNetworkConnected
-            && lastIsFemtocell == isFemtocell
+            && lastIsFemtocell.equals(isFemtocell)
             && lastMobileOperatorId.equals(mobileOperatorId)
-            && lastMobileNetworkType == mobileNetworkType) {
+            && lastMobileNetworkType.equals(mobileNetworkType)) {
             return -1;
         }
         
