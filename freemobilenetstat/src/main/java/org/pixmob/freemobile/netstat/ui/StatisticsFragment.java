@@ -249,4 +249,9 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
         return DateUtils.formatDuration(duration, getActivity(), STAT_NO_VALUE);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        exportTask.onSavedInstanceCalled();
+        super.onSaveInstanceState(outState);
+    }
 }
