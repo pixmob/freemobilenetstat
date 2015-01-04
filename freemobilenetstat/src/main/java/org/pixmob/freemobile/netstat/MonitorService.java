@@ -552,7 +552,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             nBuilder.setLargeIcon(largeIcon);
         }
 
-        if (prefs.getBoolean(SP_KEY_ENABLE_NOTIF_ACTIONS, true)) {
+        if  ((prefs != null) && (prefs.getBoolean(SP_KEY_ENABLE_NOTIF_ACTIONS, true))) {
             if (airplaneModeOn && wirelessSettingsPendingIntent != null) {
                 nBuilder.addAction(android.R.drawable.ic_menu_preferences,
                         getString(R.string.notif_action_open_wireless_settings),
