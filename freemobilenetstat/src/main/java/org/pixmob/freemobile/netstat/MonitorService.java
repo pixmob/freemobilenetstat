@@ -663,8 +663,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         
         // Prevent duplicated inserts.
         if (lastMobileNetworkConnected != null && lastMobileOperatorId != null
-        	&& lastIsFemtocell != null && lastMobileNetworkType != null
-            && lastMobileNetworkConnected == mobileNetworkConnected
+            && lastIsFemtocell != null && lastMobileNetworkType != null
+            && lastMobileNetworkConnected.equals(mobileNetworkConnected)
             && lastIsFemtocell.equals(isFemtocell)
             && lastMobileOperatorId.equals(mobileOperatorId)
             && lastMobileNetworkType.equals(mobileNetworkType)) {
