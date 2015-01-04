@@ -211,15 +211,20 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             final int largeIconHeight =
                 getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
             if ((largeIconWidth > 0) && (largeIconHeight > 0)) {
-                freeLargeIcon =
-                        Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                                R.drawable.ic_stat_notify_service_free_large), largeIconWidth, largeIconHeight, true);
-                freeFemtoLargeIcon =
-                        Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                                R.drawable.ic_stat_notify_service_free_femto_large), largeIconWidth, largeIconHeight, true);
-                orangeLargeIcon =
-                        Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(),
-                                R.drawable.ic_stat_notify_service_orange_large), largeIconWidth, largeIconHeight, true);
+                Bitmap freeLargeIconTmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_notify_service_free_large);
+                if ((freeLargeIconTmp != null) && (freeLargeIconTmp.getWidth() > 0) && (freeLargeIconTmp.getHeight() > 0)) {
+                    freeLargeIcon = Bitmap.createScaledBitmap(freeLargeIconTmp, largeIconWidth, largeIconHeight, true);
+                }
+
+                Bitmap freeFemtoLargeIconTmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_notify_service_free_femto_large);
+                if ((freeFemtoLargeIconTmp != null) && (freeFemtoLargeIconTmp.getHeight() > 0) && (freeFemtoLargeIconTmp.getWidth() > 0)) {
+                    freeFemtoLargeIcon = Bitmap.createScaledBitmap(freeFemtoLargeIconTmp, largeIconWidth, largeIconHeight, true);
+                }
+
+                Bitmap orangeLargeIconTmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_stat_notify_service_orange_large);
+                if ((orangeLargeIconTmp != null) && (orangeLargeIconTmp.getHeight() > 0) && (orangeLargeIconTmp.getWidth() > 0)) {
+                    orangeLargeIcon = Bitmap.createScaledBitmap(orangeLargeIconTmp, largeIconWidth, largeIconHeight, true);
+                }
             }
         }
 
