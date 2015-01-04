@@ -50,6 +50,7 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
     private final Context context;
     private FragmentManager fragmentManager;
     private boolean aborted;
+    private boolean onSavedInstanceCalled;
     
     public ExportTask(final Context context,
             final FragmentManager fragmentManager) {
@@ -122,7 +123,7 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
     private void dismissDialog() {
         final DialogFragment f = (DialogFragment) fragmentManager
                 .findFragmentByTag(DIALOG_TAG);
-        if (f != null) {
+        if ((f != null) && (!onSavedInstanceCalled)){
             f.dismiss();
         }
         
@@ -202,4 +203,9 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
 
         }
     }
+
+    public void onSavedInstanceCalled() {
+        onSavedInstanceCalled = true;
+    }
+
 }
