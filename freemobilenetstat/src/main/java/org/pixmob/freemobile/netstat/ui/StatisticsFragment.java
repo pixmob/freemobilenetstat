@@ -251,7 +251,9 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        exportTask.onSavedInstanceCalled();
+        if (exportTask != null) {
+            exportTask.onSavedInstanceCalled();
+        }
         super.onSaveInstanceState(outState);
     }
 }
