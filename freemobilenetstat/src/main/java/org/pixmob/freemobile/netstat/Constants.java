@@ -46,6 +46,11 @@ public final class Constants {
      */
     public static final String SP_KEY_STAT_NOTIF_SOUND_ORANGE = "pref_notif_sound_orange";
     /**
+     * {@link SharedPreferences} key: play a sound when the mobile operator is
+     * updated, on 4G (Free) network.
+     */
+    public static final String SP_KEY_STAT_NOTIF_SOUND_4G = "pref_notif_sound_4g";
+    /**
      * {@link SharedPreferences} key: enable a workaround for KitKat START_STICKY bug.
      */
     public static final String SP_KEY_ENABLE_AUTO_RESTART_SERVICE = "pref_enable_auto_restart_service";
