@@ -33,9 +33,6 @@ import org.pixmob.freemobile.netstat.SyncService;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
 
-import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE;
-import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_ORANGE;
-
 /**
  * Main application activity.
  * @author Pixmob
