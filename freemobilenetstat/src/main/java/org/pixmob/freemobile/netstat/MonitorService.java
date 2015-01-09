@@ -573,10 +573,11 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
 
         if ((playSound) && (prefs != null)) {
-            final String rawSoundUri;
+            String rawSoundUri = null;
             if ((Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) && (mobileNetworkType == TelephonyManager.NETWORK_TYPE_LTE)) {
                 rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND_4G, null);
-            } else {
+            }
+            if (rawSoundUri == null) {
                 rawSoundUri = prefs.getString((mobOp == MobileOperator.FREE_MOBILE) ? SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE : SP_KEY_STAT_NOTIF_SOUND_ORANGE, null);
             }
             if (rawSoundUri != null) {
