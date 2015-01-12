@@ -56,12 +56,12 @@
     <string name="pref_license_summary">Code source disponible sur github.com/vdavy/freemobilenetstat</string>
     <string name="pref_homesite">Statistiques nationales</string>
     <string name="pref_homesite_summary">Ouvrir la page freemobilenetstat.appspot.com</string>
-    <string name="pref_notif_sound_free_mobile">Alarme sonore Free Mobile</string>
-    <string name="pref_notif_sound_free_mobile_summary">Avertir lorsque le téléphone bascule sur le réseau Free Mobile</string>
+    <string name="pref_notif_sound_free_mobile">Alarme sonore Free Mobile 3G</string>
+    <string name="pref_notif_sound_free_mobile_summary">Avertir lorsque le téléphone bascule sur le réseau Free Mobile 3G</string>
     <string name="pref_notif_sound_orange">Alarme sonore Orange</string>
-    <string name="pref_notif_sound_orange_summary">Avertir lorsque le téléphone bascule sur le réseau Orange</string>
-    <string name="pref_notif_sound_4g">Alarme sonore 4G</string>
-    <string name="pref_notif_sound_4g_summary">Avertir lorsque le téléphone bascule sur le réseau 4G Free (alarme Free non exécutée)</string>
+    <string name="pref_notif_sound_orange_summary">Avertir lorsque le téléphone bascule sur le réseau Orange (2G/3G)</string>
+    <string name="pref_notif_sound_4g">Alarme sonore Free Mobile 4G</string>
+    <string name="pref_notif_sound_4g_summary">Avertir lorsque le téléphone bascule sur le réseau Free Mobile 4G</string>
     <string name="pref_enable_auto_restart_service">Relancement automatique du service</string>
     <string name="pref_enable_auto_restart_service_summary">Si la notification ne s\'actualise plus (Bug KitKat).</string>
     <string name="pref_time_interval">Afficher les données depuis…</string>
