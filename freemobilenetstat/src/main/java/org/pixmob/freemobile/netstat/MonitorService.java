@@ -571,13 +571,26 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             }
         }
 
+        // check if we need to trigger LTE alarm
+        // network type changed from 3G to LTE
+        boolean lteAlarm  = ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                && ((lastMobileNetworkType != null) && (!lastMobileNetworkType.equals(TelephonyManager.NETWORK_TYPE_LTE)))
+                && (mobileNetworkType == TelephonyManager.NETWORK_TYPE_LTE));
 
-        if ((playSound) && (prefs != null)) {
+        // other case : trigger FreeMobile 3G alarm if we changed network type from LTE to 3G
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) // first, are we using a compatible android version ?
+                && (mobOp == MobileOperator.FREE_MOBILE) // second, are we on FreeMobile network ?
+                && (!lteAlarm) // third, are not we on LTE network
+                && (lastMobileNetworkType != null)
+                && (lastMobileNetworkType.equals(TelephonyManager.NETWORK_TYPE_LTE))) { // fourth, and the last mobile network type is LTE
+            playSound = true; // trigger 3G alarm
+        }
+
+        if (((playSound) || (lteAlarm)) && (prefs != null)) {
             String rawSoundUri = null;
-            if ((Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) && (mobileNetworkType == TelephonyManager.NETWORK_TYPE_LTE)) {
+            if (lteAlarm) { // we are in LTE alarm case
                 rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND_4G, null);
-            }
-            if (rawSoundUri == null) {
+            } else if (playSound) { // we are in operator change case
                 rawSoundUri = prefs.getString((mobOp == MobileOperator.FREE_MOBILE) ? SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE : SP_KEY_STAT_NOTIF_SOUND_ORANGE, null);
             }
             if (rawSoundUri != null) {
