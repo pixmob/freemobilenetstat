@@ -148,6 +148,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     private Boolean lastIsFemtocell;
     private boolean mobileNetworkConnected;
     private Integer lastMobileNetworkType;
+    private Integer lastMobileNetworkTypeForLTEDetect;
     private int mobileNetworkType;
     private BlockingQueue< Event> pendingInsert;
     private SharedPreferences prefs;
@@ -190,7 +191,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (SP_KEY_THEME.equals(key) || SP_KEY_ENABLE_NOTIF_ACTIONS.equals(key)) {
-            updateNotification(false);
+            updateNotification(false, false);
         }
     }
 
@@ -307,7 +308,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 if (phoneStateUpdated >= 0)
                     updateEventDatabase();
 
-                updateNotification(phoneStateUpdated == 1);
+                updateNotification(true, phoneStateUpdated == 1);
             }
         };
         int events =
@@ -414,7 +415,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 if (DEBUG) {
                     Log.d(TAG, "onStartCommand > update the notification on lockscreen (hide / show)");
                 }
-                updateNotification(false);
+                updateNotification(false, false);
             }
         }
 
@@ -424,7 +425,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         // Update with current state.
         onConnectivityUpdated();
         onPhoneStateUpdated();
-        updateNotification(false);
+        updateNotification(false, false);
 
         return START_STICKY;
     }
@@ -508,8 +509,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
     /**
      * Update the status bar notification.
+     * @param playSound play notification sound
+     * @param phoneStateUpdated if phone state has been updated
      */
-	private void updateNotification(boolean playSound) {
+	private void updateNotification(boolean playSound, boolean phoneStateUpdated) {
         String tickerText, contentText;
         int smallIcon;
         final int notificationPriority = NotificationCompat.PRIORITY_LOW;
@@ -517,7 +520,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         final PendingIntent contentIntent = openUIPendingIntent;
         boolean airplaneModeOn = false;
 
-        final MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
+        MobileOperator mobOp = MobileOperator.fromString(mobileOperatorId);
 
         if (mobOp == null) { // Not Free Mobile nor Orange
         	if (airplaneModeOn = isAirplaneModeOn()) { // Airplane mode
@@ -534,6 +537,12 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             smallIcon = android.R.drawable.stat_sys_warning;
             largeIcon = null; // Use small icon as large icon.
         } else { // Free Mobile or Orange detected
+            if ((mobOp == MobileOperator.FREE_MOBILE) // we are on Free Mobile network and we detected 2G network... huhu
+                && ((mobileNetworkType == TelephonyManager.NETWORK_TYPE_GPRS) || (mobileNetworkType == TelephonyManager.NETWORK_TYPE_EDGE))) {
+                // so force network operator
+                mobOp = MobileOperator.ORANGE;
+            }
+
             tickerText = String.format(getString(R.string.stat_connected_to_mobile_network), mobOp.toName(this));
 
             final Integer networkTypeRes = NETWORK_TYPE_STRINGS.get(mobileNetworkType, R.string.network_type_unknown);
@@ -571,31 +580,39 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             }
         }
 
-        // check if we need to trigger LTE alarm
-        // network type changed from 3G to LTE
-        boolean lteAlarm  = ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-                && ((lastMobileNetworkType != null) && (!lastMobileNetworkType.equals(TelephonyManager.NETWORK_TYPE_LTE)))
-                && (mobileNetworkType == TelephonyManager.NETWORK_TYPE_LTE));
+        if (playSound) {
+            Log.d(TAG, "Play notification sound");
 
-        // other case : trigger FreeMobile 3G alarm if we changed network type from LTE to 3G
-        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) // first, are we using a compatible android version ?
-                && (mobOp == MobileOperator.FREE_MOBILE) // second, are we on FreeMobile network ?
-                && (!lteAlarm) // third, are not we on LTE network
-                && (lastMobileNetworkType != null)
-                && (lastMobileNetworkType.equals(TelephonyManager.NETWORK_TYPE_LTE))) { // fourth, and the last mobile network type is LTE
-            playSound = true; // trigger 3G alarm
-        }
+            // check if we need to trigger LTE alarm
+            // network type changed from 3G to LTE
+            boolean lteAlarm = ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                    && (lastMobileNetworkTypeForLTEDetect != TelephonyManager.NETWORK_TYPE_LTE)
+                    && (mobileNetworkType == TelephonyManager.NETWORK_TYPE_LTE));
 
-        if (((playSound) || (lteAlarm)) && (prefs != null)) {
-            String rawSoundUri = null;
-            if (lteAlarm) { // we are in LTE alarm case
-                rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND_4G, null);
-            } else if (playSound) { // we are in operator change case
-                rawSoundUri = prefs.getString((mobOp == MobileOperator.FREE_MOBILE) ? SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE : SP_KEY_STAT_NOTIF_SOUND_ORANGE, null);
+            // other case : trigger FreeMobile 3G alarm if we changed network type from LTE to 3G
+            if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) // first, are we using a compatible android version ?
+                    && (mobOp == MobileOperator.FREE_MOBILE) // second, are we on FreeMobile network ?
+                    && (!lteAlarm) // third, are not we on LTE network
+                    && (lastMobileNetworkTypeForLTEDetect != null)
+                    && (lastMobileNetworkTypeForLTEDetect.equals(TelephonyManager.NETWORK_TYPE_LTE))) { // fourth, and the last mobile network type is LTE
+                phoneStateUpdated = true; // trigger 3G alarm
             }
-            if (rawSoundUri != null) {
-                final Uri soundUri = Uri.parse(rawSoundUri);
-                nBuilder.setSound(soundUri);
+
+            if ((phoneStateUpdated || lteAlarm) && (prefs != null)) {
+                String rawSoundUri = null;
+                if (lteAlarm) { // we are in LTE alarm case
+                    Log.d(TAG, "Try to play LTE alarm");
+                    rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND_4G, null);
+                } else if (phoneStateUpdated) { // we are in operator change case
+                    Log.d(TAG, "Try to play normal operator alarm");
+                    rawSoundUri = prefs.getString((mobOp == MobileOperator.FREE_MOBILE) ? SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE : SP_KEY_STAT_NOTIF_SOUND_ORANGE, null);
+                }
+                if (rawSoundUri != null) {
+                    final Uri soundUri = Uri.parse(rawSoundUri);
+                    nBuilder.setSound(soundUri);
+                }
+            } else if (BuildConfig.DEBUG) {
+                Log.d(TAG, "No notification sound to play");
             }
         }
 
@@ -699,6 +716,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         lastMobileNetworkConnected = mobileNetworkConnected;
         lastMobileOperatorId = mobileOperatorId;
         lastIsFemtocell = isFemtocell;
+        lastMobileNetworkTypeForLTEDetect = lastMobileNetworkType; // save previous network type for LTE detection
         lastMobileNetworkType = mobileNetworkType;
         
         Log.i(TAG, "Phone state updated: operator=" + mobileOperatorId + "; connected=" + mobileNetworkConnected + "; femtocell=" + isFemtocell);
