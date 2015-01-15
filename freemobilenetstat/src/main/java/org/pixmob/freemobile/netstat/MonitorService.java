@@ -581,6 +581,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             // check if we need to trigger LTE alarm
             // network type changed from 3G to LTE
             boolean lteAlarm = ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+                    && (lastMobileNetworkTypeForLTEDetect != null)
                     && (lastMobileNetworkTypeForLTEDetect != TelephonyManager.NETWORK_TYPE_LTE)
                     && (mobileNetworkType == TelephonyManager.NETWORK_TYPE_LTE));
 
