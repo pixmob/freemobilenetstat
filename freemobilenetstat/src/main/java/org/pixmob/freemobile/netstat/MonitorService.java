@@ -282,8 +282,6 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         phoneMonitor = new PhoneStateListener() {
             @Override
             public void onDataConnectionStateChanged(int state, int networkType) {
-                mobileNetworkType = networkType;
-                
                 updateService();
             }
 
@@ -304,6 +302,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             }
 
             private void updateService() {
+                mobileNetworkType = tm.getNetworkType(); //update the network type to have the latest
                 final int phoneStateUpdated = onPhoneStateUpdated();
                 if (phoneStateUpdated >= 0)
                     updateEventDatabase();
@@ -536,20 +535,16 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
             smallIcon = android.R.drawable.stat_sys_warning;
             largeIcon = null; // Use small icon as large icon.
-        } else { // Free Mobile or Orange detected
-            if ((mobOp == MobileOperator.FREE_MOBILE) // we are on Free Mobile network and we detected 2G network... huhu
-                && ((mobileNetworkType == TelephonyManager.NETWORK_TYPE_GPRS) || (mobileNetworkType == TelephonyManager.NETWORK_TYPE_EDGE))) {
-                // so force network operator
-                mobOp = MobileOperator.ORANGE;
-            }
 
+        } else { // Free Mobile or Orange detected
             tickerText = String.format(getString(R.string.stat_connected_to_mobile_network), mobOp.toName(this));
 
             final Integer networkTypeRes = NETWORK_TYPE_STRINGS.get(mobileNetworkType, R.string.network_type_unknown);
             contentText = String.format(getString(R.string.mobile_network_type), getString(networkTypeRes));
-            if (MobileOperator.FREE_MOBILE.equals(mobOp) && isFemtocell)
-            	contentText = getString(R.string.network_free_femtocell, contentText);
-            
+            if (MobileOperator.FREE_MOBILE.equals(mobOp) && isFemtocell) {
+                contentText = getString(R.string.network_free_femtocell, contentText);
+            }
+
             smallIcon = getStatIcon(mobOp);
             largeIcon = getStatLargeIcon(mobOp);
         }
