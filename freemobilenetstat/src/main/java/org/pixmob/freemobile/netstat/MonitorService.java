@@ -302,7 +302,9 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             }
 
             private void updateService() {
-                mobileNetworkType = tm.getNetworkType(); //update the network type to have the latest
+                if (tm != null) { // Fix NPE - found by Acralyzer
+                    mobileNetworkType = tm.getNetworkType(); //update the network type to have the latest
+                }
                 final int phoneStateUpdated = onPhoneStateUpdated();
                 if (phoneStateUpdated >= 0)
                     updateEventDatabase();
