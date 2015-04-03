@@ -1,6 +1,7 @@
 package org.pixmob.freemobile.netstat.content;
 
-import org.jetbrains.annotations.NotNull;
+import android.support.annotation.NonNull;
+
 import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
 
@@ -53,7 +54,7 @@ public class Statistics {
             Pair(K left, V right) { this.left = left; this.right = right; }
 
             @Override
-            public int compareTo(@NotNull Pair<K, V> another) {
+            public int compareTo(@NonNull Pair<K, V> another) {
                 return right.compareTo(another.right);
             }
         }

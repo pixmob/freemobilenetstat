@@ -22,13 +22,13 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Shader;
+import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 
-import org.jetbrains.annotations.NotNull;
 import org.pixmob.freemobile.netstat.Event;
 import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.R;
@@ -73,7 +73,7 @@ public class BatteryChart extends View {
     }
 
     @Override
-    public boolean onTouchEvent(@NotNull MotionEvent event) {
+    public boolean onTouchEvent(@NonNull MotionEvent event) {
         final int action = event.getAction();
         if (MotionEvent.ACTION_DOWN == action || MotionEvent.ACTION_MOVE == action) {
             final float x = event.getX();
@@ -175,7 +175,7 @@ public class BatteryChart extends View {
 
                 final MobileOperator mobOp = MobileOperator.fromString(e.mobileOperator);
                 if (mobOp != null) {
-                    float x2 = graphLeft;
+                    float x2;
                     if (i != 0) {
                         final Event e0 = events[i - 1];
                         if (e.powerOn && !e0.powerOn) {
