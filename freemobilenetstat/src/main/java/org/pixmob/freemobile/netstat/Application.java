@@ -48,7 +48,7 @@ import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
  * @author Pixmob
  * add ACRA setup : https://github.com/ACRA/acra/wiki/BasicSetup
  */
-@ReportsCrashes(formKey = "",
+@ReportsCrashes(
         formUri = "https://freemobilenetstat.iriscouch.com/acra-freemobilenetstat/_design/acra-storage/_update/report",
         reportType = HttpSender.Type.JSON,
         httpMethod = HttpSender.Method.PUT,
