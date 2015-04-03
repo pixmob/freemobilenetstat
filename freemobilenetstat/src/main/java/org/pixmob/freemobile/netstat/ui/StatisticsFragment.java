@@ -188,8 +188,6 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
 
     @Override
     public Loader<Statistics> onCreateLoader(int id, Bundle args) {
-        progressBar.setVisibility(View.VISIBLE);
-
         return new StatisticsLoader(getActivity());
     }
 

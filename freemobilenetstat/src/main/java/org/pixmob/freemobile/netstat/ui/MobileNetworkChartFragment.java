@@ -41,7 +41,6 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
     private TextView onFreeMobileFemtocellTextView;
     private TextView onFreeMobile4GnetworkTextView;
 
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -100,8 +99,6 @@ public class MobileNetworkChartFragment extends Fragment implements LoaderCallba
     
 	@Override
 	public Loader<Statistics> onCreateLoader(int arg0, Bundle arg1) {
-        progressBar.setVisibility(View.VISIBLE);
-
         return new StatisticsLoader(getActivity());
 	}
 
