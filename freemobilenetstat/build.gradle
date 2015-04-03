@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "org.pixmob.freemobile.netstat"
         minSdkVersion 7
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 50
         versionName "2.1.1"
     }
@@ -28,7 +28,6 @@ android {
 
 dependencies {
     compile project(':httpclient')
-    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.android.support:support-v4:22.0.0'
     compile 'ch.acra:acra:4.5.0'
-    compile 'com.intellij:annotations:+@jar'
 }
