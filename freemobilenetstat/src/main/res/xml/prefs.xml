@@ -50,6 +50,14 @@
             android:title="@string/pref_notif_sound_4g" />
 
         <RingtonePreference
+            android:key="pref_notif_sound_femto"
+            android:ringtoneType="notification"
+            android:showDefault="true"
+            android:showSilent="true"
+            android:summary="@string/pref_notif_sound_femto_summary"
+            android:title="@string/pref_notif_sound_femto" />
+
+        <RingtonePreference
             android:key="pref_notif_sound_orange"
             android:ringtoneType="notification"
             android:showDefault="true"
