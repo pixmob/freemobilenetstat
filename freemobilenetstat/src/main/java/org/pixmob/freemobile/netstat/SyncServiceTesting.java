@@ -63,9 +63,9 @@ import static org.pixmob.freemobile.netstat.Constants.TAG;
  * 
  * @author Pixmob
  */
-public class SyncService extends IntentService {
+public class SyncServiceTesting extends IntentService {
     private static final Random RANDOM = new Random();
-    private static final String SERVER_API_URL = "http://freemobilenetstat.appspot.com/";
+    private static final String SERVER_API_URL = "http://freemobile-netstat-gae.appspot.com/";
     private static final int SERVER_API_VERSION = 1;
     private static final String EXTRA_DEVICE_REG = "org.pixmob.freemobile.netstat.deviceReg";
     private static final long DAY_IN_MILLISECONDS = 86400 * 1000;
@@ -82,15 +82,15 @@ public class SyncService extends IntentService {
     private PowerManager pm;
     private SQLiteOpenHelper dbHelper;
 
-    public SyncService() {
-        super("FreeMobileNetstat/Sync");
+    public SyncServiceTesting() {
+        super("FreeMobileNetstat/SyncTesting");
     }
 
     public static void schedule(Context context, boolean enabled) {
         final Context appContext = context.getApplicationContext();
         final AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         final PendingIntent syncIntent =
-            PendingIntent.getService(appContext, 0, new Intent(appContext, SyncService.class),
+            PendingIntent.getService(appContext, 0, new Intent(appContext, SyncServiceTesting.class),
                 PendingIntent.FLAG_CANCEL_CURRENT);
         am.cancel(syncIntent);
 
@@ -196,18 +196,25 @@ public class SyncService extends IntentService {
         // Get pending uploads.
         Cursor pendingUploadsCursor = null;
         try {
-            pendingUploadsCursor = db.query("daily_stat", new String[]{"stat_timestamp", "orange", "free_mobile", "sync"},
+            pendingUploadsCursor = db.query("daily_stat_testing",
+                    new String[] {
+                            "stat_timestamp", "orange", "free_mobile",
+                            "free_mobile_3g", "free_mobile_4g", "free_mobile_femtocell", "sync"
+                    },
                     "stat_timestamp>=? AND stat_timestamp<?", new String[]{String.valueOf(statTimestampStart),
                             String.valueOf(now)}, null, null, null);
             while (pendingUploadsCursor.moveToNext()) {
                 final long d = pendingUploadsCursor.getLong(0);
-                final int sync = pendingUploadsCursor.getInt(3);
+                final int sync = pendingUploadsCursor.getInt(6);
                 if (SYNC_UPLOADED == sync) {
                     uploadedStats.add(d);
                 } else if (SYNC_PENDING == sync) {
                     final DailyStat s = new DailyStat();
                     s.orange = pendingUploadsCursor.getInt(1);
                     s.freeMobile = pendingUploadsCursor.getInt(2);
+                    s.freeMobile3G = pendingUploadsCursor.getInt(3);
+                    s.freeMobile4G = pendingUploadsCursor.getInt(4);
+                    s.freeMobileFemtocell = pendingUploadsCursor.getInt(5);
                     stats.put(d, s);
                 }
             }
@@ -232,8 +239,11 @@ public class SyncService extends IntentService {
                     cv.put("stat_timestamp", d);
                     cv.put("orange", s.orange);
                     cv.put("free_mobile", s.freeMobile);
+                    cv.put("free_mobile_3g", s.freeMobile3G);
+                    cv.put("free_mobile_4g", s.freeMobile4G);
+                    cv.put("free_mobile_femtocell", s.freeMobileFemtocell);
                     cv.put("sync", SYNC_PENDING);
-                    db.insertOrThrow("daily_stat", null, cv);
+                    db.insertOrThrow("daily_stat_testing", null, cv);
                     stats.put(d, s);
                 }
             }
@@ -246,7 +256,7 @@ public class SyncService extends IntentService {
         if (DEBUG) {
             Log.d(TAG, "Cleaning up upload database");
         }
-        db.delete("daily_stat", "stat_timestamp<?", new String[] {String.valueOf(statTimestampStart) });
+        db.delete("daily_stat_testing", "stat_timestamp<?", new String[] {String.valueOf(statTimestampStart) });
 
         // Check if there are any statistics to upload.
         final int statsLen = stats.size();
@@ -276,6 +286,9 @@ public class SyncService extends IntentService {
             try {
                 json.put("timeOnOrange", s.orange);
                 json.put("timeOnFreeMobile", s.freeMobile);
+                json.put("timeOnFreeMobile3g", s.freeMobile3G);
+                json.put("timeOnFreeMobile4g", s.freeMobile4G);
+                json.put("timeOnFreeMobileFemtocell", s.freeMobileFemtocell);
             } catch (JSONException e) {
                 final IOException ioe = new IOException("Failed to prepare statistics upload");
                 ioe.initCause(e);
@@ -306,14 +319,14 @@ public class SyncService extends IntentService {
                                 registerDevice(deviceId);
 
                                 // Restart this service.
-                                startService(new Intent(getApplicationContext(), SyncService.class).putExtra(
-                                    EXTRA_DEVICE_REG, true));
+                                startService(new Intent(getApplicationContext(), SyncServiceTesting.class).putExtra(
+                                        EXTRA_DEVICE_REG, true));
                             }
                         } else if (HttpURLConnection.HTTP_OK == sc) {
                             // Update upload database.
                             cv.clear();
                             cv.put("sync", SYNC_UPLOADED);
-                            db.update("daily_stat", cv, "stat_timestamp=?", new String[] {String.valueOf(d) });
+                            db.update("daily_stat_testing", cv, "stat_timestamp=?", new String[] {String.valueOf(d) });
 
                             if (DEBUG) {
                                 Log.d(TAG, "Upload done for " + DateUtils.formatDate(d));
@@ -332,6 +345,9 @@ public class SyncService extends IntentService {
     private DailyStat computeDailyStat(long date) {
         long timeOnOrange = 0;
         long timeOnFreeMobile = 0;
+        long timeOnFreeMobile3G = 0;
+        long timeOnFemtocell = 0;
+        long timeOnFreeMobile4G = 0;
 
         if (DEBUG) {
             Log.d(TAG, "Computing statistics for " + DateUtils.formatDate(date));
@@ -340,7 +356,7 @@ public class SyncService extends IntentService {
         Cursor computeStatisticsCursor = null;
         try {
             computeStatisticsCursor = getContentResolver().query(Events.CONTENT_URI,
-                    new String[]{Events.TIMESTAMP, Events.MOBILE_OPERATOR},
+                    new String[]{Events.TIMESTAMP, Events.MOBILE_OPERATOR, Events.MOBILE_NETWORK_TYPE, Events.FEMTOCELL},
                     Events.TIMESTAMP + ">=? AND " + Events.TIMESTAMP + "<=?",
                     new String[]{String.valueOf(date), String.valueOf(date + 86400 * 1000)}, Events.TIMESTAMP);
 
@@ -352,6 +368,8 @@ public class SyncService extends IntentService {
                 final long t = computeStatisticsCursor.getLong(0);
                 computeStatisticsCursor.copyStringToBuffer(1, cBuf);
                 final MobileOperator op = MobileOperator.fromString(cBuf);
+                final NetworkClass nc = NetworkClass.getNetworkClass(computeStatisticsCursor.getInt(2));
+                final boolean isFemtocell = computeStatisticsCursor.getInt(3) != 0;
 
                 if (t0 != 0) {
                     if (op != null && op.equals(op0)) {
@@ -360,6 +378,15 @@ public class SyncService extends IntentService {
                             timeOnOrange += dt;
                         } else if (MobileOperator.FREE_MOBILE.equals(op)) {
                             timeOnFreeMobile += dt;
+                            if (isFemtocell) {
+                                timeOnFemtocell += dt;
+                            }
+                            else if (NetworkClass.NC_3G.equals(nc)) {
+                                timeOnFreeMobile3G += dt;
+                            }
+                            else if (NetworkClass.NC_4G.equals(nc)) {
+                                timeOnFreeMobile4G += dt;
+                            }
                         }
                     }
                 }
@@ -381,6 +408,9 @@ public class SyncService extends IntentService {
         final DailyStat s = new DailyStat();
         s.orange = timeOnOrange;
         s.freeMobile = timeOnFreeMobile;
+        s.freeMobile3G = timeOnFreeMobile3G;
+        s.freeMobile4G = timeOnFreeMobile4G;
+        s.freeMobileFemtocell = timeOnFemtocell;
         return s;
     }
 
@@ -446,7 +476,7 @@ public class SyncService extends IntentService {
         String deviceId = null;
         Cursor deviceCursor = null;
         try {
-            deviceCursor = db.query("device", new String[]{"device_id"}, null, null, null, null, null);
+            deviceCursor = db.query("device_testing", new String[]{"device_id"}, null, null, null, null, null);
             if (deviceCursor.moveToNext()) {
                 deviceId = deviceCursor.getString(0);
             }
@@ -467,7 +497,7 @@ public class SyncService extends IntentService {
             // Store this device identifier in the database.
             final ContentValues cv = new ContentValues(1);
             cv.put("device_id", deviceId);
-            db.insertOrThrow("device", null, cv);
+            db.insertOrThrow("device_testing", null, cv);
         }
         return deviceId;
     }
@@ -484,7 +514,7 @@ public class SyncService extends IntentService {
     }
 
     private static class UploadDatabaseHelper extends SQLiteOpenHelper {
-        private static final int UPLOAD_DATABASE_VERSION = 1;
+        private static final int UPLOAD_DATABASE_VERSION = 2;
 
         public UploadDatabaseHelper(final Context context) {
             super(context, "upload.db", null, UPLOAD_DATABASE_VERSION);
@@ -494,11 +524,13 @@ public class SyncService extends IntentService {
         public void onCreate(SQLiteDatabase db) {
             if (!db.isReadOnly()) {
                 String req =
-                    "CREATE TABLE daily_stat (stat_timestamp TIMESTAMP PRIMARY KEY, "
-                        + "orange INTEGER NOT NULL, free_mobile INTEGER NOT NULL, sync INTEGER NOT NULL)";
+                    "CREATE TABLE daily_stat_testing (stat_timestamp TIMESTAMP PRIMARY KEY, "
+                        + "orange INTEGER NOT NULL, free_mobile INTEGER NOT NULL, "
+                        + "free_mobile_3g INTEGER NOT NULL, free_mobile_4g INTEGER NOT NULL, "
+                        + "free_mobile_femtocell INTEGER NOT NULL, sync INTEGER NOT NULL)";
                 db.execSQL(req);
 
-                req = "CREATE TABLE device (device_id TEXT PRIMARY KEY)";
+                req = "CREATE TABLE device_testing (device_id TEXT PRIMARY KEY)";
                 db.execSQL(req);
             }
         }
@@ -506,8 +538,8 @@ public class SyncService extends IntentService {
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if (!db.isReadOnly()) {
-                db.execSQL("DROP TABLE IF EXISTS daily_stat");
-                db.execSQL("DROP TABLE IF EXISTS device");
+                db.execSQL("DROP TABLE IF EXISTS daily_stat_testing");
+                db.execSQL("DROP TABLE IF EXISTS device_testing");
                 onCreate(db);
             }
         }
@@ -516,5 +548,8 @@ public class SyncService extends IntentService {
     private static class DailyStat {
         public long orange;
         public long freeMobile;
+        public long freeMobile3G;
+        public long freeMobile4G;
+        public long freeMobileFemtocell;
     }
 }

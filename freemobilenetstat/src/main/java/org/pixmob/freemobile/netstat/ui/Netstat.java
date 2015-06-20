@@ -30,6 +30,7 @@ import android.view.Window;
 import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.MonitorService;
 import org.pixmob.freemobile.netstat.SyncService;
+import org.pixmob.freemobile.netstat.SyncServiceTesting;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
 
@@ -60,6 +61,7 @@ public class Netstat extends FragmentActivity {
         final Intent i = new Intent(c, MonitorService.class);
         c.startService(i);
 
+        SyncServiceTesting.schedule(this, true);
         SyncService.schedule(this, true);
 
         final int applicationVersion;
