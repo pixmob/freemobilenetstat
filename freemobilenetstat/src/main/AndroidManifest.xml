@@ -37,6 +37,7 @@
         <activity android:name=".ui.DocumentBrowser" />
 
         <service android:name=".SyncService" />
+        <service android:name=".SyncServiceTesting" />
         <service
             android:name=".MonitorService"
             android:label="@string/service_monitor" />
