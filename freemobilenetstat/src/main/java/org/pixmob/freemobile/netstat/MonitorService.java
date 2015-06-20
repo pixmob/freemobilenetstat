@@ -601,7 +601,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 if (lteAlarm) { // we are in LTE alarm case
                     Log.d(TAG, "Try to play LTE alarm");
                     rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND_4G, null);
-                } else if (phoneStateUpdated) { // we are in operator change case
+                } else { // we are in operator change case
                     Log.d(TAG, "Try to play normal operator alarm");
                     rawSoundUri = prefs.getString((mobOp == MobileOperator.FREE_MOBILE) ? SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE : SP_KEY_STAT_NOTIF_SOUND_ORANGE, null);
                 }
