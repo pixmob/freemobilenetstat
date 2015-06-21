@@ -74,6 +74,7 @@ import static org.pixmob.freemobile.netstat.Constants.ACTION_NOTIFICATION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_4G;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_FEMTO;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_ORANGE;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
@@ -587,6 +588,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                     && (lastMobileNetworkTypeForLTEDetect != TelephonyManager.NETWORK_TYPE_LTE)
                     && (mobileNetworkType == TelephonyManager.NETWORK_TYPE_LTE));
 
+            // we have just connected on a femtocell, trigger sound
+            boolean femtocellConnection = ((isFemtocell) && (lastIsFemtocell != null)
+                    && (!lastIsFemtocell) && MobileOperator.FREE_MOBILE.equals(mobOp));
+
             // other case : trigger FreeMobile 3G alarm if we changed network type from LTE to 3G
             if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) // first, are we using a compatible android version ?
                     && (mobOp == MobileOperator.FREE_MOBILE) // second, are we on FreeMobile network ?
@@ -596,11 +601,14 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 phoneStateUpdated = true; // trigger 3G alarm
             }
 
-            if ((phoneStateUpdated || lteAlarm) && (prefs != null)) {
+            if ((phoneStateUpdated || lteAlarm || femtocellConnection) && (prefs != null)) {
                 String rawSoundUri = null;
                 if (lteAlarm) { // we are in LTE alarm case
                     Log.d(TAG, "Try to play LTE alarm");
                     rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND_4G, null);
+                } else if (femtocellConnection) { //we are in fetmocell connection alarm case
+                    Log.d(TAG, "Try to play Femtocell alarm");
+                    rawSoundUri = prefs.getString(SP_KEY_STAT_NOTIF_SOUND_FEMTO, null);
                 } else { // we are in operator change case
                     Log.d(TAG, "Try to play normal operator alarm");
                     rawSoundUri = prefs.getString((mobOp == MobileOperator.FREE_MOBILE) ? SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE : SP_KEY_STAT_NOTIF_SOUND_ORANGE, null);

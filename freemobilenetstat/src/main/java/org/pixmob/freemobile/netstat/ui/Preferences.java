@@ -50,6 +50,7 @@ import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_4G;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_FEMTO;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_ORANGE;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
@@ -119,6 +120,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         pm.findPreference(SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE).setOnPreferenceChangeListener(this); // RingtonePreference does not trigger otherwise
         pm.findPreference(SP_KEY_STAT_NOTIF_SOUND_ORANGE).setOnPreferenceChangeListener(this); // RingtonePreference does not trigger otherwise
         pm.findPreference(SP_KEY_STAT_NOTIF_SOUND_4G).setOnPreferenceChangeListener(this); // RingtonePreference does not trigger otherwise
+        pm.findPreference(SP_KEY_STAT_NOTIF_SOUND_FEMTO).setOnPreferenceChangeListener(this); // RingtonePreference does not trigger otherwise
 
         final IntListPreference lp = (IntListPreference) pm.findPreference(SP_KEY_TIME_INTERVAL);
         lp.setEntries(getValues(timeIntervals));
@@ -221,6 +223,12 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             case SP_KEY_STAT_NOTIF_SOUND_4G:
                 if ("".equals(value)) { // Fix for phone always vibrating after selecting a sound, even "None".
                     getPreferenceManager().getSharedPreferences().edit().putString(SP_KEY_STAT_NOTIF_SOUND_4G, null).commit();
+                    return false;
+                }
+                break;
+            case SP_KEY_STAT_NOTIF_SOUND_FEMTO:
+                if ("".equals(value)) { // Fix for phone always vibrating after selecting a sound, even "None".
+                    getPreferenceManager().getSharedPreferences().edit().putString(SP_KEY_STAT_NOTIF_SOUND_FEMTO, null).commit();
                     return false;
                 }
                 break;
