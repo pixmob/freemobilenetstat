@@ -8,8 +8,8 @@ android {
         applicationId "org.pixmob.freemobile.netstat"
         minSdkVersion 7
         targetSdkVersion 22
-        versionCode 51
-        versionName "2.1.2"
+        versionCode 52
+        versionName "2.2.0 ALPHA"
     }
 
     buildTypes {
@@ -28,6 +28,6 @@ android {
 
 dependencies {
     compile project(':httpclient')
-    compile 'com.android.support:support-v4:22.0.0'
+    compile 'com.android.support:support-v4:22.2.0'
     compile 'ch.acra:acra:4.6.1'
 }
