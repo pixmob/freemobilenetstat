@@ -108,6 +108,9 @@ public class Netstat extends FragmentActivity {
         }
 
         requestRequiredPermissions();
+
+        // FIXME Remove this (+ SP key + messages strings + workaround in MonitorService) once OxygenOS has fixed the bug.
+        showOnePlusTwoErrorMessage();
     }
 
     private void checkManualMode() {
@@ -245,6 +248,31 @@ public class Netstat extends FragmentActivity {
 
                 break;
         }
+    }
+
+    private void showOnePlusTwoErrorMessage() {
+        if (MonitorService.ONE_PLUS_TWO_MANUFACTURER.equals(Build.MANUFACTURER) && MonitorService.ONE_PLUS_TWO_MODEL.equals(Build.MODEL)) {
+            final SharedPreferences prefs = getSharedPreferences(Constants.SP_NAME, MODE_PRIVATE);
+            if (!prefs.getBoolean(Constants.SP_KEY_ONE_PLUS_TWO_MESSAGE_SEEN, false)) {
+                Resources res = getResources();
+                new AlertDialog.Builder(this)
+                        .setTitle(res.getString(R.string.one_plus_two_error_message_title))
+                        .setMessage(res.getString(R.string.one_plus_two_error_message_message))
+                        .setPositiveButton(
+                                res.getString(R.string.one_plus_two_error_message_dismiss),
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        final SharedPreferences.Editor prefsEditor = prefs.edit();
+                                        prefsEditor.putBoolean(Constants.SP_KEY_ONE_PLUS_TWO_MESSAGE_SEEN, true);
+                                        Features.getFeature(SharedPreferencesSaverFeature.class).save(prefsEditor);
+                                    }
+                                }
+                        )
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        }
+
     }
     
     public void enlargeChart(View view) {

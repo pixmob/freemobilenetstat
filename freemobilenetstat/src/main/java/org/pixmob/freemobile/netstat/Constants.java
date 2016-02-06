@@ -85,6 +85,10 @@ public final class Constants {
      */
     public static final String SP_KEY_MANUAL_MODE_DETECTION_ENABLED = "pref_manual_mode_detection_enabled";
     /**
+     * {@link SharedPreferences} key: the one plus two incompatibility message has been dismissed
+     */
+    public static final String SP_KEY_ONE_PLUS_TWO_MESSAGE_SEEN = "pref_one_plus_two_message_seen";
+    /**
      * Notification action: open network operator settings.
      */
     public static final String NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS = "network_operator_settings";

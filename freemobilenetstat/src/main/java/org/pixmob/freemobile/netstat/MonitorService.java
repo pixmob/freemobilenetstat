@@ -111,6 +111,11 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
      * SDK Versions concerned with service auto-kill issue.
      */
     public static final String[] ANDROID_VERSIONS_ALLOWED_TO_AUTO_RESTART_SERVICE = new String[] { "4.4", "4.4.1", "4.4.2" };
+    /**
+     * One+2
+     */
+    public static final String ONE_PLUS_TWO_MANUFACTURER = "OnePlus";
+    public static final String ONE_PLUS_TWO_MODEL = "ONE A2003";
 
     /**
      * Intent extra when requesting service restart after died
@@ -133,6 +138,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     private IntentFilter batteryIntentFilter;
     private PowerManager pm;
     private TelephonyManager tm;
+    private int telephonyManagerEvents;
     private ConnectivityManager cm;
     private BroadcastReceiver screenMonitor;
     private PhoneStateListener phoneMonitor;
@@ -238,9 +244,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         new PendingInsertWorker(c, pendingInsert).start();
 
         // This intent is fired when the application notification is clicked.
-        openUIPendingIntent =
-            PendingIntent
-                .getBroadcast(this, 0, new Intent(ACTION_NOTIFICATION), PendingIntent.FLAG_CANCEL_CURRENT);
+        openUIPendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_NOTIFICATION), PendingIntent.FLAG_CANCEL_CURRENT);
 
         // This intent is only available as a Jelly Bean notification action in
         // order to open network operator settings.
@@ -313,13 +317,12 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
                 updateNotification(true, phoneStateUpdated == 1);
             }
         };
-        int events =
-                  PhoneStateListener.LISTEN_SERVICE_STATE
-                | PhoneStateListener.LISTEN_DATA_CONNECTION_STATE;
+        telephonyManagerEvents = PhoneStateListener.LISTEN_SERVICE_STATE |
+                                 PhoneStateListener.LISTEN_DATA_CONNECTION_STATE;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-            events |= PhoneStateListener.LISTEN_CELL_INFO;
+            telephonyManagerEvents |= PhoneStateListener.LISTEN_CELL_INFO;
 
-        tm.listen(phoneMonitor, events);
+        tm.listen(phoneMonitor, telephonyManagerEvents);
 
         // Watch battery level.
         batteryMonitor = new BroadcastReceiver() {
@@ -351,6 +354,12 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             // Kitkat and JellyBean auto-kill service workaround
             // http://stackoverflow.com/a/20735519/1527491
             ensureServiceStaysRunning();
+        }
+
+        if (MonitorService.ONE_PLUS_TWO_MANUFACTURER.equals(Build.MANUFACTURER) && MonitorService.ONE_PLUS_TWO_MODEL.equals(Build.MODEL)) {
+            // One+2 (OxygenOS) does not send PhoneState events when the application is in foreground.
+            // This is a bug. We are still waiting for a solution. This workaround will force PhoneState to refresh.
+            refreshPhoneStatePeriodically();
         }
     }
 
@@ -507,6 +516,20 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             };
             restartServiceHandler.sendEmptyMessageDelayed(0, 0); 
         }
+    }
+
+    private void refreshPhoneStatePeriodically() {
+        if (DEBUG) Log.e(TAG, "refreshPhoneStatePeriodically > Setting service restart");
+        final Handler h = new Handler();
+        final int delay = 60 * 1000; //milliseconds
+
+        h.postDelayed(new Runnable(){
+            public void run(){
+                tm.listen(phoneMonitor, PhoneStateListener.LISTEN_NONE);
+                tm.listen(phoneMonitor, telephonyManagerEvents);
+                ensureServiceStaysRunning();
+            }
+        }, delay);
     }
 
     /**

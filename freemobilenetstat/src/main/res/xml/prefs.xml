@@ -71,6 +71,11 @@
             android:summary="@string/pref_notif_sound_orange_summary"
             android:title="@string/pref_notif_sound_orange" />
 
+        <Preference
+            android:key="pref_disable_all_sounds"
+            android:summary="@string/pref_disable_all_sounds_summary"
+            android:title="@string/pref_disable_all_sounds" />
+
         <ListPreference
             android:dialogTitle="@string/pref_theme"
             android:entries="@array/theme_titles"

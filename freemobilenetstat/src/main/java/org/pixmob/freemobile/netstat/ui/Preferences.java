@@ -30,6 +30,7 @@ import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseArray;
+import android.widget.Toast;
 
 import org.pixmob.freemobile.netstat.MonitorService;
 import org.pixmob.freemobile.netstat.R;
@@ -71,6 +72,11 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     private static final String SP_KEY_CHANGELOG = "pref_changelog";
     private static final String SP_KEY_LICENSE = "pref_license";
     private static final String SP_KEY_HOMESITE = "pref_homesite";
+    private static final String SP_KEY_DISABLE_ALL_SOUNDS = "pref_disable_all_sounds";
+    private static final String[] SOUND_NOTIFICATIONS_SP_KEYS = {
+            SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE, SP_KEY_STAT_NOTIF_SOUND_ORANGE, SP_KEY_STAT_NOTIF_SOUND_4G,
+            SP_KEY_STAT_NOTIF_SOUND_FEMTO
+    };
     private final SparseArray<CharSequence> timeIntervals = new SparseArray<>(4);
     private final Map<String, String> notifActions = new HashMap<>(2);
     private final Map<String, Integer> themes = new HashMap<>(3);
@@ -116,7 +122,8 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         pm.findPreference(SP_KEY_CHANGELOG).setOnPreferenceClickListener(this);
         pm.findPreference(SP_KEY_LICENSE).setOnPreferenceClickListener(this);
         pm.findPreference(SP_KEY_HOMESITE).setOnPreferenceClickListener(this);
-        
+        pm.findPreference(SP_KEY_DISABLE_ALL_SOUNDS).setOnPreferenceClickListener(this);
+
         pm.findPreference(SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE).setOnPreferenceChangeListener(this); // RingtonePreference does not trigger otherwise
         pm.findPreference(SP_KEY_STAT_NOTIF_SOUND_ORANGE).setOnPreferenceChangeListener(this); // RingtonePreference does not trigger otherwise
         pm.findPreference(SP_KEY_STAT_NOTIF_SOUND_4G).setOnPreferenceChangeListener(this); // RingtonePreference does not trigger otherwise
@@ -171,8 +178,8 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
             final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
             g.removePreference(pm.findPreference(SP_KEY_ENABLE_NOTIF_ACTIONS));
         }
-        if (!Arrays.asList(MonitorService.ANDROID_VERSIONS_ALLOWED_TO_AUTO_RESTART_SERVICE)
-        		.contains(Build.VERSION.RELEASE)) {
+
+        if (!Arrays.asList(MonitorService.ANDROID_VERSIONS_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.RELEASE)) {
         	// Disable auto restart service workaround if not on KitKat nor Jelly Bean
             final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
         	g.removePreference(pm.findPreference(SP_KEY_ENABLE_AUTO_RESTART_SERVICE));
@@ -187,6 +194,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         findPreference(SP_KEY_HOMESITE).setOnPreferenceClickListener(null);
         findPreference(SP_KEY_TIME_INTERVAL).setOnPreferenceChangeListener(null);
         findPreference(SP_KEY_THEME).setOnPreferenceChangeListener(null);
+        findPreference(SP_KEY_DISABLE_ALL_SOUNDS).setOnPreferenceChangeListener(null);
 
         getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         super.onDestroy();
@@ -195,6 +203,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
     @Override
     public boolean onPreferenceChange(Preference p, Object value) {
         final String k = p.getKey();
+
         switch (k) {
             case SP_KEY_TIME_INTERVAL:
                 final IntListPreference lp = (IntListPreference) p;
@@ -208,30 +217,13 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
                 }
                 p.setSummary(themePrefSummary);
                 break;
-            case SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE:
-                if ("".equals(value)) { // Fix for phone always vibrating after selecting a sound, even "None".
-                    getPreferenceManager().getSharedPreferences().edit().putString(SP_KEY_STAT_NOTIF_SOUND_FREE_MOBILE, null).commit();
-                    return false;
-                }
-                break;
-            case SP_KEY_STAT_NOTIF_SOUND_ORANGE:
-                if ("".equals(value)) { // Fix for phone always vibrating after selecting a sound, even "None".
-                    getPreferenceManager().getSharedPreferences().edit().putString(SP_KEY_STAT_NOTIF_SOUND_ORANGE, null).commit();
-                    return false;
-                }
-                break;
-            case SP_KEY_STAT_NOTIF_SOUND_4G:
-                if ("".equals(value)) { // Fix for phone always vibrating after selecting a sound, even "None".
-                    getPreferenceManager().getSharedPreferences().edit().putString(SP_KEY_STAT_NOTIF_SOUND_4G, null).commit();
-                    return false;
-                }
-                break;
-            case SP_KEY_STAT_NOTIF_SOUND_FEMTO:
-                if ("".equals(value)) { // Fix for phone always vibrating after selecting a sound, even "None".
-                    getPreferenceManager().getSharedPreferences().edit().putString(SP_KEY_STAT_NOTIF_SOUND_FEMTO, null).commit();
-                    return false;
-                }
-                break;
+        }
+
+        for (final String soundNotification : SOUND_NOTIFICATIONS_SP_KEYS) {
+            if (soundNotification.equals(k) && "".equals(value)) {
+                getPreferenceManager().getSharedPreferences().edit().putString(soundNotification, null).commit();
+                return false;
+            }
         }
 
         return true;
@@ -276,6 +268,12 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
                 break;
             case SP_KEY_HOMESITE:
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://freemobilenetstat.appspot.com")));
+                break;
+            case SP_KEY_DISABLE_ALL_SOUNDS:
+                for (final String soundNotification : SOUND_NOTIFICATIONS_SP_KEYS) {
+                    getPreferenceManager().getSharedPreferences().edit().putString(soundNotification, null).commit();
+                }
+                Toast.makeText(this, getResources().getString(R.string.all_alerts_removed), Toast.LENGTH_SHORT).show();
                 break;
         }
 

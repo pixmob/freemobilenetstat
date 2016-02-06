@@ -20,6 +20,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+
 import io.fabric.sdk.android.Fabric;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
@@ -39,6 +40,7 @@ import static org.pixmob.freemobile.netstat.Constants.SP_KEY_THEME;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_TIME_INTERVAL;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_UPLOAD_STATS;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_MANUAL_MODE_DETECTION_ENABLED;
 import static org.pixmob.freemobile.netstat.Constants.TAG;
 import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
 
@@ -67,6 +69,7 @@ public class Application extends android.app.Application {
         defaultValues.put(SP_KEY_ENABLE_NOTIF_ACTIONS, true);
         defaultValues.put(SP_KEY_THEME, THEME_DEFAULT);
         defaultValues.put(SP_KEY_ENABLE_AUTO_RESTART_SERVICE, true);
+        defaultValues.put(SP_KEY_MANUAL_MODE_DETECTION_ENABLED, true);
 
         // Set default values for preferences.
         final SharedPreferences prefs = getSharedPreferences(SP_NAME, MODE_PRIVATE);

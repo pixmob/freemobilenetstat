@@ -65,6 +65,8 @@
     <string name="pref_notif_sound_4g_summary">Avertir lorsque le téléphone bascule sur le réseau Free Mobile 4G (ne fonctionne que à partir de Honeycomb)</string>
     <string name="pref_notif_sound_femto">Alarme sonore Free Mobile Femtocell</string>
     <string name="pref_notif_sound_femto_summary">Avertir lorsque le téléphone bascule sur une Femtocell Free Mobile</string>
+    <string name="pref_disable_all_sounds">Désactiver toutes les alertes</string>
+    <string name="pref_disable_all_sounds_summary">Tous les alertes sonores seront désactivées</string>
     <string name="pref_enable_auto_restart_service">Relancement automatique du service</string>
     <string name="pref_enable_auto_restart_service_summary">Si la notification ne s\'actualise plus (Bug KitKat).</string>
     <string name="pref_enable_manual_mode_detection">Détecter la sélection manuelle</string>
@@ -96,6 +98,7 @@
     <string name="network_free_mobile_4G">Free 4G</string>
     <string name="network_orange_2G">Orange 2G</string>
     <string name="network_orange_3G">Orange 3G</string>
+    <string name="all_alerts_removed">Toutes les alertes ont été supprimées.</string>
 
     <string name="required_permission_explanation_title">L\'application a besoin de certaines permissions.</string>
     <string name="required_permission_explanation_message">
@@ -112,5 +115,13 @@
     <string name="manual_mode_dialog_action_dismiss">Ne plus afficher</string>
     <string name="manual_mode_dialog_action_close">Fermer</string>
     <string name="manual_mode_dialog_action_open_network_settings">Ouvrir les paramètres opérateur</string>
+
+    <string name="one_plus_two_error_message_title">Appareil mal supporté</string>
+    <string name="one_plus_two_error_message_message">
+        La surcouche OxygenOS du One+2 souffre d\'un bug qui empêche le bon fonctionnement de cette application.
+        Une solution de contournement a été implémentée, mais elle risque de réduire l\'autonomie de la batterie.
+        Malgré de nombreuses relances auprès du support de OnePlus, aucune solution n\'a été donnée.
+    </string>
+    <string name="one_plus_two_error_message_dismiss">Ne plus afficher</string>
 
 </resources>
