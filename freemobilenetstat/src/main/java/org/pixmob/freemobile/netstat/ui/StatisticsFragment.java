@@ -18,11 +18,14 @@ package org.pixmob.freemobile.netstat.ui;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -136,6 +139,19 @@ public class StatisticsFragment extends Fragment implements LoaderCallbacks<Stat
     }
 
 	private void onMenuExport() {
+        if (ContextCompat.checkSelfPermission(getActivity(), Netstat.EXPORT_TASK_PERMISSION) == PackageManager.PERMISSION_GRANTED) {
+            launchExportTask();
+        }
+        else {
+            ActivityCompat.requestPermissions(
+                    getActivity(),
+                    new String[]{Netstat.EXPORT_TASK_PERMISSION},
+                    Netstat.EXPORT_TASK_PERMISSION_CODE
+            );
+        }
+    }
+
+    public void launchExportTask() {
         exportTask = new ExportTask(getActivity().getApplicationContext(), getFragmentManager());
         exportTask.execute();
     }

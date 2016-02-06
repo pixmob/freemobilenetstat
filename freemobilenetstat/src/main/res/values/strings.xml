@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">Free Mobile Netstat</string>
+    <string name="permission_request">Demande de permission</string>
     <string name="stat_connected_to_foreign_mobile_network">Connecté à un réseau étranger</string>
     <string name="stat_connected_to_mobile_network">Connecté au réseau %s</string>
     <string name="stat_airplane_mode_on">Mode avion détecté</string>
@@ -66,6 +67,8 @@
     <string name="pref_notif_sound_femto_summary">Avertir lorsque le téléphone bascule sur une Femtocell Free Mobile</string>
     <string name="pref_enable_auto_restart_service">Relancement automatique du service</string>
     <string name="pref_enable_auto_restart_service_summary">Si la notification ne s\'actualise plus (Bug KitKat).</string>
+    <string name="pref_enable_manual_mode_detection">Détecter la sélection manuelle</string>
+    <string name="pref_enable_manual_mode_detection_summary">Un message d\'erreur apparaîtra si vous avez activé le mode de sélection manuel.</string>
     <string name="pref_time_interval">Afficher les données depuis…</string>
     <string name="pref_notif">Notification</string>
     <string name="pref_notif_action">Action de la notification</string>
@@ -93,5 +96,21 @@
     <string name="network_free_mobile_4G">Free 4G</string>
     <string name="network_orange_2G">Orange 2G</string>
     <string name="network_orange_3G">Orange 3G</string>
+
+    <string name="required_permission_explanation_title">L\'application a besoin de certaines permissions.</string>
+    <string name="required_permission_explanation_message">
+        Ces permissions sont nécessaires pour accéder aux informations sur l\'antenne en cours d\'utilisation.
+        En aucun cas elles ne seront utilisées à d\'autres fins.
+        Si vous avez définitivement refusé les permissions, réinstallez l\'application.
+    </string>
+
+    <string name="manual_mode_dialog_title">Sélection manuelle de l\'opérateur détectée</string>
+    <string name="manual_mode_dialog_message">
+        La sélection manuelle a pour conséquence de vous enfermer sur le réseau d\'Orange après un certain temps (même si Free est sélectionné).
+        Choisissez la sélection automatique dans paramètres opérateur de votre téléphone.
+    </string>
+    <string name="manual_mode_dialog_action_dismiss">Ne plus afficher</string>
+    <string name="manual_mode_dialog_action_close">Fermer</string>
+    <string name="manual_mode_dialog_action_open_network_settings">Ouvrir les paramètres opérateur</string>
 
 </resources>

@@ -17,6 +17,12 @@
             android:dialogTitle="@string/pref_time_interval"
             android:key="pref_time_interval"
             android:title="@string/pref_time_interval" />
+
+        <CheckBoxPreference
+            android:enabled="true"
+            android:key="pref_manual_mode_detection_enabled"
+            android:title="@string/pref_enable_manual_mode_detection"
+            android:summary="@string/pref_enable_manual_mode_detection_summary" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="notif_category"

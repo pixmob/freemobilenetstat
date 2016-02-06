@@ -19,7 +19,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.util.Log;
+
+import org.pixmob.freemobile.netstat.ui.Netstat;
 
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AT_BOOT;
 import static org.pixmob.freemobile.netstat.Constants.SP_NAME;
@@ -34,16 +37,22 @@ public class MonitorServiceStarter extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
-            final SharedPreferences p = context.getSharedPreferences(SP_NAME,
-                Context.MODE_PRIVATE);
+            final SharedPreferences p = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
             final boolean enabled = p.getBoolean(SP_KEY_ENABLE_AT_BOOT, false);
             if (!enabled) {
                 Log.i(TAG, "Monitor service is not started at boot");
             } else {
                 Log.i(TAG, "Starting monitor service");
                 
-                final Context c = context.getApplicationContext();
-                c.startService(new Intent(c, MonitorService.class));
+                final Context applicationContext = context.getApplicationContext();
+                if (PermissionsManager.checkRequiredPermissions(applicationContext) == PackageManager.PERMISSION_GRANTED) {
+                    applicationContext.startService(new Intent(applicationContext, MonitorService.class));
+                }
+                else {
+                    Intent mainActivityIntent = new Intent(applicationContext, Netstat.class);
+                    mainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    applicationContext.startActivity(mainActivityIntent);
+                }
             }
         }
     }

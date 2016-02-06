@@ -98,7 +98,7 @@ class ExportTask extends AsyncTask<Void, Integer, Boolean> {
                 Toast.LENGTH_SHORT).show();
             aborted = true;
         } else {
-            new ExportDialogFragment().show(fragmentManager, DIALOG_TAG);
+            fragmentManager.beginTransaction().add(new ExportDialogFragment(), DIALOG_TAG).commitAllowingStateLoss();
         }
     }
     

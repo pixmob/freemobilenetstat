@@ -81,6 +81,10 @@ public final class Constants {
      */
     public static final String SP_KEY_ENABLE_NOTIF_ACTIONS = "pref_enable_notif_actions";
     /**
+     * {@link SharedPreferences} key: detect manual mode selection when starting the application
+     */
+    public static final String SP_KEY_MANUAL_MODE_DETECTION_ENABLED = "pref_manual_mode_detection_enabled";
+    /**
      * Notification action: open network operator settings.
      */
     public static final String NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS = "network_operator_settings";

@@ -15,24 +15,42 @@
  */
 package org.pixmob.freemobile.netstat.ui;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
+import android.telephony.PhoneStateListener;
+import android.telephony.ServiceState;
+import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
+import org.pixmob.freemobile.netstat.Constants;
 import org.pixmob.freemobile.netstat.MobileOperator;
 import org.pixmob.freemobile.netstat.MonitorService;
+import org.pixmob.freemobile.netstat.PermissionsManager;
+import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.SyncService;
 import org.pixmob.freemobile.netstat.SyncServiceTesting;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
+import org.pixmob.freemobile.netstat.util.IntentFactory;
 
 /**
  * Main application activity.
@@ -40,6 +58,15 @@ import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
  */
 @SuppressLint("CommitPrefEdits")
 public class Netstat extends FragmentActivity {
+
+    public static final String[] REQUIRED_PERMISSIONS = {
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.READ_PHONE_STATE,
+    };
+    public static final String EXPORT_TASK_PERMISSION = Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
+    public static final int REQUIRED_PERMISSIONS_CODE = 0;
+    public static final int EXPORT_TASK_PERMISSION_CODE = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,20 +76,14 @@ public class Netstat extends FragmentActivity {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
         }
 
-        if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null)
+        if (getSupportFragmentManager().findFragmentById(android.R.id.content) == null) {
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, new StatisticsFragment()).commitAllowingStateLoss();
+        }
 
         if (MobileOperator.FREE_MOBILE.isCurrentSimOwner(this) != 1) {
             new UnsupportedSimDialogFragment().show(getSupportFragmentManager(), "error");
             return;
         }
-
-        final Context c = getApplicationContext();
-        final Intent i = new Intent(c, MonitorService.class);
-        c.startService(i);
-
-        SyncServiceTesting.schedule(this, true);
-        SyncService.schedule(this, true);
 
         final int applicationVersion;
         try {
@@ -84,6 +105,145 @@ public class Netstat extends FragmentActivity {
             // The application was updated: let's show changelog.
             startActivity(new Intent(this, DocumentBrowser.class).putExtra(DocumentBrowser.INTENT_EXTRA_URL,
                     "CHANGELOG.html"));
+        }
+
+        requestRequiredPermissions();
+    }
+
+    private void checkManualMode() {
+        final SharedPreferences prefs = getSharedPreferences(Constants.SP_NAME, MODE_PRIVATE);
+        final boolean manualModeDetectionEnabled = prefs.getBoolean(Constants.SP_KEY_MANUAL_MODE_DETECTION_ENABLED, true);
+
+        if (manualModeDetectionEnabled) {
+            PhoneStateListener mPhoneListener = new PhoneStateListener() {
+                @Override
+                public void onServiceStateChanged(ServiceState serviceState) {
+                    if (serviceState.getIsManualSelection()) {
+                        showManualModeDialog();
+                    }
+                    super.onServiceStateChanged(serviceState);
+                }
+            };
+
+            TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+            tm.listen(mPhoneListener, PhoneStateListener.LISTEN_SERVICE_STATE);
+            tm.listen(mPhoneListener, PhoneStateListener.LISTEN_NONE);
+        }
+    }
+
+    private void showManualModeDialog() {
+        final Resources res = getResources();
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this)
+                .setTitle(res.getString(R.string.manual_mode_dialog_title))
+                .setMessage(res.getString(R.string.manual_mode_dialog_message))
+                .setNegativeButton(
+                        res.getString(R.string.manual_mode_dialog_action_dismiss),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                final SharedPreferences prefs = getSharedPreferences(Constants.SP_NAME, MODE_PRIVATE);
+                                final SharedPreferences.Editor prefsEditor = prefs.edit();
+                                prefsEditor.putBoolean(Constants.SP_KEY_MANUAL_MODE_DETECTION_ENABLED, false);
+                                Features.getFeature(SharedPreferencesSaverFeature.class).save(prefsEditor);
+                            }
+                        }
+                )
+                .setNeutralButton(
+                        res.getString(R.string.manual_mode_dialog_action_close),
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        }
+                );
+
+        final Intent networkOperatorSettingsIntent = IntentFactory.networkOperatorSettings(this);
+        if (networkOperatorSettingsIntent != null) {
+            alertDialogBuilder = alertDialogBuilder.setPositiveButton(
+                    res.getString(R.string.manual_mode_dialog_action_open_network_settings),
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(networkOperatorSettingsIntent);
+                        }
+                    }
+            );
+        }
+
+        alertDialogBuilder = alertDialogBuilder.setIcon(android.R.drawable.ic_dialog_alert);
+
+        alertDialogBuilder.show();
+    }
+
+    private void requestRequiredPermissions() {
+        if (PermissionsManager.checkSelfPermissions(this, REQUIRED_PERMISSIONS) != PackageManager.PERMISSION_GRANTED) {
+            if (PermissionsManager.shouldShowRequestPermissionsRationale(this, REQUIRED_PERMISSIONS)) {
+                showPermissionExplanationDialog();
+            }
+            else {
+                ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUIRED_PERMISSIONS_CODE);
+            }
+        }
+        else {
+            checkManualMode();
+            startService();
+        }
+
+    }
+
+    private void showPermissionExplanationDialog() {
+        final Activity _this = this;
+        Resources res = getResources();
+
+        showInformationDialog(
+                res.getString(R.string.required_permission_explanation_title),
+                res.getString(R.string.required_permission_explanation_message),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        ActivityCompat.requestPermissions(_this, REQUIRED_PERMISSIONS, REQUIRED_PERMISSIONS_CODE);
+                    }
+                }
+        );
+    }
+
+    private void showInformationDialog(String title, String message, DialogInterface.OnClickListener callback) {
+        new AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(
+                    android.R.string.yes,
+                    callback
+            )
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
+    }
+
+    private void startService() {
+        final Context c = getApplicationContext();
+        final Intent i = new Intent(c, MonitorService.class);
+        c.startService(i);
+
+        SyncServiceTesting.schedule(this, true);
+        SyncService.schedule(this, true);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUIRED_PERMISSIONS_CODE:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkManualMode();
+                    startService();
+                } else {
+                    showPermissionExplanationDialog();
+                }
+
+                break;
+            case EXPORT_TASK_PERMISSION_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    ((StatisticsFragment)getSupportFragmentManager().findFragmentById(android.R.id.content)).launchExportTask();
+                }
+
+                break;
         }
     }
     

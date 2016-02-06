@@ -19,9 +19,8 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import org.acra.ACRA;
-import org.acra.annotation.ReportsCrashes;
-import org.acra.sender.HttpSender;
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
 import org.pixmob.freemobile.netstat.feature.StrictModeFeature;
@@ -46,24 +45,13 @@ import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
 /**
  * Global application state.
  * @author Pixmob
- * add ACRA setup : https://github.com/ACRA/acra/wiki/BasicSetup
  */
-@ReportsCrashes(
-        formUri = "https://freemobilenetstat.iriscouch.com/acra-freemobilenetstat/_design/acra-storage/_update/report",
-        reportType = HttpSender.Type.JSON,
-        httpMethod = HttpSender.Method.PUT,
-        formUriBasicAuthLogin = "",
-        formUriBasicAuthPassword = ""
-)
 public class Application extends android.app.Application {
     @SuppressLint("CommitPrefEdits")
     @Override
     public void onCreate() {
         super.onCreate();
-
-        // The following line triggers the initialization of ACRA
-        ACRA.init(this);
-        ACRA.getErrorReporter().setEnabled(!DEBUG);
+        Fabric.with(this, new Crashlytics());
 
         if (DEBUG) {
             // StrictMode is a developer only feature.

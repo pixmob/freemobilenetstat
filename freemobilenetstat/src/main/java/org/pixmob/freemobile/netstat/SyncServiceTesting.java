@@ -52,6 +52,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
@@ -65,8 +66,8 @@ import static org.pixmob.freemobile.netstat.Constants.TAG;
  */
 public class SyncServiceTesting extends IntentService {
     private static final Random RANDOM = new Random();
-    private static final String SERVER_API_URL = "http://freemobile-netstat.appspot.com/";
-    private static final int SERVER_API_VERSION = 1;
+    private static final String SERVER_API_URL = "http://212.47.249.177/";
+    private static final int SERVER_API_VERSION = 2;
     private static final String EXTRA_DEVICE_REG = "org.pixmob.freemobile.netstat.deviceReg";
     private static final long DAY_IN_MILLISECONDS = 86400 * 1000;
     private static final int SYNC_UPLOADED = 1;
@@ -189,8 +190,8 @@ public class SyncServiceTesting extends IntentService {
 
         Log.i(TAG, "Initializing statistics before uploading");
 
-        final LongSparseArray< DailyStat> stats = new LongSparseArray<>(15);
-        final Set< Long> uploadedStats = new HashSet<>(15);
+        final LongSparseArray<DailyStat> stats = new LongSparseArray<>(15);
+        final Set<Long> uploadedStats = new HashSet<>(15);
         final long statTimestampStart = now - 7 * DAY_IN_MILLISECONDS;
 
         // Get pending uploads.
@@ -442,7 +443,7 @@ public class SyncServiceTesting extends IntentService {
     private String createServerUrl(String path) {
         final String safePath;
         if (path == null) {
-            return SERVER_API_URL;
+            return SERVER_API_URL + SERVER_API_VERSION;
         } else if (path.startsWith("/")) {
             safePath = path;
         } else {
@@ -503,7 +504,8 @@ public class SyncServiceTesting extends IntentService {
     }
 
     private static long dateAtMidnight(long d) {
-        final Calendar cal = Calendar.getInstance();
+        TimeZone timeZone = TimeZone.getTimeZone("Europe/Paris");
+        final Calendar cal = Calendar.getInstance(timeZone);
         cal.setTimeInMillis(d);
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
@@ -514,7 +516,7 @@ public class SyncServiceTesting extends IntentService {
     }
 
     private static class UploadDatabaseHelper extends SQLiteOpenHelper {
-        private static final int UPLOAD_DATABASE_VERSION = 3;
+        private static final int UPLOAD_DATABASE_VERSION = 4;
 
         public UploadDatabaseHelper(final Context context) {
             super(context, "upload_testing.db", null, UPLOAD_DATABASE_VERSION);
