@@ -87,6 +87,11 @@
             android:key="pref_enable_auto_restart_service"
             android:summary="@string/pref_enable_auto_restart_service_summary"
             android:title="@string/pref_enable_auto_restart_service" />
+
+        <CheckBoxPreference
+            android:key="pref_enable_auto_send_phone_listener_events"
+            android:summary="@string/pref_enable_auto_send_phone_listener_events_summary"
+            android:title="@string/pref_enable_auto_send_phone_listener_events" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_about">
         <Preference

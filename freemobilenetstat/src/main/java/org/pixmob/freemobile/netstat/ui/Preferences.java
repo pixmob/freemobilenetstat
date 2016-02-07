@@ -48,6 +48,7 @@ import static org.pixmob.freemobile.netstat.Constants.INTERVAL_SINCE_BOOT;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_NETWORK_OPERATOR_SETTINGS;
 import static org.pixmob.freemobile.netstat.Constants.NOTIF_ACTION_STATISTICS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_SEND_PHONE_LISTENER_EVENTS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_NOTIF_ACTION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_4G;
@@ -183,6 +184,13 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
         	// Disable auto restart service workaround if not on KitKat nor Jelly Bean
             final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
         	g.removePreference(pm.findPreference(SP_KEY_ENABLE_AUTO_RESTART_SERVICE));
+        }
+
+
+        if (!(MonitorService.ONE_PLUS_TWO_MANUFACTURER.equals(Build.MANUFACTURER) && MonitorService.ONE_PLUS_TWO_MODEL.equals(Build.MODEL))) {
+            // Disable auto refresh TelephonyListener workaround if not OnePlusTwo
+            final PreferenceGroup g = (PreferenceGroup) pm.findPreference("notif_category");
+            g.removePreference(pm.findPreference(SP_KEY_ENABLE_AUTO_SEND_PHONE_LISTENER_EVENTS));
         }
     }
 

@@ -60,6 +60,10 @@ public final class Constants {
      */
     public static final String SP_KEY_ENABLE_AUTO_RESTART_SERVICE = "pref_enable_auto_restart_service";
     /**
+     * {@link SharedPreferences} key: enable a workaround for OnePlusTwo not update notification.
+     */
+    public static final String SP_KEY_ENABLE_AUTO_SEND_PHONE_LISTENER_EVENTS = "pref_enable_auto_send_phone_listener_events";
+    /**
      * {@link SharedPreferences} key: set the time interval for displayed data.
      */
     public static final String SP_KEY_TIME_INTERVAL = "pref_time_interval";

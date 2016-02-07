@@ -65,10 +65,12 @@
     <string name="pref_notif_sound_4g_summary">Avertir lorsque le téléphone bascule sur le réseau Free Mobile 4G (ne fonctionne que à partir de Honeycomb)</string>
     <string name="pref_notif_sound_femto">Alarme sonore Free Mobile Femtocell</string>
     <string name="pref_notif_sound_femto_summary">Avertir lorsque le téléphone bascule sur une Femtocell Free Mobile</string>
-    <string name="pref_disable_all_sounds">Désactiver toutes les alertes</string>
-    <string name="pref_disable_all_sounds_summary">Tous les alertes sonores seront désactivées</string>
+    <string name="pref_disable_all_sounds">Désactiver toutes les alarmes</string>
+    <string name="pref_disable_all_sounds_summary">Tous les alarmes sonores seront désactivées</string>
     <string name="pref_enable_auto_restart_service">Relancement automatique du service</string>
     <string name="pref_enable_auto_restart_service_summary">Si la notification ne s\'actualise plus (Bug KitKat).</string>
+    <string name="pref_enable_auto_send_phone_listener_events">Support pour le One+2</string>
+    <string name="pref_enable_auto_send_phone_listener_events_summary">Solution de contournement pour le One+2 (peut réduire l\'autonomie)</string>
     <string name="pref_enable_manual_mode_detection">Détecter la sélection manuelle</string>
     <string name="pref_enable_manual_mode_detection_summary">Un message d\'erreur apparaîtra si vous avez activé le mode de sélection manuel.</string>
     <string name="pref_time_interval">Afficher les données depuis…</string>
@@ -98,7 +100,7 @@
     <string name="network_free_mobile_4G">Free 4G</string>
     <string name="network_orange_2G">Orange 2G</string>
     <string name="network_orange_3G">Orange 3G</string>
-    <string name="all_alerts_removed">Toutes les alertes ont été supprimées.</string>
+    <string name="all_alerts_removed">Toutes les alarmes ont été supprimées.</string>
 
     <string name="required_permission_explanation_title">L\'application a besoin de certaines permissions.</string>
     <string name="required_permission_explanation_message">

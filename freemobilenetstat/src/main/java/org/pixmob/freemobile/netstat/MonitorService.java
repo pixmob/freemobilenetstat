@@ -72,6 +72,7 @@ import java.util.concurrent.BlockingQueue;
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.ACTION_NOTIFICATION;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_RESTART_SERVICE;
+import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_AUTO_SEND_PHONE_LISTENER_EVENTS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_ENABLE_NOTIF_ACTIONS;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_4G;
 import static org.pixmob.freemobile.netstat.Constants.SP_KEY_STAT_NOTIF_SOUND_FEMTO;
@@ -356,7 +357,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             ensureServiceStaysRunning();
         }
 
-        if (MonitorService.ONE_PLUS_TWO_MANUFACTURER.equals(Build.MANUFACTURER) && MonitorService.ONE_PLUS_TWO_MODEL.equals(Build.MODEL)) {
+        if (prefs.getBoolean(SP_KEY_ENABLE_AUTO_SEND_PHONE_LISTENER_EVENTS, false) &&
+                ONE_PLUS_TWO_MANUFACTURER.equals(Build.MANUFACTURER) && ONE_PLUS_TWO_MODEL.equals(Build.MODEL)) {
             // One+2 (OxygenOS) does not send PhoneState events when the application is in foreground.
             // This is a bug. We are still waiting for a solution. This workaround will force PhoneState to refresh.
             refreshPhoneStatePeriodically();
@@ -519,7 +521,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     }
 
     private void refreshPhoneStatePeriodically() {
-        if (DEBUG) Log.e(TAG, "refreshPhoneStatePeriodically > Setting service restart");
+        if (DEBUG) Log.d(TAG, "refreshPhoneStatePeriodically > Setting service restart");
         final Handler h = new Handler();
         final int delay = 60 * 1000; //milliseconds
 
@@ -527,7 +529,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             public void run(){
                 tm.listen(phoneMonitor, PhoneStateListener.LISTEN_NONE);
                 tm.listen(phoneMonitor, telephonyManagerEvents);
-                ensureServiceStaysRunning();
+                refreshPhoneStatePeriodically();
             }
         }, delay);
     }
