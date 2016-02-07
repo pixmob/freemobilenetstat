@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -59,6 +60,7 @@ import android.util.Log;
 import android.util.SparseIntArray;
 
 import org.pixmob.freemobile.netstat.content.NetstatContract.Events;
+import org.pixmob.freemobile.netstat.ui.Netstat;
 import org.pixmob.freemobile.netstat.util.IntentFactory;
 
 import java.util.ArrayList;
@@ -203,10 +205,26 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         }
     }
 
+    private boolean checkRequiredPermissions() {
+        if (PermissionsManager.checkRequiredPermissions(this) != PackageManager.PERMISSION_GRANTED) {
+            Intent mainActivityIntent = new Intent(this, Netstat.class);
+            mainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(mainActivityIntent);
+            stopSelf();
+            return false;
+        }
+
+        return true;
+    }
+
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
     public void onCreate() {
         super.onCreate();
+
+        if (!checkRequiredPermissions()) {
+            return;
+        }
 
         pm = (PowerManager) getSystemService(POWER_SERVICE);
         tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
@@ -369,6 +387,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     public void onDestroy() {
         super.onDestroy();
 
+        if (!checkRequiredPermissions()) {
+            return;
+        }
+
         // Tell the PendingInsert worker thread to stop.
         try {
             pendingInsert.put(STOP_PENDING_CONTENT_MARKER);
@@ -410,6 +432,9 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (!checkRequiredPermissions()) {
+            return START_NOT_STICKY;
+        }
 
         if (intent != null) //we have intent to handle
         {
@@ -432,8 +457,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             }
         }
 
-        if (stopServiceIfSimOperatorIsNotFreeMobile())
+        if (stopServiceIfSimOperatorIsNotFreeMobile()) {
+            stopSelf();
             return START_NOT_STICKY;
+        }
         
         // Update with current state.
         onConnectivityUpdated();
