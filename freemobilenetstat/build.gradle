@@ -23,8 +23,8 @@ android {
         applicationId "org.pixmob.freemobile.netstat"
         minSdkVersion 8
         targetSdkVersion 23
-        versionCode 59
-        versionName "2.3.1"
+        versionCode 60
+        versionName "2.3.2"
     }
 
     buildTypes {
