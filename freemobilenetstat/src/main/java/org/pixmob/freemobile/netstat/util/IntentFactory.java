@@ -43,16 +43,18 @@ public final class IntentFactory {
     public static Intent networkOperatorSettings(Context context) {
         // Check if the network operator settings intent is available.
         Intent networkOperatorSettingsIntent = new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS);
-        boolean networkOperatorSettingsAvailable = isIntentAvailable(context, networkOperatorSettingsIntent);
-        if (!networkOperatorSettingsAvailable) {
-            // The previous intent action is not available with some devices:
-            // http://stackoverflow.com/a/6789616/422906
-            networkOperatorSettingsIntent = new Intent(Intent.ACTION_MAIN);
-            networkOperatorSettingsIntent.setComponent(new ComponentName("com.android.phone",
-                    "com.android.phone.NetworkSetting"));
-            networkOperatorSettingsAvailable = isIntentAvailable(context, networkOperatorSettingsIntent);
+
+        ComponentName cName;
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            cName = new ComponentName("com.android.phone", "com.android.phone.Settings");
         }
-        return (networkOperatorSettingsAvailable) ? networkOperatorSettingsIntent : null;
+        else {
+            cName = new ComponentName("com.android.phone","com.android.phone.MobileNetworkSettings");
+        }
+
+        networkOperatorSettingsIntent.setComponent(cName);
+        return isIntentAvailable(context, networkOperatorSettingsIntent) ? networkOperatorSettingsIntent : null;
     }
 
     /**
