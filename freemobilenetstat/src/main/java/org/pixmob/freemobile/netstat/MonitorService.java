@@ -132,25 +132,29 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
     private static final List<Integer> FEMTOCELL_AVAILABLE_NETWORK_TYPE = new ArrayList<>();
 
+    private static final String[] POWEROFF_INTENT_FILTER_ACTIONS = {
+            Intent.ACTION_SHUTDOWN,
+            // HTC devices use a different Intent action:
+            // http://stackoverflow.com/q/5076410/422906
+            "android.intent.action.QUICKBOOT_POWEROFF",
+    };
+
     /**
      * This intent will open the main UI.
      */
     private PendingIntent openUIPendingIntent;
     private PendingIntent networkOperatorSettingsPendingIntent;
     private PendingIntent wirelessSettingsPendingIntent;
-    private IntentFilter batteryIntentFilter;
     private PowerManager pm;
     private TelephonyManager tm;
     private int telephonyManagerEvents;
     private ConnectivityManager cm;
-    private BroadcastReceiver screenMonitor;
+    private BroadcastReceiver broadcastReceiver;
     private PhoneStateListener phoneMonitor;
-    private BroadcastReceiver connectionMonitor;
-    private BroadcastReceiver batteryMonitor;
-    private BroadcastReceiver shutdownMonitor;
     private Boolean lastWifiConnected;
     private Boolean lastMobileNetworkConnected;
     private boolean powerOn = true;
+    private int batteryLevel;
     private boolean firstInsert = true;
     private String lastMobileOperatorId;
     private String mobileOperatorId;
@@ -276,31 +280,54 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             wirelessSettingsPendingIntent = PendingIntent.getActivity(this, 0, wirelessSettingsIntent, PendingIntent.FLAG_CANCEL_CURRENT);
         }
 
-        // Watch screen light: is the screen on?
-        screenMonitor = new BroadcastReceiver() {
+        // Initialize battery level. Do this before initializing events, so that we don't risk to put wrong value for battery.
+        batteryLevel = getBatteryLevel();
+
+        broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                final String action = intent.getAction();
+
+                if (Arrays.asList(POWEROFF_INTENT_FILTER_ACTIONS).contains(action)) {
+                    onDeviceShutdown();
+                    return;
+                }
+
+                if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action))
+                    if (!onConnectivityUpdated())
+                        return;
+
+                if (Intent.ACTION_BATTERY_CHANGED.equals(action)) {
+                    int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                    int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+
+                    if (level != -1 && scale != -1) {
+                        batteryLevel = parseBatteryLevel(level, scale);
+                    }
+                }
+
                 updateEventDatabase();
             }
         };
 
-        final IntentFilter screenIntentFilter = new IntentFilter();
-        screenIntentFilter.addAction(Intent.ACTION_SCREEN_ON);
-        screenIntentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-        registerReceiver(screenMonitor, screenIntentFilter);
+        final IntentFilter intentFilter = new IntentFilter();
 
-        // Watch Wi-Fi connections.
-        connectionMonitor = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (onConnectivityUpdated()) {
-                    updateEventDatabase();
-                }
-            }
-        };
+        // Watch screen light: is the screen on?
+        intentFilter.addAction(Intent.ACTION_SCREEN_ON);
+        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
 
-        final IntentFilter connectionIntentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(connectionMonitor, connectionIntentFilter);
+        // Watch Wi-Fi connections
+        intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+
+        // Watch battery level.
+        intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
+
+        // Watch shutdown
+        intentFilter.addAction(Intent.ACTION_SHUTDOWN);
+        intentFilter.addAction("android.intent.action.QUICKBOOT_POWEROFF");
+
+        registerReceiver(broadcastReceiver, intentFilter);
+
 
         // Watch mobile connections.
         phoneMonitor = new PhoneStateListener() {
@@ -326,7 +353,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             }
 
             private void updateService() {
-                if (tm != null) { // Fix NPE - found by Acralyzer
+                if (tm != null) { // Fix NPE
                     mobileNetworkType = tm.getNetworkType(); //update the network type to have the latest
                 }
                 final int phoneStateUpdated = onPhoneStateUpdated();
@@ -342,31 +369,6 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             telephonyManagerEvents |= PhoneStateListener.LISTEN_CELL_INFO;
 
         tm.listen(phoneMonitor, telephonyManagerEvents);
-
-        // Watch battery level.
-        batteryMonitor = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                updateEventDatabase();
-            }
-        };
-
-        batteryIntentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver(batteryMonitor, batteryIntentFilter);
-
-        shutdownMonitor = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                onDeviceShutdown();
-            }
-        };
-        final IntentFilter shutdownIntentFilter = new IntentFilter();
-        shutdownIntentFilter.addAction(Intent.ACTION_SHUTDOWN);
-        // HTC devices use a different Intent action:
-        // http://stackoverflow.com/q/5076410/422906
-        shutdownIntentFilter.addAction("android.intent.action.QUICKBOOT_POWEROFF");
-        registerReceiver(shutdownMonitor, shutdownIntentFilter);
-
 
         if (prefs.getBoolean(SP_KEY_ENABLE_AUTO_RESTART_SERVICE, false) &&
                 Arrays.asList(ANDROID_VERSIONS_ALLOWED_TO_AUTO_RESTART_SERVICE).contains(Build.VERSION.RELEASE)) {
@@ -399,11 +401,8 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         }
 
         // Stop listening to system events.
-        unregisterReceiver(screenMonitor);
+        unregisterReceiver(broadcastReceiver);
         tm.listen(phoneMonitor, PhoneStateListener.LISTEN_NONE);
-        unregisterReceiver(connectionMonitor);
-        unregisterReceiver(batteryMonitor);
-        unregisterReceiver(shutdownMonitor);
 
         tm = null;
         cm = null;
@@ -853,7 +852,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
         final Event e = new Event();
         e.timestamp = System.currentTimeMillis();
         e.screenOn = pm != null && pm.isScreenOn();
-        e.batteryLevel = getBatteryLevel();
+        e.batteryLevel = this.batteryLevel;
         e.wifiConnected = Boolean.TRUE.equals(lastWifiConnected);
         e.mobileConnected = powerOn && Boolean.TRUE.equals(lastMobileNetworkConnected);
         e.mobileOperator = lastMobileOperatorId;
@@ -872,17 +871,23 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     }
 
     private int getBatteryLevel() {
-        if (batteryIntentFilter == null) {
-            return 100;
-        }
-        final Intent i = registerReceiver(null, batteryIntentFilter);
-        if (i == null) {
+        Intent batteryIntent = registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+
+        if (batteryIntent == null) {
             return 100;
         }
 
-        final int level = i.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-        final int scale = i.getIntExtra(BatteryManager.EXTRA_SCALE, 0);
+        int level = batteryIntent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryIntent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
+        if(level == -1 || scale == -1) {
+            return 100;
+        }
+
+        return parseBatteryLevel(level, scale);
+    }
+
+    private int parseBatteryLevel(int level, int scale) {
         return scale == 0 ? 100 : (int) Math.round(level * 100d / scale);
     }
 
