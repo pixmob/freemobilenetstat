@@ -15,13 +15,9 @@
  */
 package org.pixmob.freemobile.netstat;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
-
-import io.fabric.sdk.android.Fabric;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
 import org.pixmob.freemobile.netstat.feature.StrictModeFeature;
@@ -50,11 +46,9 @@ import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
  * @author Pixmob
  */
 public class Application extends android.app.Application {
-    @SuppressLint("CommitPrefEdits")
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
 
         if (DEBUG) {
             // StrictMode is a developer only feature.
