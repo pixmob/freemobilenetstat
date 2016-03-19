@@ -787,6 +787,11 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 	 */
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	private void updateFemtocellStatus() {
+        // getAllCellInfo requires ACCESS_COARSE_LOCATION
+        if (!checkRequiredPermissions()) {
+            return;
+        }
+
         // No need to check LAC if current operator is not free mobile
         // And no need to check if network type is not femtocell supported network
         if ((!MobileOperator.FREE_MOBILE.equals(MobileOperator.fromString(mobileOperatorId)))
