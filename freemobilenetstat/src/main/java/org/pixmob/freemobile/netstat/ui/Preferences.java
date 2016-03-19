@@ -275,7 +275,7 @@ public class Preferences extends PreferenceActivity implements OnPreferenceClick
                 }
                 break;
             case SP_KEY_HOMESITE:
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://freemobilenetstat.appspot.com")));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://fm.netstat.fr")));
                 break;
             case SP_KEY_DISABLE_ALL_SOUNDS:
                 for (final String soundNotification : SOUND_NOTIFICATIONS_SP_KEYS) {
