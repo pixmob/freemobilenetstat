@@ -40,6 +40,10 @@
         <service
             android:name=".MonitorService"
             android:label="@string/service_monitor" />
+        <service
+            android:name="org.acra.sender.SenderService"
+            android:exported="false"
+            android:process=":acra" />
 
         <receiver
             android:name=".MonitorServiceStarter"

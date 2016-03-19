@@ -15,15 +15,20 @@
  */
 package org.pixmob.freemobile.netstat;
 
+
+import java.util.HashMap;
+import java.util.Map;
+
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+
+import org.acra.*;
+import org.acra.annotation.*;
 
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
 import org.pixmob.freemobile.netstat.feature.StrictModeFeature;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.pixmob.freemobile.netstat.BuildConfig.DEBUG;
 import static org.pixmob.freemobile.netstat.Constants.INTERVAL_SINCE_BOOT;
@@ -45,7 +50,18 @@ import static org.pixmob.freemobile.netstat.Constants.THEME_DEFAULT;
  * Global application state.
  * @author Pixmob
  */
+@ReportsCrashes(
+    formUri = "http://collector.tracepot.com/ef2af7a4"
+)
 public class Application extends android.app.Application {
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+
+        // The following line triggers the initialization of ACRA
+        ACRA.init(this);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
