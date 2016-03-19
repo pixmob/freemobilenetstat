@@ -92,7 +92,7 @@ public class SyncService extends IntentService {
         final AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         final PendingIntent syncIntent =
             PendingIntent.getService(appContext, 0, new Intent(appContext, SyncService.class),
-                PendingIntent.FLAG_CANCEL_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT);
         am.cancel(syncIntent);
 
         if (enabled) {
