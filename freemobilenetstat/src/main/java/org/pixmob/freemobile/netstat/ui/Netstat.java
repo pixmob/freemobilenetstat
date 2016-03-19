@@ -44,7 +44,6 @@ import org.pixmob.freemobile.netstat.MonitorService;
 import org.pixmob.freemobile.netstat.PermissionsManager;
 import org.pixmob.freemobile.netstat.R;
 import org.pixmob.freemobile.netstat.SyncService;
-import org.pixmob.freemobile.netstat.SyncServiceTesting;
 import org.pixmob.freemobile.netstat.feature.Features;
 import org.pixmob.freemobile.netstat.feature.SharedPreferencesSaverFeature;
 import org.pixmob.freemobile.netstat.util.IntentFactory;
@@ -221,7 +220,6 @@ public class Netstat extends FragmentActivity {
         final Intent i = new Intent(c, MonitorService.class);
         c.startService(i);
 
-        SyncServiceTesting.schedule(this, true);
         SyncService.schedule(this, true);
     }
 

@@ -34,7 +34,6 @@ public class ConnectivityListener extends BroadcastReceiver {
             final NetworkInfo ni = cm.getActiveNetworkInfo();
             final boolean scheduleSync = ni != null && ni.isAvailable() && ni.isConnected();
             SyncService.schedule(context, scheduleSync);
-            SyncServiceTesting.schedule(context, scheduleSync);
         }
     }
 }

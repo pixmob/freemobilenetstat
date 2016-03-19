@@ -353,7 +353,7 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
             }
 
             private void updateService() {
-                if (tm != null) { // Fix NPE
+                if (tm != null) {
                     mobileNetworkType = tm.getNetworkType(); //update the network type to have the latest
                 }
                 final int phoneStateUpdated = onPhoneStateUpdated();
@@ -553,6 +553,10 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
 
         h.postDelayed(new Runnable(){
             public void run(){
+                if (tm == null) {
+                    return;
+                }
+
                 tm.listen(phoneMonitor, PhoneStateListener.LISTEN_NONE);
                 tm.listen(phoneMonitor, telephonyManagerEvents);
                 refreshPhoneStatePeriodically();
@@ -678,7 +682,6 @@ public class MonitorService extends Service implements OnSharedPreferenceChangeL
     /**
      * Gets the state of Airplane Mode.
      */
-    @SuppressWarnings("deprecation")
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private boolean isAirplaneModeOn() {        
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
