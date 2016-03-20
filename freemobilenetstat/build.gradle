@@ -3,22 +3,19 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
-
     defaultConfig {
         applicationId "org.pixmob.freemobile.netstat"
         minSdkVersion 8
         targetSdkVersion 23
-        versionCode 61
-        versionName "2.4.0"
+        versionCode 62
+        versionName "2.4.1"
     }
-
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), "proguard-rules.txt"
         }
     }
-
     //use java 7
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
