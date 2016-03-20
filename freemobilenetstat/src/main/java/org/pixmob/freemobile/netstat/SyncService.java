@@ -46,6 +46,7 @@ import org.pixmob.httpclient.HttpClientException;
 import org.pixmob.httpclient.HttpResponse;
 import org.pixmob.httpclient.HttpResponseHandler;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Calendar;
@@ -84,7 +85,7 @@ public class SyncService extends IntentService {
     private SQLiteOpenHelper dbHelper;
 
     public SyncService() {
-        super("FreeMobileNetstat/SyncTesting");
+        super("FreeMobileNetstat/Sync");
     }
 
     public static void schedule(Context context, boolean enabled) {
@@ -518,22 +519,37 @@ public class SyncService extends IntentService {
     private static class UploadDatabaseHelper extends SQLiteOpenHelper {
         private static final int UPLOAD_DATABASE_VERSION = 5;
 
+        private final Context context;
+
         public UploadDatabaseHelper(final Context context) {
             super(context, "upload.db", null, UPLOAD_DATABASE_VERSION);
+            this.context = context;
+        }
+
+        private String[] schema() {
+            return new String[] {
+                "CREATE TABLE daily_stat(stat_timestamp TIMESTAMP PRIMARY KEY, "
+                    + "orange INTEGER NOT NULL, free_mobile INTEGER NOT NULL, "
+                    + "free_mobile_3g INTEGER NOT NULL, free_mobile_4g INTEGER NOT NULL, "
+                    + "free_mobile_femtocell INTEGER NOT NULL, sync INTEGER NOT NULL);",
+                "CREATE TABLE device(device_id TEXT PRIMARY KEY);"
+            };
+        }
+
+        private void applyStatements(SQLiteDatabase db, final String[] queries) {
+            for (final String query : queries) {
+                db.execSQL(query);
+            }
+        }
+
+        private void initSchema(SQLiteDatabase db) {
+            applyStatements(db, schema());
         }
 
         @Override
         public void onCreate(SQLiteDatabase db) {
             if (!db.isReadOnly()) {
-                String req =
-                    "CREATE TABLE daily_stat (stat_timestamp TIMESTAMP PRIMARY KEY, "
-                        + "orange INTEGER NOT NULL, free_mobile INTEGER NOT NULL, "
-                        + "free_mobile_3g INTEGER NOT NULL, free_mobile_4g INTEGER NOT NULL, "
-                        + "free_mobile_femtocell INTEGER NOT NULL, sync INTEGER NOT NULL)";
-                db.execSQL(req);
-
-                req = "CREATE TABLE device (device_id TEXT PRIMARY KEY)";
-                db.execSQL(req);
+                initSchema(db);
             }
         }
 
@@ -541,10 +557,6 @@ public class SyncService extends IntentService {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             if (!db.isReadOnly()) {
                 switch (oldVersion) {
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
                     case 4:
                         this.upgradeV4ToV5(db);
                         break;
@@ -557,15 +569,36 @@ public class SyncService extends IntentService {
         }
 
         private void upgradeV4ToV5(final SQLiteDatabase db) {
-            final String[] statements = {
+            String[] statements = new String[] {
                 "DROP TABLE IF EXISTS daily_stat;",
-                "DROP TABLE IF EXISTS device;",
-                "ALTER TABLE daily_stat_testing RENAME TO daily_stat;",
-                "ALTER TABLE device_testing RENAME TO device;"
+                "DROP TABLE IF EXISTS device;"
             };
-            for (String stmt : statements) {
-                db.execSQL(stmt);
+            applyStatements(db, statements);
+
+            initSchema(db);
+
+            final File db_testing = context.getDatabasePath("upload_testing.db");
+            if (!db_testing.exists()) {
+                return;
             }
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            db.execSQL("ATTACH DATABASE ? AS testing;", new String[]{db_testing.getAbsolutePath()});
+            db.beginTransaction();
+            statements = new String[] {
+                "INSERT INTO main.daily_stat(stat_timestamp, orange, free_mobile, free_mobile_3g, "
+                    + "free_mobile_4g, free_mobile_femtocell, sync) "
+                    + "SELECT * FROM testing.daily_stat_testing;",
+                "INSERT INTO main.device(device_id) SELECT * FROM testing.device_testing;"
+            };
+            applyStatements(db, statements);
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            db.execSQL("DETACH DATABASE testing;");
+            db.beginTransaction();
+
+            context.deleteDatabase("upload_testing.db");
         }
     }
 
